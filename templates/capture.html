@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <title>Redheads</title>
+  <meta charset='utf-8'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" media="all">
+  <script src="{{ url_for('static', filename='js/capture.js') }}">
+  </script>
+</head>
+  <body>
+      <div class="container" id="overlay">
+        <div class="footer navbar-fixed-bottom" id="choices">
+          <div class="col-xs-12">
+            <div class="camera">
+              <video id="video">Video stream not available.</video>
+              <button class="btn btn-lg glowing-border" id="startbutton">capture</button> 
+            </div>
+            <canvas id="canvas">
+            </canvas>
+            <div class="output">
+              <img id="photo" alt="The screen capture will appear in this box."> 
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>
+
