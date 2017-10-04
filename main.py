@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 
+from redheads.graphql import GraphQL
 
 app = Flask(__name__)
 
@@ -8,6 +9,11 @@ app = Flask(__name__)
 @app.route('/capture')
 def capture():
     return render_template('capture.html')
+
+
+@app.route('/product')
+def get_graphql_products():
+    return str(GraphQL.get_products())
 
 
 if __name__ == '__main__':

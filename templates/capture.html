@@ -4,11 +4,13 @@
   <title>Redheads</title>
   <meta charset='utf-8'>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" media="all">
-  <script src="{{ url_for('static', filename='js/capture.js') }}">
-  </script>
+  <script src="http://sdks.shopifycdn.com/js-buy-sdk/v0/latest/shopify-buy.umd.polyfilled.min.js"></script>
+  <script src="{{ url_for('static', filename='js/capture.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/shopify_buy.js') }}"></script>
 </head>
   <body>
-      <div class="container" id="overlay">
+    <button onclick="getProduct()">Get Product</button>
+      <!--<div class="container" id="overlay">
         <div class="footer navbar-fixed-bottom" id="choices">
           <div class="col-xs-12">
             <div class="camera">
@@ -22,7 +24,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div>-->
   </body>
 </html>
 

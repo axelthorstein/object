@@ -4,3 +4,4 @@ google-cloud-storage==1.4.0
 Pillow==4.2.1
 requests==2.18.4
 gunicorn==19.7.1
+graphene>=2.0.dev
