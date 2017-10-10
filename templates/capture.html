@@ -4,27 +4,37 @@
   <title>Redheads</title>
   <meta charset='utf-8'>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" media="all">
-  <script src="http://sdks.shopifycdn.com/js-buy-sdk/v0/latest/shopify-buy.umd.polyfilled.min.js"></script>
   <script src="{{ url_for('static', filename='js/capture.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/shopify_buy.js') }}"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js"></script>
+  <script>
+	  // Initialize Firebase
+	  // TODO: Replace with your project's customized code snippet
+	  var config = {
+		apiKey: "AIzaSyDAwxqpgWkeAhg85YyDy_xaBj4X53hnHek",
+		authDomain: "redheads-181023.firebaseapp.com",
+		databaseURL: "https://redheads-181023.firebaseio.com",
+		storageBucket: "gs://redheads-181023.appspot.com",
+		messagingSenderId: "253345171344",
+	  };
+	  firebase.initializeApp(config);
+  </script>
 </head>
   <body>
-    <button onclick="getProduct()">Get Product</button>
-      <!--<div class="container" id="overlay">
-        <div class="footer navbar-fixed-bottom" id="choices">
-          <div class="col-xs-12">
-            <div class="camera">
-              <video id="video">Video stream not available.</video>
-              <button class="btn btn-lg glowing-border" id="startbutton">capture</button> 
-            </div>
-            <canvas id="canvas">
-            </canvas>
-            <div class="output">
-              <img id="photo" alt="The screen capture will appear in this box."> 
-            </div>
+    <div class="container" id="overlay">
+      <div class="footer navbar-fixed-bottom" id="choices">
+        <div class="col-xs-12">
+          <div class="camera">
+            <video id="video">Video stream not available.</video>
+            <button class="btn btn-lg glowing-border" id="startbutton">capture</button> 
+          </div>
+          <canvas id="canvas">
+          </canvas>
+          <div class="output">
+            <img id="photo" alt="The screen capture will appear in this box."> 
           </div>
         </div>
-      </div>-->
+      </div>
+    </div>
   </body>
 </html>
 

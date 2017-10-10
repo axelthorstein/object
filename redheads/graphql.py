@@ -22,10 +22,28 @@ class GraphQL:
 
     def get_product(product_name):
         query = '{shop {productByHandle(handle: "' + product_name + '") {id}}}'
+
         return GraphQL.request(query)
 
-    def get_graphql_variant():
-        query = 'mutation {checkoutCreate(input: {lineItems: [{\
-                variantId: "Z2lkOi8vc2hvcGlmeS9Qcm9kdWN0VmFyaWFudC8zNTQ1MDE0MDQxOA==", quantity: 1 }]})\
-                {checkout {id webUrl lineItems(first: 5) {edges {node {title quantity}}}}}}'
+    def get_product_variants(product_name):
+        query = '{ shop { productByHandle(handle: "' + product_name + '")\
+                 { variants(first:3) { edges { node { id }}}}}}'
+
+        return GraphQL.request(query)
+
+    def build_line_items(variants):
+        variants = variants['data']['shop']['productByHandle']['variants']['edges']
+        line_items = "["
+        for variant in variants:
+            line_items += '{ variantId: "' + variant['node']['id'] + '", quantity: 1 }'
+
+        return str(line_items + ']')
+
+    def create_checkout(product_name):
+        variants = GraphQL.get_product_variants(product_name)
+        line_items = GraphQL.build_line_items(variants)
+        query = ('mutation {checkoutCreate(input: {lineItems: '
+                 + line_items
+                 + '}){checkout {id webUrl lineItems(first: 5) {edges {node {title quantity}}}}}}')
+
         return GraphQL.request(query)

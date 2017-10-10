@@ -95,6 +95,9 @@
   // other changes before drawing it.
 
   function takepicture() {
+    var storageRef = firebase.storage().ref();
+    var id = (Math.floor(Math.random() * (1000000 - 1)) + 1).toString();
+    var ref = storageRef.child("/images/" + id + ".png");
     var context = canvas.getContext('2d');
     if (width && height) {
       canvas.width = width;
@@ -102,6 +105,20 @@
       context.drawImage(video, 0, 0, width, height);
     
       var data = canvas.toDataURL('image/png');
+        ref.putString(data, 'data_url').then(function(snapshot) {
+        console.log('Uploaded a data_url string!');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', "http://localhost:8080/images/" + id, true);
+        xhr.send();
+        xhr.onreadystatechange = processRequest;
+        function processRequest(e) {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                //var response = JSON.parse(xhr.responseText);
+                console.log(xhr.responseText);
+                window.location.replace(xhr.responseText);
+            }
+        }
+        });
       photo.setAttribute('src', data);
     } else {
       clearphoto();
