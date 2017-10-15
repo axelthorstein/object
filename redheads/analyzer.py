@@ -29,6 +29,11 @@ class Analyzer:
 
     def detect_properties(self):
 
+        def get_rgb(color):
+            return (int(color.color.red),
+                    int(color.color.green),
+                    int(color.color.blue))
+
         def get_product(color):
             if color == "red":
                 return "heima"
@@ -40,11 +45,9 @@ class Analyzer:
         response = self.client.image_properties(image=self.image)
         properties = response.image_properties_annotation
 
-        color = properties.dominant_colors.colors[0]
-        color = self.get_color((int(color.color.red),
-                                int(color.color.green),
-                                int(color.color.blue)))
-        print(color)
+        primary_color = self.get_color(get_rgb(properties.dominant_colors.colors[0]))
+        secondary_color = self.get_color(get_rgb(properties.dominant_colors.colors[1]))
+        print(primary_color, secondary_color)
         return get_product(color)
 
     def get_color(self, rgb):
