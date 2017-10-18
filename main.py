@@ -5,6 +5,8 @@ from flask import render_template
 
 from redheads.graphql import GraphQL
 from redheads.analyzer import Analyzer
+from redheads.config import env
+
 
 app = Flask(__name__)
 

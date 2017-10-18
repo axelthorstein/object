@@ -108,12 +108,13 @@
         ref.putString(data, 'data_url').then(function(snapshot) {
         console.log('Uploaded a data_url string!');
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', "https://redheads-181023.appspot.com/images/" + id, true);
+        var getUrl = window.location;
+        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        xhr.open('GET', baseUrl + "/images/" + id, true);
         xhr.send();
         xhr.onreadystatechange = processRequest;
         function processRequest(e) {
             if (xhr.readyState == 4 && xhr.status == 200) {
-                //var response = JSON.parse(xhr.responseText);
                 console.log(xhr.responseText);
                 window.location.replace(xhr.responseText);
             }
