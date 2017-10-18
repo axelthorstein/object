@@ -48,7 +48,7 @@ class Analyzer:
         primary_color = self.get_color(get_rgb(properties.dominant_colors.colors[0]))
         secondary_color = self.get_color(get_rgb(properties.dominant_colors.colors[1]))
         print(primary_color, secondary_color)
-        return get_product(color)
+        return get_product(primary_color)
 
     def get_color(self, rgb):
 

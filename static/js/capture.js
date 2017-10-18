@@ -108,7 +108,7 @@
         ref.putString(data, 'data_url').then(function(snapshot) {
         console.log('Uploaded a data_url string!');
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', "http://localhost:8080/images/" + id, true);
+        xhr.open('GET', "https://redheads-181023.appspot.com/images/" + id, true);
         xhr.send();
         xhr.onreadystatechange = processRequest;
         function processRequest(e) {
