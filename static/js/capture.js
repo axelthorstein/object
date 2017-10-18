@@ -85,7 +85,9 @@
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
+    if (photo != null) {
+      photo.setAttribute('src', data);
+    }
   }
   
   // Capture a photo by fetching the current contents of the video
@@ -108,8 +110,7 @@
         ref.putString(data, 'data_url').then(function(snapshot) {
         console.log('Uploaded a data_url string!');
         var xhr = new XMLHttpRequest();
-        var getUrl = window.location;
-        var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+        var baseUrl = window.location.href.split('/capture')[0];
         xhr.open('GET', baseUrl + "/images/" + id, true);
         xhr.send();
         xhr.onreadystatechange = processRequest;
@@ -120,7 +121,9 @@
             }
         }
         });
-      photo.setAttribute('src', data);
+      if (photo != null) {
+        photo.setAttribute('src', data);
+      }
     } else {
       clearphoto();
     }
