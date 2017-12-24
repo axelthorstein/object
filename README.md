@@ -1,5 +1,5 @@
-# redheads
-Redefining Culture
+# Object
+Culture
 
 This project is the testing ground.
 

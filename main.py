@@ -3,10 +3,10 @@ import os
 from flask import Flask
 from flask import render_template
 
-from redheads.graphql import GraphQL
-from redheads.detect import Detect
-from redheads.config import env
-from redheads.firebase import Firebase
+from o.graphql import GraphQL
+from o.detect import Detect
+from o.config import env
+from o.firebase import Firebase
 
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def images(id):
     # db = Firebase(file_path)
     # db.download_image()
 
-    colors = Detect('/Users/axelthor/Projects/redheads/images/ring.png').detect_circle()
+    colors = Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
     # colors = Detect(file_path).detect_circle()
     product = PRODUCT_MAP[str(colors[0]) + "-" + str(colors[1])]
     print(product)
