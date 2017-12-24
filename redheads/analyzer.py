@@ -6,10 +6,11 @@ import webcolors
 
 class Analyzer:
 
-    def __init__(self, image_path):
-        self.client = vision.ImageAnnotatorClient()
-        self.image = types.Image()
-        self.image.source.image_uri = "gs://redheads-181023.appspot.com/" + image_path
+    # def __init__(self):
+        # self.client = vision.ImageAnnotatorClient()
+        # self.image = types.Image()
+        # self.image.source.image_uri = "gs://redheads-181023.appspot.com/" + image_path
+        # self.image.source.image_uri = "gs://redheads-181023.appspot.com/"
 
     def analyze(self):
         self.detect_labels()
@@ -50,7 +51,7 @@ class Analyzer:
         print(primary_color, secondary_color)
         return get_product(primary_color)
 
-    def get_color(self, rgb):
+    def get_color(rgb):
 
         def closest_color(requested_color):
             min_colors = {}

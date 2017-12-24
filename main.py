@@ -4,12 +4,17 @@ from flask import Flask
 from flask import render_template
 
 from redheads.graphql import GraphQL
-from redheads.analyzer import Analyzer
+from redheads.detect import Detect
 from redheads.config import env
+from redheads.firebase import Firebase
 
 
 app = Flask(__name__)
 
+
+PRODUCT_MAP = {
+    "crimson-gold" : "object-001",
+}
 
 @app.route('/capture')
 def capture():
@@ -30,11 +35,18 @@ def create_checkout(target):
 @app.route('/images/<id>', methods=["GET"])
 def images(id):
     file_path = "images/" + id + ".png"
-    analyzer = Analyzer(file_path)
 
-    color = analyzer.analyze()
+    # db = Firebase(file_path)
+    # db.download_image()
 
-    return GraphQL.create_checkout(color)['data']['checkoutCreate']['checkout']['webUrl']
+    colors = Detect('/Users/axelthor/Projects/redheads/images/ring.png').detect_circle()
+    # colors = Detect(file_path).detect_circle()
+    product = PRODUCT_MAP[str(colors[0]) + "-" + str(colors[1])]
+    print(product)
+
+    db.clean_up()
+
+    return GraphQL.create_checkout(product)['data']['checkoutCreate']['checkout']['webUrl']
 
 
 if __name__ == '__main__':
