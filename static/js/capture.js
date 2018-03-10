@@ -22,8 +22,11 @@
   function startup() {
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
+    canvasCircleOverlay = document.getElementById('canvas-circle-overlay');
     photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
+    canvas.setAttribute('width', 100);
+    canvas.setAttribute('height', 100);
 
     navigator.getMedia = ( navigator.getUserMedia ||
                            navigator.webkitGetUserMedia ||
@@ -59,16 +62,32 @@
         if (isNaN(height)) {
           height = width / (4/3);
         }
-      
+        
         video.setAttribute('width', width);
         video.setAttribute('height', height);
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
+        canvasCircleOverlay.setAttribute('width', width);
+        canvasCircleOverlay.setAttribute('height', height);
+
+        // Draw the circle overlay
+        var context = canvasCircleOverlay.getContext('2d');
+        context.beginPath();
+        context.lineWidth = 20;
+        context.strokeStyle = "#f1d3ff";
+        context.globalAlpha = 0.5;
+        context.arc(width/2, height/2, 90, 0, Math.PI * 2, true); // Outer circle
+        context.stroke();
+
+
+
         streaming = true;
       }
     }, false);
 
+
     startbutton.addEventListener('click', function(ev){
+
       takepicture();
       ev.preventDefault();
     }, false);
@@ -80,6 +99,9 @@
   // captured.
 
   function clearphoto() {
+
+
+
     var context = canvas.getContext('2d');
     context.fillStyle = "#AAA";
     context.fillRect(0, 0, canvas.width, canvas.height);

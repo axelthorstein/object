@@ -4,13 +4,13 @@
 /* ------------------------- */
 
 html {
-  position: relative;
-  min-height: 100%;
+  /*position: relative;*/
+  height: 100%;
 }
 
 body {
+  height: 100%;
   background-color: white;
-  margin-bottom: 44px;
   line-height: 1.57142857;
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -35,6 +35,22 @@ footer {
   bottom: 0;
   background-color: #fff;
   border-top: 1px solid #e0e0e0;
+}
+
+.video {
+  object-fit: cover;
+  height: 80%;
+  width: 100%;
+}
+
+#canvas-circle-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: auto;
 }
 
 .login-container {
@@ -296,8 +312,8 @@ textarea {
   }
 
   #overlay {
-    z-index: 1000;
-    position: absolute;
+    z-index: 0;
+    /*position: absolute;*/
     text-align: center;
     min-width: 100%;
     min-height: 100%;

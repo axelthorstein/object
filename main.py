@@ -6,7 +6,7 @@ from flask import render_template
 from o.graphql import GraphQL
 from o.detect import Detect
 from o.config import env
-from o.firebase import Firebase
+# from o.firebase import Firebase
 
 
 app = Flask(__name__)

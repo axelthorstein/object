@@ -4,7 +4,7 @@ import matplotlib.image
 from PIL import Image
 import numpy as np
 
-from redheads.analyzer import Analyzer
+from o.analyzer import Analyzer
 
 
 class Ring:
@@ -133,9 +133,9 @@ class Detect:
 
 
 if __name__=="__main__":
-    Detect('/Users/axelthor/Projects/redheads/images/ring.png').detect_circle()
-    Detect('/Users/axelthor/Projects/redheads/images/thick_ring.png').detect_circle()
-    Detect('/Users/axelthor/Projects/redheads/images/two_rings.png').detect_circle()
-    Detect('/Users/axelthor/Projects/redheads/images/moon_ring.png').detect_circle()
-    Detect('/Users/axelthor/Projects/redheads/images/circle.png').detect_circle()
-    Detect('/Users/axelthor/Projects/redheads/images/moon.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/circle.png').detect_circle()
+    Detect('/Users/axelthor/Projects/object/images/moon.png').detect_circle()
