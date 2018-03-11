@@ -7,8 +7,8 @@ from firebase_admin import storage
 
 global admin
 admin = firebase_admin.initialize_app(credentials.Certificate('config/firebase_credentials.json'),
-                                      name='redheads-181023',
-                                      options={"databaseURL": "https://redheads-181023.firebaseio.com/"})
+                                      name='object-is',
+                                      options={"databaseURL": "https://object-is.firebaseio.com/"})
 
 
 class Firebase:
@@ -17,7 +17,7 @@ class Firebase:
         self.file_path = file_path
 
     def download_image(self):
-        bucket = storage.bucket(name="redheads-181023.appspot.com", app=admin)
+        bucket = storage.bucket(name="object-is.appspot.com", app=admin)
         bucket.blob(self.file_path).download_to_filename(self.file_path)
 
     def clean_up(self):

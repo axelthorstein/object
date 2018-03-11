@@ -9,7 +9,7 @@ def set_config():
     if env == "local":
         os.environ["URL"] = "https://localhost:8080"
     elif env == "production":
-        os.environ["URL"] = "https://redheads-181023.appspot.com"
+        os.environ["URL"] = "https://object-is.appspot.com"
 
     return env
 

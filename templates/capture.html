@@ -5,34 +5,25 @@
   <meta charset='utf-8'>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" type="text/css" media="all">
   <script src="{{ url_for('static', filename='js/capture.js') }}"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.5.0/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
   <script>
-	  // Initialize Firebase
-	  // TODO: Replace with your project's customized code snippet
-	 //  var config = {
-		// apiKey: "AIzaSyDAwxqpgWkeAhg85YyDy_xaBj4X53hnHek",
-		// authDomain: "redheads-181023.firebaseapp.com",
-		// databaseURL: "https://redheads-181023.firebaseio.com",
-		// storageBucket: "gs://redheads-181023.appspot.com",
-		// messagingSenderId: "253345171344",
-	 //  };
-	 //  firebase.initializeApp(config);
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAkqsueNAICiJBRPptjD7V9191Lmuw3uY8",
+      authDomain: "object-is.firebaseapp.com",
+      databaseURL: "https://object-is.firebaseio.com",
+      projectId: "object-is",
+      storageBucket: "",
+      messagingSenderId: "162519022749"
+    };
+    firebase.initializeApp(config);
   </script>
 </head>
   <body>
-    <!-- <div class="camera"> -->
-          <video id="video" class="video">Video stream not available.</video>
-          <!-- </div> -->
-          <canvas id="canvas-circle-overlay""></canvas>
-          <canvas id="canvas"></canvas>
-          <button class="btn btn-lg glowing-border" id="startbutton">capture</button> 
-    <!-- <div class="container" id="overlay">
-      <div class="footer navbar-fixed-bottom" id="choices">
-        <div class="col-xs-12" style="position: relative;">
-          
-        </div>
-      </div>
-    </div> -->
+    <video id="video" class="video">Video stream not available.</video>
+    <canvas id="canvas-circle-overlay""></canvas>
+    <canvas id="canvas"></canvas>
+    <button class="btn btn-lg glowing-border" id="startbutton">capture</button> 
   </body>
 </html>
 

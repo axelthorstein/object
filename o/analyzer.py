@@ -9,8 +9,8 @@ class Analyzer:
     # def __init__(self):
         # self.client = vision.ImageAnnotatorClient()
         # self.image = types.Image()
-        # self.image.source.image_uri = "gs://redheads-181023.appspot.com/" + image_path
-        # self.image.source.image_uri = "gs://redheads-181023.appspot.com/"
+        # self.image.source.image_uri = "gs://object-is.appspot.com/" + image_path
+        # self.image.source.image_uri = "gs://object-is.appspot.com/"
 
     def analyze(self):
         self.detect_labels()
