@@ -79,8 +79,6 @@
         context.arc(width/2, height/2, 90, 0, Math.PI * 2, true); // Outer circle
         context.stroke();
 
-
-
         streaming = true;
       }
     }, false);

@@ -6,7 +6,7 @@ from flask import render_template
 from o.graphql import GraphQL
 from o.detect import Detect
 from o.config import env
-# from o.firebase import Firebase
+from o.firebase import Firebase
 
 
 app = Flask(__name__)
@@ -34,14 +34,19 @@ def create_checkout(target):
 
 @app.route('/images/<id>', methods=["GET"])
 def images(id):
+    print("here")
     file_path = "images/" + id + ".png"
 
-    # db = Firebase(file_path)
-    # db.download_image()
+    db = Firebase(file_path)
+    db.download_image()
 
-    colors = Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
-    # colors = Detect(file_path).detect_circle()
-    product = PRODUCT_MAP[str(colors[0]) + "-" + str(colors[1])]
+    # colors = Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
+    colors = Detect(file_path).detect_circle()
+    color = str(colors[0]) + "-" + str(colors[1])
+    if PRODUCT_MAP.get(color):
+        product = PRODUCT_MAP[color]
+    else:
+        product = "object-001"
     print(product)
 
     db.clean_up()
