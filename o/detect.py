@@ -4,8 +4,8 @@ import matplotlib.image
 from PIL import Image
 import numpy as np
 
-# from o.analyzer import Analyzer
-from analyzer import Analyzer
+from o.analyzer import Analyzer
+# from analyzer import Analyzer
 import webcolors
 
 

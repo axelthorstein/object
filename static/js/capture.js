@@ -42,8 +42,11 @@
         if (navigator.mozGetUserMedia) {
           video.mozSrcObject = stream;
         } else {
-          var vendorURL = window.URL || window.webkitURL;
-          video.src = vendorURL.createObjectURL(stream);
+          try {
+            video.srcObject = stream;
+          } catch (error) {
+            video.src = window.URL.createObjectURL(mediaSource);
+          }
         }
         video.play();
       },
@@ -146,6 +149,34 @@
       }
     } else {
       clearphoto();
+    }
+  }
+
+  // To run a function every second with backoff. 
+  // https://codereview.stackexchange.com/questions/125555/javascript-to-fire-event-every-second-until-10s-then-gradually-increase?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+  // heartbeat(10000, 1000, 10000000, function(now, interval){
+  //     console.log('beat', interval / 1000);
+  // });
+
+  function heartbeat(delay, interval, duration, callback){
+    var now = Date.now();
+    var end = now + delay + duration;
+    var inc = function(v){ return v; };
+    function beat(){
+      var now = Date.now();
+      if(now < end){
+        callback(now, interval);
+        interval = inc(interval);
+        timeout = setTimeout(beat, interval);
+      }
+    }
+    var timeout = setTimeout(beat, interval);
+    var delayTimeout = setTimeout(function(){
+      inc = function(v){ return Math.pow(v, 1.15); }
+    }, delay);
+    return function(){
+      clearTimeout(timeout);
+      clearTimeout(delayTimeout);
     }
   }
 
