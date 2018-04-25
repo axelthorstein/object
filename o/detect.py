@@ -4,13 +4,13 @@ import matplotlib.image
 from PIL import Image
 import numpy as np
 
-from o.analyzer import Analyzer
-# from analyzer import Analyzer
+# from o.analyzer import Analyzer
+from analyzer import Analyzer
 import webcolors
 
 
 
-class Ring:
+class Ring2:
     """
     A ring object with a center point, and a distance radius to it's inner
     and outer rings.
@@ -65,126 +65,312 @@ class Ring:
         return "Detected a ring at the coordinates {} with a inner and \
 outer radius of {} from {}.".format(
                self.center_coords, (self.inner_radius, self.outer_radius),
-               os.path.basename(self.image_path).replace("_thumbnail.png", ""))
+               os.path.basename(self.image_path).replace("_cropped.png", ""))
+
+
+class Ring:
+    """
+    A ring based on the radii and edge points of two circles. This ring bounded by the same color inside and surrounding.
+
+    Using a simple method of linearly analyzing pixels determine if a ring exists in an image. If a ring is found to be in the image, determine the two colors that the ring consists of.
+
+    The description for this simple method can be found here:
+    https://gist.github.com/axelthorstein/337312d5030af4b965e5a40271ba0361#simple
+    """
+
+    def __init__(self, image, starting_coords, debug=True):
+        self.image = image
+        self.debug = debug
+        self.left_inner_edge = self.walk(starting_coords, Ring.left)
+        self.right_inner_edge = self.walk(starting_coords, Ring.right)
+        self.up_inner_edge = self.walk(starting_coords, Ring.up)
+        self.down_inner_edge = self.walk(starting_coords, Ring.down)
+        self.center_coords = (self.get_center_x(), self.get_center_y())
+        self.inner_radius = self.get_inner_radius()
+        self.outer_radius = self.get_outer_radius()
+        self.center_color = self.get_center_color()
+        self.ring_color = self.get_ring_color()
+
+    def get_center_color(self):
+        """Find the color inside the circle.
+
+        Returns:
+            str: The center color.
+        """
+        return self.color(self.center_coords)
+
+    def get_ring_color(self):
+        """Find the color inside the ring.
+
+        Returns:
+            str: The ring color.
+        """
+        x = self.center_coords[0] + self.inner_radius + int((self.outer_radius - self.inner_radius) / 2)
+        y = self.center_coords[1]
+
+        return self.color((x, y))
+
+    def get_inner_radius(self):
+        """Find the radius of the inner circle.
+
+        Returns:
+            int: The inner radius.
+        """
+        return self.right_inner_edge[0] - self.center_coords[0]
+
+    def get_outer_radius(self):
+        """Find the radius of the outer circle.
+
+        Returns:
+            int: The outer radius.
+        """
+        return self.walk(Ring.right(self.right_inner_edge), Ring.right)[0] - self.center_coords[0]
+
+    def get_center_x(self):
+        """Find the center x coordinate of the ring based on the inner edges.
+
+        Returns:
+            int: The x coordinate of a pixel.
+        """
+        return int(self.left_inner_edge[0] + ((self.right_inner_edge[0] - self.left_inner_edge[0]) / 2))
+        
+    def get_center_y(self):
+        """Find the center y coordinate of the ring based on the inner edges.
+
+        Returns:
+            int: The y coordinate of a pixel.
+        """
+        return int(self.down_inner_edge[1] + ((self.up_inner_edge[1] - self.down_inner_edge[1]) / 2))
+
+    def up(coords):
+        """Increment the y value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0], coords[1] + 1)
+
+    def down(coords):
+        """Decrement the y value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0], coords[1] - 1)
+
+    def left(coords):
+        """Decrement the x value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] - 1, coords[1])
+
+    def right(coords):
+        """Increment the x value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] + 1, coords[1])
+
+    def get_colour_name(rgb):
+        """Get the name of a color for a RGB value.
+
+        Resolve the closest human readable name for a RBG value.
+
+        Args:
+            rgb (list of int): The Red, Green, Blue triplet.
+
+        Returns:
+            str: The color name from the RGB value.
+        """
+        min_colours = {}
+
+        for key, name in webcolors.css21_hex_to_names.items():
+            r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+            rd = (r_c - rgb[0]) ** 2
+            gd = (g_c - rgb[1]) ** 2
+            bd = (b_c - rgb[2]) ** 2
+            min_colours[(rd + gd + bd)] = name
+
+        return min_colours[min(min_colours.keys())]
+
+    def color(self, coords):
+        """Return the name of a color for the given pixel.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return Ring.get_colour_name(tuple(self.image[coords[0], coords[1]]))
+
+    def walk(self, starting_coords, direction):
+        """Walk a stright line of pixels until a new color is reached.
+
+        Begining at the given stating coordinates continue incrementally in the given direction until a new color is reached. At each new pixel arrived at check the pixels color.
+        
+        Args:
+            starting_coords (tuple of int): The coordinates of the starting pixel.
+            direction (method): The direction to increment/decrement.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        starting_color = self.color(starting_coords)
+        next_coords = starting_coords
+        next_color = self.color(direction(next_coords))
+
+        while next_color == starting_color:
+            next_coords = direction(next_coords)
+            next_color = self.color(direction(next_coords))
+
+        if self.debug:
+            print("Walked {}, starting color: {} at {}, next color: {} at {}".format(direction.__name__, starting_color, starting_coords, next_color, next_coords))
+
+        return next_coords
+
+    def to_string(self):
+        print("Ring: left {}, right {}, up {}, down {}, center {}, inner {}, outer {}, center color {}, ring_color {}".format(
+                self.left_inner_edge, 
+                self.right_inner_edge,
+                self.up_inner_edge,
+                self.down_inner_edge,
+                self.center_coords,
+                self.inner_radius,
+                self.outer_radius,
+                self.center_color,
+                self.ring_color
+            )
+        )
+
 
 class Detect:
     """
     Detect a circle from a given image.
     """
 
-    def __init__(self, image_path):
-        self.image_path = self.crop(image_path)
+    def __init__(self, image_path, debug=True):
+        self.image_path = image_path
+        self.debug = debug
 
-    def crop(self, image_path):
-        cropped_path = image_path[:-4] + "_thumbnail.png"
-        image = Image.open(image_path)
+    def crop(self, image):
+        """Crop a photo.
+
+        Crop the photo by creating to slightly larger than the circle overlay.
+
+        If debug is enabled save the newly cropped image to new path suffixed with "_cropped.png".
+
+        Args:
+            image (np.array of np.array): The path to the original image.
+
+        Returns:
+            np.array of np.array: The newly cropped image.
+        """
         half_the_width = image.size[0] / 2
         half_the_height = image.size[1] / 2
 
         # TODO: Will need to adjust these values to match the actual overlay.
-        # cropped_image = image.crop(
-        #     (
-        #         half_the_width - (half_the_width * 0.35),
-        #         half_the_height - (half_the_height * 0.15),
-        #         half_the_width + (half_the_width * 0.3),
-        #         half_the_height + (half_the_height * 0.7)
-        #     )
-        # )
-        cropped_image = image
-        cropped_image.save(cropped_path)
-        self.image_width = cropped_image.size[0]
-        self.center_pixel = int(self.image_width / 2)
+        cropped_image = image.crop(
+            (
+                half_the_width - (half_the_width * 0.25),
+                half_the_height - (half_the_height * 0.35),
+                half_the_width + (half_the_width * 0.25),
+                half_the_height + (half_the_height * 0.35)
+            )
+        )
 
-        return self.compress(cropped_path)
-
-    def compress(self, image_path):
-        image = Image.open(image_path)
-        image.thumbnail((self.image_width, self.image_width), Image.ANTIALIAS)
-        image.save(image_path)
+        if self.debug:
+            cropped_path = self.image_path[:-4] + "_cropped.png"
+            cropped_image.save(cropped_path)
         
-        return image_path
+        return cropped_image
 
-    def get_ring(self, img):
-        x = 0
-        y = 1
+    def compress(self, image):
+        """Compress a photo.
 
-        def get_colour_name(rgb_triplet):
-            min_colours = {}
-            for key, name in webcolors.css21_hex_to_names.items():
-                r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-                rd = (r_c - rgb_triplet[0]) ** 2
-                gd = (g_c - rgb_triplet[1]) ** 2
-                bd = (b_c - rgb_triplet[2]) ** 2
-                min_colours[(rd + gd + bd)] = name
-            return min_colours[min(min_colours.keys())]
+        Args:
+            image (np.array of np.array): The path to the original image.
 
-        def rgb(coords):
-            return tuple(img[coords[x], coords[y]])
+        Returns:
+            np.array of np.array: The newly cropped image.
+        """
+        image.thumbnail((image.size[0], image.size[0]), Image.ANTIALIAS)
 
-        def color(coords):
-            return get_colour_name(rgb(coords))
+        return image
 
-        def walk(starting_coords, direction):
-            starting_color = color(starting_coords)
-            next_coords = starting_coords
-            next_color = color(direction(next_coords))
+    def draw_ring(self, image, ring):
+        """Draw onto a new image the potentially found ring.
 
-            while next_color == starting_color:
-                next_coords = direction(next_coords)
-                next_color = color(direction(next_coords))
+        Args:
+            image (np.array of np.array): The original image.
+            coords (tuple of int): The coordinates of a pixel.
 
-            print("Walked {}, starting color: {} at {}, next color: {} at {}".format(direction.__name__, starting_color, starting_coords, next_color, next_coords))
-
-            return next_coords
-
-        def up(coords):
-            return (coords[x], coords[y] + 1)
-
-        def down(coords):
-            return (coords[x], coords[y] - 1)
-
-        def left(coords):
-            return (coords[x] - 1, coords[y])
-
-        def right(coords):
-            return (coords[x] + 1, coords[y])
-
-        starting_center_coords = [self.center_pixel, self.center_pixel]
-
-        left_coords = walk(starting_center_coords, left)
-        right_coords = walk(starting_center_coords, right)
-        up_coords = walk(starting_center_coords, up)
-        down_coords = walk(starting_center_coords, down)
-
-        center_x = left_coords[x] + (int(right_coords[x] - left_coords[x]) / 2)
-        center_y = down_coords[y] + (int(up_coords[y] - down_coords[y]) / 2)
-        center_coords = (int(center_x), int(center_y))
-
-        inner_radius = right_coords[x] - center_coords[x]
-        outer_radius = walk(right(right_coords), right)[x] - center_coords[x]
-
-        print("Center point {}, inner radius: {}, outer radius: {}".format(center_coords, inner_radius, outer_radius))
-
-        self.draw_ring(img, center_coords, inner_radius, outer_radius)
-
-        center_color = color(center_coords)
-        ring_color = color((center_coords[x] + inner_radius + int((outer_radius - inner_radius) / 2), center_coords[y]))
-
-        return (center_color, ring_color)
-
-    def draw_ring(self, img, center_coords, inner_radius, outer_radius):
-        cv2.circle(img, center_coords, inner_radius, (0, 255, 0), 1)
-        cv2.circle(img, center_coords, outer_radius, (0, 255, 0), 1)
-        cv2.circle(img, center_coords, 2, (255, 0, 0), 1)
-        cv2.imwrite("/Users/axelthor/Projects/object/images/test_draw.png", img)
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        cv2.circle(image, ring.center_coords, ring.inner_radius, (0, 255, 0), 1)
+        cv2.circle(image, ring.center_coords, ring.outer_radius, (0, 255, 0), 1)
+        cv2.circle(image, ring.center_coords, 2, (255, 0, 0), 1)
+        cv2.imwrite("/Users/axelthor/Projects/object/images/test_draw.png", image)
         
+    def preprocess_image(self):
+        """Crop, compress, and filter to image.
+
+        The image needs to be saved and reopened so that it can be manipulated as an array, where as the processing happens on the image object.
+
+        Returns:
+            np.array of np.array: The preprocessed image.
+        """
+        image = Image.open(self.image_path)
+
+        preprocessed_image_path = self.image_path[:-4] + "_preprocessed.png"
+
+        cropped_image = self.crop(image)
+        compressed_image = self.compress(cropped_image)
+
+        compressed_image.save(preprocessed_image_path)
+        image_width = compressed_image.size[0]
+
+        preprocessed_image = cv2.imread(preprocessed_image_path)
+
+        interpolated_image = cv2.bilateralFilter(preprocessed_image, 9, 75, 75)
+
+        return interpolated_image, image_width
+
     def detect_circle(self):
-        img = cv2.imread(self.image_path)
-        img = cv2.bilateralFilter(img,9,75,75)
+        """Detect whether a ring exists in the given photo.
 
-        ring = self.get_ring(img)
+        Returns:
+            tuple of int: The colors of the ring.
+        """
+        # crop, compress, and blur image
+        preprocessed_image, image_width = self.preprocess_image()
+        
+        # locate the ring colors
+        center_pixel = int(image_width / 2)
+        starting_center_coords = [center_pixel, center_pixel]
+        ring = Ring(preprocessed_image, starting_center_coords, debug=self.debug)
 
-        exit()
+        # draw the ring onto a photo for visual validation
+        if self.debug:
+            self.draw_ring(preprocessed_image, ring)
+
+        return (ring.center_color, ring.ring_color)
 
 
 class Detect_hard:
@@ -196,22 +382,22 @@ class Detect_hard:
         self.image_path = self.compress(image_path)
 
     def compress(self, image_path):
-        thumbnail_path = image_path[:-4] + "_thumbnail.png"
+        thumbnail_path = image_path[:-4] + "_cropped.png"
         image = Image.open(image_path)
         image.thumbnail((256, 256), Image.ANTIALIAS)
         image.save(thumbnail_path)
         
         return thumbnail_path
 
-    def get_ring(self, img):
+    def get_ring(self, image):
 
         def round(nums, precision=0):
             return np.uint16(np.around(nums, precision))
 
-        # print(cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, .5, 20, 30, 30, 10, 10))
+        # print(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, .5, 20, 30, 30, 10, 10))
 
-        c1 = round(cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0])
-        c2 = round(cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0])
+        c1 = round(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0])
+        c2 = round(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0])
 
         if c1[2] > c2[2]:
             outer_circle = c1
@@ -221,10 +407,10 @@ class Detect_hard:
             inner_circle = c1
 
         if round(inner_circle[0:1], -1) == round(outer_circle[0:1], -1):
-            return Ring(img, self.image_path, inner_circle, outer_circle)
+            return Ring(image, self.image_path, inner_circle, outer_circle)
 
-    def draw_ring(self, ring, img): 
-        gray_scale = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    def draw_ring(self, ring, image): 
+        gray_scale = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
         if ring.outer_radius != ring.inner_radius:
             # Draw the outer circle
@@ -240,13 +426,13 @@ class Detect_hard:
         cv2.imwrite(self.image_path, gray_scale)
         
     def detect_circle(self):
-        img = cv2.imread(self.image_path, 0)
-        img = cv2.medianBlur(img, 5)
-        ring = self.get_ring(img)
+        image = cv2.imread(self.image_path, 0)
+        image = cv2.medianBlur(image, 5)
+        ring = self.get_ring(image)
 
         if ring:
             print(ring.to_string())
-            self.draw_ring(ring, img)
+            self.draw_ring(ring, image)
             return ring.get_colors()
         else:
             print("No circles detected.")
@@ -255,7 +441,7 @@ class Detect_hard:
 
 
 if __name__=="__main__":
-    Detect("/Users/axelthor/Projects/object/images/test.png").detect_circle()
+    Detect("/Users/axelthor/Projects/object/images/test2.png", debug=False).detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_circle()
