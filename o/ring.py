@@ -23,20 +23,29 @@ class HoughTransformRing:
         self.center_coords = (inner_circle[0], inner_circle[1])
         self.inner_radius = inner_circle[2]
         self.outer_radius = outer_circle[2]
-        self.is_ring = (outer_circle[2] - inner_circle[2]) > 2
-        self.colors = self.get_colors()[0]
-        self.center_color = self.colors[0]
-        self.ring_color = self.colors[1]
+        self.center_color = self.get_center_color()
+        self.ring_color = self.get_ring_color()
+        self.is_valid = is_valid()
+
+    def is_valid(self):
+        """Determine if the ring is valid.
+
+        Returns:
+            bool: Whether the ring is valid.
+        """
+        return (self.outer_circle[2] - self.inner_circle[2]) > 2
 
     def get_ring_circles(self):
+        """Use the Hough Transform algorithm to find candidate circles in the image.
 
+        Returns:
+            bool: Whether the ring is valid.
+        """
         def round(nums, precision=0):
             return np.uint16(np.around(nums, precision))
 
-        # print(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, .5, 20, 30, 30, 10, 10))
-
-        c1 = HoughTransformRing.round(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0])
-        c2 = round(cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0])
+        c1 = round(cv2.HoughCircles(self.image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0])
+        c2 = round(cv2.HoughCircles(self.image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0])
 
         if c1[2] > c2[2]:
             outer_circle = c1
@@ -47,48 +56,75 @@ class HoughTransformRing:
 
         if round(inner_circle[0:1], -1) == round(outer_circle[0:1], -1):
             return inner_circle, outer_circle
+        raise RingException("The circles found do not share the same center coordinate.")
 
-    def get_rgb(self, rgb):
+    def get_rgb(rgb):
+    	"""Return the RGB triplet for a coordinate.
+		
+		Args:
+			rgb (array of float): The RGB float triplet of a coordinate.
+
+        Returns:
+            str: The RGB integer triplet of a coordinate.
+        """
         return (int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
 
-    def get_secondary_color(self, image, primary_color):
-        """
-        The while will go out of bounds if the ring is too close to the top.
-        """
-        if self.is_ring:
-            secondary_color = Analyzer.get_color(self.get_rgb(image[self.center_coords[0]][self.center_coords[1]]))
-        else:
-            offset = self.outer_radius + 1
-            secondary_color = Analyzer.get_color(self.get_rgb(image[self.center_coords[0]][self.center_coords[1] + offset]))
-
-            while secondary_color == primary_color:
-                offset += 10
-                secondary_color = Analyzer.get_color(self.get_rgb(image[self.center_coords[0]][self.center_coords[1] + offset]))
-
-        return secondary_color
-
     def get_rgb_coords(self):
+    	"""Return the RGB coordinates of the ring.
+		
+		TODO: What does this do?
+
+        Returns:
+            str: The ring colors.
+        """
         if self.is_ring:
             return (self.center_coords[0], ((self.outer_radius - self.inner_radius) // 2)
                     + self.inner_radius + self.center_coords[1])
         else:
             return (self.center_coords[0], self.inner_radius // 2 + self.center_coords[1])
 
-    def get_colors(self):
-        image = matplotlib.image.imread(self.image_path)
+    def get_center_color(self):
+        """Return the center color of the ring.
 
+        Returns:
+            str: The ring center color.
+        """
         rgb_coords = self.get_rgb_coords()
 
-        primary_color = Analyzer.get_color(self.get_rgb(image[rgb_coords[0]][rgb_coords[1]]))
-        secondary_color = self.get_secondary_color(image, primary_color)
-        
-        return (primary_color, secondary_color)
+        return Analyzer.get_color(HoughTransformRing.get_rgb(self.image[rgb_coords[0]][rgb_coords[1]]))
 
-    def to_string(self):
-        return "Detected a ring at the coordinates {} with a inner and \
-outer radius of {} from {}.".format(
-               self.center_coords, (self.inner_radius, self.outer_radius),
-               os.path.basename(self.image_path).replace("_cropped.png", ""))
+    def get_ring_color(self):
+        """
+        The while will go out of bounds if the ring is too close to the top.
+
+        Returns:
+            str: The ring color.
+        """
+        if self.is_ring:
+            ring_color = Analyzer.get_color(HoughTransformRing.get_rgb(image[self.center_coords[0]][self.center_coords[1]]))
+        else:
+            offset = self.outer_radius + 1
+            ring_color = Analyzer.get_color(HoughTransformRing.get_rgb(image[self.center_coords[0]][self.center_coords[1] + offset]))
+
+            while ring_color == self.center_color:
+                offset += 10
+                ring_color = Analyzer.get_color(HoughTransformRing.get_rgb(image[self.center_coords[0]][self.center_coords[1] + offset]))
+
+        return ring_color
+
+    def __str__(self):
+        """Return a string representation of the ring.
+
+        Returns:
+            str: The ring attributes.
+        """
+        return "".join(["\nRing:\n"
+				"  Center coordinates: {}\n".format(self.center_coords),
+				"  Inner radius: {}\n".format(self.inner_radius),
+				"  Outer radius: {}\n".format(self.outer_radius),
+				"  Center color: {}\n".format(self.center_color),
+				"  Ring color: {}\n".format(self.ring_color)
+				])
 
 
 class SimpleRing:
@@ -293,3 +329,8 @@ class SimpleRing:
 				"  Center color: {}\n".format(self.center_color),
 				"  Ring color: {}\n".format(self.ring_color)
 				])
+
+
+class RingException(Exception):
+	pass
+	
