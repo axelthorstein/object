@@ -52,7 +52,7 @@ class Analyzer:
         return get_product(primary_color)
 
     def get_color(rgb):
-
+        print(rgb)
         def closest_color(requested_color):
             min_colors = {}
             for key, name in webcolors.css3_hex_to_names.items():

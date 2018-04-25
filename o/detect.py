@@ -1,11 +1,14 @@
+from enum import Enum
 import cv2
 from PIL import Image
 import numpy as np
 
 from ring import SimpleRing, HoughTransformRing
 
-SIMPLE = "simple"
-HOUGH_TRANSFORM = "hough_transform"
+
+class DetectionStrategy(Enum):
+    SIMPLE = SimpleRing
+    HOUGH_TRANSFORM = HoughTransformRing
 
 
 class Detect:
@@ -13,9 +16,9 @@ class Detect:
     Detect a circle from a given image.
     """
 
-    def __init__(self, image_path, strategy, debug=True):
+    def __init__(self, image_path, strategy=DetectionStrategy.SIMPLE, debug=True):
         self.image_path = image_path
-        self.strategy = strategy
+        self.strategy = strategy.value
         self.debug = debug
 
     def crop(self, image):
@@ -73,6 +76,7 @@ class Detect:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
+        # ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
         cv2.circle(image, ring.center_coords,
             ring.inner_radius, (0, 255, 0), 1)
         cv2.circle(image, ring.center_coords,
@@ -99,11 +103,10 @@ class Detect:
         image_width = compressed_image.size[0]
 
         preprocessed_image = cv2.imread(preprocessed_image_path)
-
-        # preprocessed_image = cv2.imread(self.image_path, 0)
-        # interpolated_image = cv2.medianBlur(preprocessed_image, 5)
-
         interpolated_image = cv2.bilateralFilter(preprocessed_image, 9, 75, 75)
+        # elif self.strategy == "hough_transform":
+        #     preprocessed_image = cv2.imread(self.image_path, 0)
+        #     interpolated_image = cv2.medianBlur(preprocessed_image, 5)
 
         return interpolated_image, image_width
 
@@ -116,15 +119,14 @@ class Detect:
         # crop, compress, and blur image
         preprocessed_image, image_width = self.preprocess_image()
         
+        center_pixel = int(image_width / 2)
+        starting_center_coords = [center_pixel, center_pixel]
+
         # locate the ring colors using strategy
-        if self.strategy == "simple":
-            center_pixel = int(image_width / 2)
-            starting_center_coords = [center_pixel, center_pixel]
-            ring = SimpleRing(preprocessed_image,
+        try:
+            ring = self.strategy(preprocessed_image,
                 starting_center_coords, debug=self.debug)
-        elif self.strategy == "hough_transform":
-            HoughTransformRing(preprocessed_image, debug=self.debug)
-        else:
+        except:
             raise DetectionException(
                 "Detection strategy {} not found.".format(self.strategy))
 
@@ -135,7 +137,7 @@ class Detect:
         if ring.is_valid:
             print("Valid ring found at: {}".format(ring))
         else:
-            print("No valid ring found: {}".format(ring))
+            DetectionException("No valid ring found: {}".format(ring))
 
         return (ring.center_color, ring.ring_color)
 
@@ -145,7 +147,8 @@ class DetectionException(Exception):
 
 
 if __name__=="__main__":
-    Detect("/Users/axelthor/Projects/object/images/test2.png", strategy=SIMPLE, debug=False).detect_circle()
+    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_circle()
+    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_circle()
     # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_circle()
