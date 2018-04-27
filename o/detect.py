@@ -80,13 +80,18 @@ class Detect:
         """
         # TODO: fix
         # ring.center_coords = (90, 105)
-        ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
+        # ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
 
         cv2.circle(image, ring.center_coords,
             ring.inner_radius, (200, 20, 24), 1)
         cv2.circle(image, ring.center_coords,
             ring.outer_radius, (43, 0, 123), 1)
         cv2.circle(image, ring.center_coords, 2, (255, 33, 0), 1)
+        cv2.line(image, ring.outer_edges["left"], ring.outer_edges["up"], (200, 20, 24), 1)
+        cv2.line(image, ring.outer_edges["up"], ring.outer_edges["right"], (200, 20, 24), 1)
+        cv2.line(image, ring.outer_edges["right"], ring.outer_edges["down"], (200, 20, 24), 1)
+        cv2.line(image, ring.outer_edges["down"], ring.outer_edges["left"], (200, 20, 24), 1)
+        cv2.line(image, ring.center_coords, ring.center_coords, (43, 0, 123), 1)
         cv2.imwrite(
             "/Users/axelthor/Projects/object/images/test_draw.png", image
             )
@@ -143,7 +148,7 @@ class Detect:
         if self.debug:
             self.draw_ring(preprocessed_image, ring)
         print("Valid ring found at: {}".format(ring))
-
+        
         if ring.is_valid:
             print("ring is valid")
         else:

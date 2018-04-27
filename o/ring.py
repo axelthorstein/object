@@ -26,8 +26,9 @@ class Ring(object):
         Returns:
             str: The ring color.
         """
-        x = self.center_coords[0] + self.inner_radius
-            + int((self.outer_radius - self.inner_radius) / 2)
+        x = (self.center_coords[0] 
+            + self.inner_radius 
+            + int((self.outer_radius - self.inner_radius) / 2))
         y = self.center_coords[1]
 
         return self.color((x, y))
@@ -303,6 +304,17 @@ class SimpleRing(Ring):
         """
         return self.get_average_radius(self.outer_edges)
 
+    def left(coords):
+        """Decrement the x value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] - 1, coords[1])
+
     def up(coords):
         """Increment the y value by 1.
 
@@ -325,17 +337,6 @@ class SimpleRing(Ring):
         """
         return (coords[0], coords[1] - 1)
 
-    def left(coords):
-        """Decrement the x value by 1.
-
-        Args:
-            coords (tuple of int): The coordinates of a pixel.
-
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        return (coords[0] - 1, coords[1])
-
     def right(coords):
         """Increment the x value by 1.
 
@@ -346,6 +347,50 @@ class SimpleRing(Ring):
             tuple of int: The coordinates of a pixel.
         """
         return (coords[0] + 1, coords[1])
+
+    def up_and_left(coords):
+        """Decrement the x and y value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] - 1, coords[1] + 1)
+
+    def up_and_right(coords):
+        """Increment the y and x value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] + 1, coords[1] + 1)
+
+    def down_and_left(coords):
+        """Decrement the y and x value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] - 1, coords[1] - 1)
+
+    def down_and_right(coords):
+        """Increment the x and y value by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] + 1, coords[1] - 1)
 
     def walk(self, starting_coords, direction, update_center_coords=True):
         """Walk a stright line of pixels until a new color is reached.
