@@ -96,6 +96,19 @@ class Detect:
             "/Users/axelthor/Projects/object/images/test_draw.png", image
             )
         
+    def get_image_width(self, image, image_path):
+        """Return the width of the image.
+
+        Return the width of the image and save the compressed image.
+
+        Returns:
+            int: The width of the image.
+        """
+        compressed_image = self.compress(self.crop(image))
+        compressed_image.save(image_path)
+
+        return compressed_image.size[0]
+
     def preprocess_image(self):
         """Crop, compress, and filter to image.
 
@@ -106,22 +119,45 @@ class Detect:
             np.array of np.array: The preprocessed image.
         """
         image = Image.open(self.image_path)
-
-        preprocessed_image_path = self.image_path[:-4] + "_preprocessed.png"
-
-        cropped_image = self.crop(image)
-        compressed_image = self.compress(cropped_image)
-
-        compressed_image.save(preprocessed_image_path)
-        image_width = compressed_image.size[0]
-
-        preprocessed_image = cv2.imread(preprocessed_image_path)
+        image_path = self.image_path[:-4] + "_preprocessed.png"
+        preprocessed_image = cv2.imread(image_path)
         interpolated_image = cv2.bilateralFilter(preprocessed_image, 9, 75, 75)
-        # elif self.strategy == "hough_transform":
-        #     preprocessed_image = cv2.imread(self.image_path, 0)
-        #     interpolated_image = cv2.medianBlur(preprocessed_image, 5)
 
-        return interpolated_image, image_width
+        return interpolated_image, self.get_image_width(image, image_path)
+
+    def get_ring(self, image_width, preprocessed_image):
+        """Return the ring from an image.
+
+        If a ring exists in the photo, return the ring.
+
+        Returns:
+            Ring: The ring object.
+        """
+        center_pixel = int(image_width / 2)
+        starting_center_coords = [center_pixel, center_pixel]
+
+        # locate the ring colors using strategy
+        ring = self.strategy(preprocessed_image,
+            starting_center_coords, debug=self.debug)
+
+        if self.debug:
+            
+        return ring
+
+    def log_debug_info(self, preprocessed_image, ring):
+        """Log debugging information.
+
+        Log the overlay and ring dimensions and draw them onto the image.
+        """
+        self.draw_ring(preprocessed_image, ring)
+
+        print(ring.overlay)
+
+        if ring.is_valid:
+            print("Valid ring found at: {}".format(ring))
+        else:
+            DetectionException("No valid ring found: {}".format(ring))
+
 
     def detect_circle(self):
         """Detect a circle in an image.
@@ -135,24 +171,11 @@ class Detect:
         # crop, compress, and blur image
         preprocessed_image, image_width = self.preprocess_image()
         
-        center_pixel = int(image_width / 2)
-        starting_center_coords = [center_pixel, center_pixel]
-
-        # locate the ring colors using strategy
-        ring = self.strategy(preprocessed_image,
-            starting_center_coords, debug=self.debug)
-        print(ring.overlay)
-
+        ring = self.get_ring(image_width, preprocessed_image)
 
         # draw the ring onto a photo for visual validation
         if self.debug:
-            self.draw_ring(preprocessed_image, ring)
-        print("Valid ring found at: {}".format(ring))
-        
-        if ring.is_valid:
-            print("ring is valid")
-        else:
-            DetectionException("No valid ring found: {}".format(ring))
+            self.log_debug_info(image_width, preprocessed_image)
 
         return (ring.center_color, ring.ring_color)
 
