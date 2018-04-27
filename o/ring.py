@@ -26,7 +26,8 @@ class Ring(object):
         Returns:
             str: The ring color.
         """
-        x = self.center_coords[0] + self.inner_radius + int((self.outer_radius - self.inner_radius) / 2)
+        x = self.center_coords[0] + self.inner_radius
+            + int((self.outer_radius - self.inner_radius) / 2)
         y = self.center_coords[1]
 
         return self.color((x, y))
@@ -167,12 +168,15 @@ class Overlay(Ring):
 
 class SimpleRing(Ring):
     """
-    A ring based on the radii and edge points of two circles. This ring bounded by the same color inside and surrounding.
+    A ring based on the radii and edge points of two circles. This ring
+    bounded by the same color inside and surrounding.
 
-    Using a simple method of linearly analyzing pixels determine if a ring exists in an image. If a ring is found to be in the image, determine the two colors that the ring consists of.
+    Using a simple method of linearly analyzing pixels determine if a
+    ring exists in an image. If a ring is found to be in the image,
+    determine the two colors that the ring consists of.
 
     The description for this simple method can be found here:
-    https://gist.github.com/axelthorstein/337312d5030af4b965e5a40271ba0361#simple
+    https://gist.github.com/axelthorstein/337312d5030af4b965e5a40271ba0361
     """
 
     def __init__(self, image, starting_coords, debug=True):
@@ -200,7 +204,8 @@ class SimpleRing(Ring):
     def update_center_coords(self, coords):
         """Set the center coordinates of the circle.
 
-        Update the ring's center coordinates as the inner edges are found. This will provide more accurate results as it progresses.
+        Update the ring's center coordinates as the inner edges are found.
+        This will provide more accurate results as it progresses.
 
         Args:
             coords (tuple of int): The coordinates of the ring edge.
@@ -212,6 +217,9 @@ class SimpleRing(Ring):
 
         # We are updating the y coordinate (up | down). 
         if center[x] == coords[x]:
+            # Get the distance between the center and the inner edge minus
+            # the overlay radius. Update the center to be closer to the true
+            # center.
             offset = abs(overlay_radius - abs(center[y] - coords[y]))
             self.center_coords = (center[x], center[y] - offset)
         
@@ -238,16 +246,23 @@ class SimpleRing(Ring):
     def get_outer_edges(self):
         """Return the outer edges of the ring.
 
-        To find the outer edge we begin walking from the inner edge until we reach the original color. We need to increment the inner edge by 1 because it returns the pixel before the color change, so it would immeadiately exit otherwise.
+        To find the outer edge we begin walking from the inner edge until
+        we reach the original color. We need to increment the inner edge
+        by 1 because it returns the pixel before the color change, so it
+        would immeadiately exit otherwise.
 
         Returns:
             int: The outer edges.
         """
         outer_edges = {
-            "left": self.walk(SimpleRing.left(self.inner_edges["left"]), SimpleRing.left, update_center_coords=False),
-            "up": self.walk(SimpleRing.up(self.inner_edges["up"]), SimpleRing.up, update_center_coords=False),
-            "right": self.walk(SimpleRing.right(self.inner_edges["right"]), SimpleRing.right, update_center_coords=False),
-            "down": self.walk(SimpleRing.down(self.inner_edges["down"]), SimpleRing.down, update_center_coords=False)
+            "left": self.walk(SimpleRing.left(self.inner_edges["left"]),
+                SimpleRing.left, update_center_coords=False),
+            "up": self.walk(SimpleRing.up(self.inner_edges["up"]),
+                SimpleRing.up, update_center_coords=False),
+            "right": self.walk(SimpleRing.right(self.inner_edges["right"]),
+                SimpleRing.right, update_center_coords=False),
+            "down": self.walk(SimpleRing.down(self.inner_edges["down"]),
+                SimpleRing.down, update_center_coords=False)
         }
 
         return outer_edges
@@ -255,7 +270,8 @@ class SimpleRing(Ring):
     def get_average_radius(self, edges):
         """Find the average radius from the edges.
 
-        Find which coordinate value is not the same at the center point and use it to calculate the average radius.
+        Find which coordinate value is not the same at the center point
+        and use it to calculate the average radius.
 
         Args:
             edges (dictionary): The edges of the ring.
@@ -334,11 +350,13 @@ class SimpleRing(Ring):
     def walk(self, starting_coords, direction, update_center_coords=True):
         """Walk a stright line of pixels until a new color is reached.
 
-        Begining at the given stating coordinates continue incrementally in the given direction until a new color is reached. At each new pixel arrived at check the pixels color.
+        Begining at the given stating coordinates continue incrementally
+        in the given direction until a new color is reached. At each new
+        pixel arrived at check the pixels color.
         
         Args:
-            starting_coords (tuple of int): The coordinates of the starting pixel.
-            direction (method): The direction to increment/decrement.
+            starting_coords (tuple of int): Coordinates of the starting pixel.
+            direction (method): Direction to increment/decrement.
 
         Returns:
             tuple of int: The coordinates of a pixel.
@@ -437,7 +455,7 @@ class HoughTransformRing(Ring):
         return (self.outer_circle[2] - self.inner_circle[2]) > 2
 
     def get_ring_circles(self):
-        """Use the Hough Transform algorithm to find candidate circles in the image.
+        """Use the Hough Transform algorithm to find circles in the image.
 
         Returns:
             bool: Whether the ring is valid.
@@ -447,8 +465,12 @@ class HoughTransformRing(Ring):
 
         greyscale_image = HoughTransformRing.get_greyscale_image(self.image)
 
-        c1 = round(cv2.HoughCircles(greyscale_image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0])
-        c2 = round(cv2.HoughCircles(greyscale_image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0])
+        c1 = round(cv2.HoughCircles(
+            greyscale_image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0]
+        )
+        c2 = round(cv2.HoughCircles(
+            greyscale_image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0]
+        )
 
         if c1[2] > c2[2]:
             outer_circle = c1
@@ -459,7 +481,7 @@ class HoughTransformRing(Ring):
 
         if round(inner_circle[0:1], -1) == round(outer_circle[0:1], -1):
             return inner_circle, outer_circle
-        raise RingException("The circles found do not share the same center coordinate.")
+        raise RingException("The circles have different center coordinates.")
 
     def __str__(self):
         """Return a string representation of the ring.

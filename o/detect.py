@@ -16,7 +16,8 @@ class Detect:
     Detect a circle from a given image.
     """
 
-    def __init__(self, image_path, strategy=DetectionStrategy.SIMPLE, debug=True):
+    def __init__(self, image_path,
+                 strategy=DetectionStrategy.SIMPLE, debug=True):
         self.image_path = image_path
         self.strategy = strategy.value
         self.debug = debug
@@ -26,7 +27,8 @@ class Detect:
 
         Crop the photo by creating to slightly larger than the circle overlay.
 
-        If debug is enabled save the newly cropped image to new path suffixed with "_cropped.png".
+        If debug is enabled save the newly cropped image to new path suffixed
+        with "_cropped.png".
 
         Args:
             image (np.array of np.array): The path to the original image.
@@ -85,12 +87,15 @@ class Detect:
         cv2.circle(image, ring.center_coords,
             ring.outer_radius, (43, 0, 123), 1)
         cv2.circle(image, ring.center_coords, 2, (255, 33, 0), 1)
-        cv2.imwrite("/Users/axelthor/Projects/object/images/test_draw.png", image)
+        cv2.imwrite(
+            "/Users/axelthor/Projects/object/images/test_draw.png", image
+            )
         
     def preprocess_image(self):
         """Crop, compress, and filter to image.
 
-        The image needs to be saved and reopened so that it can be manipulated as an array, where as the processing happens on the image object.
+        The image needs to be saved and reopened so that it can be manipulated
+        as an array, where as the processing happens on the image object.
 
         Returns:
             np.array of np.array: The preprocessed image.
@@ -114,7 +119,10 @@ class Detect:
         return interpolated_image, image_width
 
     def detect_circle(self):
-        """Detect whether a ring exists in the photo within the center ~20% of the image, detected using a specified strategy.
+        """Detect a circle in an image.
+
+        Detect whether a ring exists in the photo within the center ~20% of
+        the image, detected using a specified strategy.
 
         Returns:
             tuple of int: The colors of the ring.
