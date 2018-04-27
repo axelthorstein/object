@@ -2,6 +2,7 @@ import os
 import cv2
 import matplotlib.image
 import numpy as np
+from pprint import pprint
 
 # from o.analyzer import Analyzer
 from analyzer import Analyzer
@@ -30,6 +31,7 @@ class Ring(object):
 
         return self.color((x, y))
 
+    @staticmethod
     def get_colour_name(rgb):
         """Get the name of a color for a RGB value.
 
@@ -63,6 +65,105 @@ class Ring(object):
         """
         return Ring.get_colour_name(tuple(self.image[coords[0], coords[1]]))
 
+    @staticmethod
+    def format_edges(edges):
+        """Return a string representation of the overlays edges.
+
+        Returns:
+            str: The overlay edges.
+        """
+        return "".join(["\n"
+                "    Left coordinates:  {}\n".format(edges["left"]),
+                "    Up coordinates:    {}\n".format(edges["up"]),
+                "    Right coordinates: {}\n".format(edges["right"]),
+                "    Down coordinates:  {}".format(edges["down"])
+                ])
+
+
+class Overlay(Ring):
+    """
+    An object to represent the overlay over the camera.
+    """
+
+    def __init__(self, image):
+        self.image = image
+        self.center_coords = self.get_center_coords()
+        self.inner_radius = self.get_inner_radius()
+        self.outer_radius = self.get_outer_radius()
+        self.inner_edges = self.get_inner_edges()
+        self.outer_edges = self.get_outer_edges()
+
+    def get_center_coords(self):
+        """Return the center coordinates of the overlay.
+
+        Returns:
+            int: The center coordinates.
+        """
+        return (int(len(self.image) / 2), int(len(self.image[0]) / 2))
+
+    def get_inner_radius(self):
+        """Return the inner radius of the overlay.
+
+        Returns:
+            int: Half the height of the image.
+        """
+        return int(self.center_coords[0] * 0.28)
+
+    def get_outer_radius(self):
+        """Return the outer radius of the overlay.
+
+        Returns:
+            int: The outer radius.
+        """
+        return int(self.center_coords[0] * 0.45)
+
+    def get_inner_edges(self):
+        """Return the inner edges of the overlay.
+
+        Returns:
+            int: The inner edges.
+        """
+        center = self.center_coords
+        inner_edges = {
+            "left": (center[0] - self.inner_radius, center[1]),
+            "up": (center[0], center[1] + self.inner_radius),
+            "right": (center[0] + self.inner_radius, center[1]),
+            "down": (center[0], center[1] - self.inner_radius)
+        }
+
+        return inner_edges
+
+    def get_outer_edges(self):
+        """Return the outer edges of the overlay.
+
+        Returns:
+            int: The outer edges.
+        """
+        center = self.center_coords
+        outer_edges = {
+            "left": (center[0] - self.outer_radius, center[1]),
+            "up": (center[0], center[1] + self.outer_radius),
+            "right": (center[0] + self.outer_radius, center[1]),
+            "down": (center[0], center[1] - self.outer_radius)
+        }
+
+        return outer_edges
+
+    def __str__(self):
+        """Return a string representation of the overlay.
+
+        Returns:
+            str: The overlay attributes.
+        """
+        return "".join(["\nOverlay:\n"
+                "  Center coordinates: {}\n".format(self.center_coords),
+                "  Inner radius: {}\n".format(self.inner_radius),
+                "  Outer radius: {}\n".format(self.outer_radius),      
+                "  Inner edges: {}\n".format(
+                    Ring.format_edges(self.inner_edges)),
+                "  Outer edges: {}\n".format(
+                    Ring.format_edges(self.outer_edges))
+                ])
 
 class SimpleRing(Ring):
     """
@@ -76,13 +177,12 @@ class SimpleRing(Ring):
 
     def __init__(self, image, starting_coords, debug=True):
         self.image = image
-        self.starting_coords = starting_coords
         self.debug = debug
-        self.left_inner_edge = self.walk(starting_coords, SimpleRing.left)
-        self.right_inner_edge = self.walk(starting_coords, SimpleRing.right)
-        self.up_inner_edge = self.walk(starting_coords, SimpleRing.up)
-        self.down_inner_edge = self.walk(starting_coords, SimpleRing.down)
-        self.center_coords = self.get_center_coords()
+        self.test = tuple(starting_coords)
+        self.center_coords = tuple(starting_coords)
+        self.overlay = Overlay(image)
+        self.inner_edges = self.get_inner_edges()
+        self.outer_edges = self.get_outer_edges()
         self.inner_radius = self.get_inner_radius()
         self.outer_radius = self.get_outer_radius()
         self.center_color = self.get_center_color()
@@ -97,13 +197,79 @@ class SimpleRing(Ring):
         """
         return self.ring_color != self.center_color
 
-    def get_center_coords(self):
-        """Find the center coordinates of the circle.
+    def update_center_coords(self, coords):
+        """Set the center coordinates of the circle.
+
+        Update the ring's center coordinates as the inner edges are found. This will provide more accurate results as it progresses.
+
+        Args:
+            coords (tuple of int): The coordinates of the ring edge.
+        """
+        x, y = 0, 1
+
+        center = self.center_coords
+        overlay_radius = self.overlay.inner_radius
+
+        # We are updating the y coordinate (up | down). 
+        if center[x] == coords[x]:
+            offset = abs(overlay_radius - abs(center[y] - coords[y]))
+            self.center_coords = (center[x], center[y] - offset)
+        
+        # We are updating the x coordinate (left | right). 
+        else:
+            offset = abs(overlay_radius - abs(center[x] - coords[x]))
+            self.center_coords = (center[x] + offset, center[y])
+
+    def get_inner_edges(self):
+        """Return the inner edges of the ring.
 
         Returns:
-            int: The center coordinates.
+            int: The inner edges.
         """
-        return (self.get_center_x(), self.get_center_y())
+        inner_edges = {
+            "left": self.walk(self.center_coords, SimpleRing.left),
+            "up": self.walk(self.center_coords, SimpleRing.up),
+            "right": self.walk(self.center_coords, SimpleRing.right),
+            "down": self.walk(self.center_coords, SimpleRing.down)
+        }
+
+        return inner_edges
+
+    def get_outer_edges(self):
+        """Return the outer edges of the ring.
+
+        To find the outer edge we begin walking from the inner edge until we reach the original color. We need to increment the inner edge by 1 because it returns the pixel before the color change, so it would immeadiately exit otherwise.
+
+        Returns:
+            int: The outer edges.
+        """
+        outer_edges = {
+            "left": self.walk(SimpleRing.left(self.inner_edges["left"]), SimpleRing.left, update_center_coords=False),
+            "up": self.walk(SimpleRing.up(self.inner_edges["up"]), SimpleRing.up, update_center_coords=False),
+            "right": self.walk(SimpleRing.right(self.inner_edges["right"]), SimpleRing.right, update_center_coords=False),
+            "down": self.walk(SimpleRing.down(self.inner_edges["down"]), SimpleRing.down, update_center_coords=False)
+        }
+
+        return outer_edges
+
+    def get_average_radius(self, edges):
+        """Find the average radius from the edges.
+
+        Find which coordinate value is not the same at the center point and use it to calculate the average radius.
+
+        Args:
+            edges (dictionary): The edges of the ring.
+        Returns:
+            int: The average radius.
+        """
+        average_radius = 0
+
+        average_radius += abs(self.center_coords[0] - edges["left"][0])
+        average_radius += abs(self.center_coords[1] - edges["up"][1])
+        average_radius += abs(self.center_coords[1] - edges["down"][1])
+        average_radius += abs(self.center_coords[0] - edges["right"][0])
+
+        return int(average_radius / 4)
 
     def get_inner_radius(self):
         """Find the radius of the inner circle.
@@ -111,7 +277,7 @@ class SimpleRing(Ring):
         Returns:
             int: The inner radius.
         """
-        return self.right_inner_edge[0] - self.center_coords[0]
+        return self.get_average_radius(self.inner_edges)
 
     def get_outer_radius(self):
         """Find the radius of the outer circle.
@@ -119,23 +285,7 @@ class SimpleRing(Ring):
         Returns:
             int: The outer radius.
         """
-        return self.walk(SimpleRing.right(self.right_inner_edge), SimpleRing.right)[0] - self.center_coords[0]
-
-    def get_center_x(self):
-        """Find the center x coordinate of the ring based on the inner edges.
-
-        Returns:
-            int: The x coordinate of a pixel.
-        """
-        return int(self.left_inner_edge[0] + ((self.right_inner_edge[0] - self.left_inner_edge[0]) / 2))
-        
-    def get_center_y(self):
-        """Find the center y coordinate of the ring based on the inner edges.
-
-        Returns:
-            int: The y coordinate of a pixel.
-        """
-        return int(self.down_inner_edge[1] + ((self.up_inner_edge[1] - self.down_inner_edge[1]) / 2))
+        return self.get_average_radius(self.outer_edges)
 
     def up(coords):
         """Increment the y value by 1.
@@ -181,7 +331,7 @@ class SimpleRing(Ring):
         """
         return (coords[0] + 1, coords[1])
 
-    def walk(self, starting_coords, direction):
+    def walk(self, starting_coords, direction, update_center_coords=True):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the given stating coordinates continue incrementally in the given direction until a new color is reached. At each new pixel arrived at check the pixels color.
@@ -201,8 +351,8 @@ class SimpleRing(Ring):
             next_coords = direction(next_coords)
             next_color = self.color(direction(next_coords))
 
-        if self.debug:
-            print("Walked {}, starting color: {} at {}, next color: {} at {}".format(direction.__name__, starting_color, starting_coords, next_color, next_coords))
+        if update_center_coords:
+            self.update_center_coords(next_coords)
 
         return next_coords
 
@@ -213,15 +363,15 @@ class SimpleRing(Ring):
             str: The ring attributes.
         """
         return "".join(["\nRing:\n"
-                "  Left inner edge: {}\n".format(self.left_inner_edge),
-                "  Right inner edge: {}\n".format(self.right_inner_edge),
-                "  Up inner edge: {}\n".format(self.up_inner_edge),
-                "  Down inner edge: {}\n".format(self.down_inner_edge),
                 "  Center coordinates: {}\n".format(self.center_coords),
                 "  Inner radius: {}\n".format(self.inner_radius),
                 "  Outer radius: {}\n".format(self.outer_radius),
+                "  Inner edges: {}\n".format(
+                    Ring.format_edges(self.inner_edges)),
+                "  Outer edges: {}\n".format(
+                    Ring.format_edges(self.outer_edges)),
                 "  Center color: {}\n".format(self.center_color),
-                "  Ring color: {}\n".format(self.ring_color)
+                "  Ring color:   {}\n".format(self.ring_color),
                 ])
 
 
@@ -233,7 +383,6 @@ class HoughTransformRing(Ring):
 
     def __init__(self, image, starting_coords, debug=True):
         self.image = image
-        self.starting_coords = starting_coords
         self.debug = debug
         self.ring_circles = self.get_ring_circles()
         self.inner_circle = self.ring_circles[0]
@@ -325,7 +474,7 @@ class HoughTransformRing(Ring):
                 "  Inner radius: {}\n".format(self.inner_radius),
                 "  Outer radius: {}\n".format(self.outer_radius),
                 "  Center color: {}\n".format(self.center_color),
-                "  Ring color: {}\n".format(self.ring_color)
+                "  Ring color:   {}\n".format(self.ring_color)
                 ])
 
 

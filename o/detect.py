@@ -76,12 +76,15 @@ class Detect:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        # ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
+        # TODO: fix
+        # ring.center_coords = (90, 105)
+        ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
+
         cv2.circle(image, ring.center_coords,
-            ring.inner_radius, (0, 255, 0), 1)
+            ring.inner_radius, (200, 20, 24), 1)
         cv2.circle(image, ring.center_coords,
-            ring.outer_radius, (0, 255, 0), 1)
-        cv2.circle(image, ring.center_coords, 2, (255, 0, 0), 1)
+            ring.outer_radius, (43, 0, 123), 1)
+        cv2.circle(image, ring.center_coords, 2, (255, 33, 0), 1)
         cv2.imwrite("/Users/axelthor/Projects/object/images/test_draw.png", image)
         
     def preprocess_image(self):
@@ -123,19 +126,18 @@ class Detect:
         starting_center_coords = [center_pixel, center_pixel]
 
         # locate the ring colors using strategy
-        try:
-            ring = self.strategy(preprocessed_image,
-                starting_center_coords, debug=self.debug)
-        except:
-            raise DetectionException(
-                "Detection strategy {} not found.".format(self.strategy))
+        ring = self.strategy(preprocessed_image,
+            starting_center_coords, debug=self.debug)
+        print(ring.overlay)
+
 
         # draw the ring onto a photo for visual validation
         if self.debug:
             self.draw_ring(preprocessed_image, ring)
+        print("Valid ring found at: {}".format(ring))
 
         if ring.is_valid:
-            print("Valid ring found at: {}".format(ring))
+            print("ring is valid")
         else:
             DetectionException("No valid ring found: {}".format(ring))
 

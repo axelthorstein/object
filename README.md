@@ -1,7 +1,7 @@
 # Object
-Culture
 
-This project is the testing ground.
+Culture.
+
 
 # Authors
 
