@@ -431,9 +431,9 @@ class SimpleRing(Ring):
         starting_coords = direction(starting_coords)
 
         # get all the starting values
-        starting_colors = Ring.get_color(self.image, starting_coords)
+        starting_colors = self.color(self.image, starting_coords)
         next_coords = starting_coords
-        next_colors = Ring.get_color(self.image, direction(next_coords))
+        next_colors = self.color(self.image, direction(next_coords))
         color_freq = {}
         last_failed = False
 
@@ -453,7 +453,7 @@ class SimpleRing(Ring):
 
             # increment and update the next values
             next_coords = direction(next_coords)
-            next_colors = Ring.get_color(self.image, direction(next_coords))
+            next_colors = self.color(self.image, direction(next_coords))
 
         # update the value of the center coordinates based on the new
         # information we have found
