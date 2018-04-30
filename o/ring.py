@@ -42,7 +42,8 @@ class Ring(object):
         # Return the 3 most likely colors in order of likelihood.
         return tuple(min_colors[:3])
 
-    def color(self, image, coords):
+    @staticmethod
+    def get_color(image, coords):
         """Return the name of a color for the given pixel.
 
         Args:
@@ -433,9 +434,9 @@ class SimpleRing(Ring):
         starting_coords = direction(starting_coords)
 
         # get all the starting values
-        starting_colors = self.color(self.image, starting_coords)
+        starting_colors = Ring.get_color(self.image, starting_coords)
         next_coords = starting_coords
-        next_colors = self.color(self.image, direction(next_coords))
+        next_colors = Ring.get_color(self.image, direction(next_coords))
         color_freq = {}
         last_failed = False
 
@@ -455,7 +456,7 @@ class SimpleRing(Ring):
 
             # increment and update the next values
             next_coords = direction(next_coords)
-            next_colors = self.color(self.image, direction(next_coords))
+            next_colors = Ring.get_color(self.image, direction(next_coords))
 
         # update the value of the center coordinates based on the new
         # information we have found
