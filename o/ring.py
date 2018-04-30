@@ -9,40 +9,21 @@ import webcolors
 
 
 class Ring(object):
-    """docstring for Ring"""
-
-    def get_center_color(self):
-        """Find the color inside the circle.
-
-        Returns:
-            str: The center color.
-        """
-        return self.color(self.center_coords)[0]
-
-    def get_ring_color(self):
-        """Find the color inside the ring.
-
-        Returns:
-            str: The ring color.
-        """
-        x = (self.center_coords[0] 
-            + self.inner_radius 
-            + int((self.outer_radius - self.inner_radius) / 2))
-        y = self.center_coords[1]
-
-        return self.color((x, y))[0]
+    """
+    An abstract Ring object.
+    """
 
     @staticmethod
     def get_color_name(rgb):
         """Get the name of a color for a RGB value.
 
-        Resolve the closest human readable name for a RBG value.
+        Resolve the three closest human readable names for a RBG value.
 
         Args:
             rgb (list of int): The Red, Green, Blue triplet.
 
         Returns:
-            str: The color name from the RGB value.
+            tuple of str: The closest color names from the RGB value.
         """
         min_colors = {}
 
@@ -53,8 +34,7 @@ class Ring(object):
             bd = (b_c - rgb[2]) ** 2
             min_colors[(rd + gd + bd)] = name
 
-        # If the color is close to another color it may get identified instead
-        # of the correct color.
+        # Sort the keys based on the minimum values, indicating liklihood.
         min_colors = [min_colors[key] for key in sorted(
             min_colors.keys(), reverse=False)]
 
@@ -106,7 +86,7 @@ class Overlay(Ring):
         Returns:
             int: Half the height of the image.
         """
-        return int(self.center_coords[1] * 0.28)
+        return int(self.center_coords[1] * 0.27)
 
     def get_outer_radius(self):
         """Return the outer radius of the overlay.
@@ -182,7 +162,6 @@ class SimpleRing(Ring):
         self.debug = debug
         self.center_coords = starting_coords
         self.overlay = Overlay(image, starting_coords)
-        self.ring_width = 0
         self.color_freq = {"inner": {}, "outer": {}}
         self.inner_edges = self.get_inner_edges()
         self.outer_edges = self.get_outer_edges()
@@ -319,7 +298,6 @@ class SimpleRing(Ring):
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-
         return (coords[0] - 1, coords[1])
 
     def up(coords):
@@ -367,23 +345,23 @@ class SimpleRing(Ring):
         x, y = 0, 1
 
         center = self.center_coords
-        overlay_radius = self.overlay.inner_radius
-        print(center, overlay_radius, coords)
+        overlay_radius = self.overlay.inner_radius        
 
         # We are updating the y coordinate (up | down). 
         if center[x] == coords[x]:
             # Get the distance between the center and the inner edge minus
             # the overlay radius. Update the center to be closer to the true
             # center.
-            offset = abs(overlay_radius - abs(center[y] - coords[y]))
+            offset = overlay_radius - abs(center[y] - coords[y])
             self.center_coords = (center[x], center[y] - offset)
-        
-        # We are updating the x coordinate (left | right). 
+
+        # We are updating the x coordinate (left | right).
         else:
-            offset = abs(overlay_radius - abs(center[x] - coords[x]))
-            print(offset)
+            offset = overlay_radius - abs(center[x] - coords[x])
             self.center_coords = (center[x] + offset, center[y])
-        # exit()
+        
+        print("old center {} - coords {} = {} - {} overlay = offset {} to new center {}".format(center, coords, center[x] - coords[x], overlay_radius, offset, self.center_coords))
+        exit()
 
     def update_local_color_freq(self, color_freq, next_colors):
         """Update the color local freq dictionary.

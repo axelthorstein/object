@@ -1,7 +1,5 @@
 from enum import Enum
-import cv2
 from PIL import Image, ImageFilter
-import numpy as np
 
 from ring import SimpleRing, HoughTransformRing
 
