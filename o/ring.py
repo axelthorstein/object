@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from collections import Counter
 from operator import itemgetter
+from profilehooks import timecall
 
 # from o.analyzer import Analyzer
 from analyzer import Analyzer
@@ -41,16 +42,17 @@ class Ring(object):
         # Return the 3 most likely colors in order of likelihood.
         return tuple(min_colors[:3])
 
-    def color(self, coords):
+    def color(self, image, coords):
         """Return the name of a color for the given pixel.
 
         Args:
+            image (Image): The image being analyzed.
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return Ring.get_color_name(self.image.getpixel(coords))
+        return Ring.get_color_name(image.getpixel(coords))
 
     @staticmethod
     def format_edges(edges):
@@ -202,6 +204,7 @@ class SimpleRing(Ring):
 
         return max(dict(self.color_freq["outer"]).items(), key=itemgetter(1))[0]
 
+    @timecall
     def get_inner_edges(self):
         """Return the inner edges of the ring.
 
@@ -222,6 +225,7 @@ class SimpleRing(Ring):
 
         return inner_edges
 
+    @timecall
     def get_outer_edges(self):
         """Return the outer edges of the ring.
 
@@ -347,22 +351,25 @@ class SimpleRing(Ring):
         center = self.center_coords
         overlay_radius = self.overlay.inner_radius        
 
-        # We are updating the y coordinate (up | down). 
+        # we are updating the y coordinate (up | down)
         if center[x] == coords[x]:
-            # Get the distance between the center and the inner edge minus
+            # get the distance between the center and the inner edge minus
             # the overlay radius. Update the center to be closer to the true
-            # center.
-            offset = overlay_radius - abs(center[y] - coords[y])
-            self.center_coords = (center[x], center[y] - offset)
+            # center
+            if center[y] > coords[y]:
+                offset = overlay_radius - abs(center[y] - coords[y])
+            else:
+                offset = abs(center[y] - coords[y]) - overlay_radius
+            self.center_coords = (center[x], center[y] + offset)
 
-        # We are updating the x coordinate (left | right).
+        # we are updating the x coordinate (left | right)
         else:
-            offset = overlay_radius - abs(center[x] - coords[x])
+            if center[x] > coords[x]:
+                offset = overlay_radius - abs(center[x] - coords[x])
+            else:
+                offset = abs(center[x] - coords[x]) - overlay_radius
             self.center_coords = (center[x] + offset, center[y])
         
-        print("old center {} - coords {} = {} - {} overlay = offset {} to new center {}".format(center, coords, center[x] - coords[x], overlay_radius, offset, self.center_coords))
-        exit()
-
     def update_local_color_freq(self, color_freq, next_colors):
         """Update the color local freq dictionary.
 
@@ -422,40 +429,40 @@ class SimpleRing(Ring):
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        # Advance one past just to be safe and away from the edge.
+        # advance one past just to be safe and away from the edge
         starting_coords = direction(starting_coords)
 
-        # Get all the starting values
-        starting_colors = self.color(starting_coords)
+        # get all the starting values
+        starting_colors = self.color(self.image, starting_coords)
         next_coords = starting_coords
-        next_colors = self.color(direction(next_coords))
+        next_colors = self.color(self.image, direction(next_coords))
         color_freq = {}
         last_failed = False
 
-        # Compare the three most likely colors against the three starting colors
-        # because the color identification can be unreliable.
+        # compare the three most likely colors against the three starting colors
+        # because the color identification can be unreliable
         while bool(set(starting_colors) & set(next_colors)) or last_failed == False:
 
-            # Checking if the last iteration failed provides a small error
-            # recovery scheme in case we find a single unrepresentative pixel.
+            # checking if the last iteration failed provides a small error
+            # recovery scheme in case we find a single unrepresentative pixel
             if starting_colors not in next_colors:
                 last_failed = True
             else:
                 last_failed = False
 
-            # Track color frequency.
+            # track color frequency
             color_freq = self.update_local_color_freq(color_freq, next_colors)
 
-            # Increment and update the next values.
+            # increment and update the next values
             next_coords = direction(next_coords)
-            next_colors = self.color(direction(next_coords))
+            next_colors = self.color(self.image, direction(next_coords))
 
-        # Update the value of the center coordinates based on the new
-        # information we have found.
-        # if depth == "inner":
-        #     self.update_center_coords(next_coords)
+        # update the value of the center coordinates based on the new
+        # information we have found
+        if depth == "inner":
+            self.update_center_coords(next_coords)
 
-        # Update the global color frequency map.
+        # update the global color frequency map
         self.update_global_color_freq(color_freq, depth)
 
         return next_coords

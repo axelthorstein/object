@@ -1,5 +1,6 @@
 from enum import Enum
 from PIL import Image, ImageFilter
+from profilehooks import timecall
 
 from ring import SimpleRing, HoughTransformRing
 
@@ -116,6 +117,7 @@ class Detect:
         else:
             raise DetectionException("No valid ring found: {}".format(ring))
 
+    @timecall
     def detect_ring(self):
         """Detect a ring in an image.
 
@@ -127,9 +129,9 @@ class Detect:
         """
         # crop, compress, and blur image
         image = self.preprocess_image()
-        
-        starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
 
+        # find the ring in the image
+        starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
         ring = self.strategy(image, starting_coords, debug=self.debug)
 
         # draw the ring onto a photo for visual validation
