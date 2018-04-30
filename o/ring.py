@@ -199,7 +199,6 @@ class SimpleRing(Ring):
         Returns:
             str: The ring color.
         """
-
         return max(dict(self.color_freq["outer"]).items(), key=itemgetter(1))[0]
 
     def get_inner_edges(self):
@@ -233,8 +232,6 @@ class SimpleRing(Ring):
         Returns:
             int: The outer edges.
         """
-
-        #  TODO: use average ring width.
         left = self.walk(SimpleRing.left(self.inner_edges["left"]),
            SimpleRing.left, depth="outer")
         up = self.walk(SimpleRing.up(self.inner_edges["up"]),
