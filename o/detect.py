@@ -1,7 +1,5 @@
 from enum import Enum
-import cv2
-from PIL import Image
-import numpy as np
+from PIL import Image, ImageFilter
 
 from ring import SimpleRing, HoughTransformRing
 
@@ -13,7 +11,7 @@ class DetectionStrategy(Enum):
 
 class Detect:
     """
-    Detect a circle from a given image.
+    Detect a ring from a given image.
     """
 
     def __init__(self, image_path,
@@ -25,16 +23,13 @@ class Detect:
     def crop(self, image):
         """Crop a photo.
 
-        Crop the photo by creating to slightly larger than the circle overlay.
-
-        If debug is enabled save the newly cropped image to new path suffixed
-        with "_cropped.png".
+        Crop the photo by creating to slightly larger than the ring overlay.
 
         Args:
-            image (np.array of np.array): The path to the original image.
+            image (Image): The path to the original image.
 
         Returns:
-            np.array of np.array: The newly cropped image.
+            Image: The newly cropped image.
         """
         half_the_width = image.size[0] / 2
         half_the_height = image.size[1] / 2
@@ -48,10 +43,6 @@ class Detect:
                 half_the_height + (half_the_height * 0.35)
             )
         )
-
-        if self.debug:
-            cropped_path = self.image_path[:-4] + "_cropped.png"
-            cropped_image.save(cropped_path)
         
         return cropped_image
 
@@ -59,10 +50,10 @@ class Detect:
         """Compress a photo.
 
         Args:
-            image (np.array of np.array): The path to the original image.
+            image (Image): The path to the original image.
 
         Returns:
-            np.array of np.array: The newly cropped image.
+            Image: The newly cropped image.
         """
         image.thumbnail((image.size[0], image.size[0]), Image.ANTIALIAS)
 
@@ -71,43 +62,25 @@ class Detect:
     def draw_ring(self, image, ring):
         """Draw onto a new image the potentially found ring.
 
+        Convert each edge and center coordinate black for a visual
+        representation of the found ring.
+
         Args:
-            image (np.array of np.array): The original image.
+            image (Image): The original image.
             coords (tuple of int): The coordinates of a pixel.
-
-        Returns:
-            tuple of int: The coordinates of a pixel.
         """
-        # TODO: fix
-        # ring.center_coords = (90, 105)
-        # ring.center_coords = (ring.center_coords[1], ring.center_coords[0])
+        pixel_matrix = image.load()
+        black_pixel = (0,0,0)
 
-        cv2.circle(image, ring.center_coords,
-            ring.inner_radius, (200, 20, 24), 1)
-        cv2.circle(image, ring.center_coords,
-            ring.outer_radius, (43, 0, 123), 1)
-        cv2.circle(image, ring.center_coords, 2, (255, 33, 0), 1)
-        cv2.line(image, ring.outer_edges["left"], ring.outer_edges["up"], (200, 20, 24), 1)
-        cv2.line(image, ring.outer_edges["up"], ring.outer_edges["right"], (200, 20, 24), 1)
-        cv2.line(image, ring.outer_edges["right"], ring.outer_edges["down"], (200, 20, 24), 1)
-        cv2.line(image, ring.outer_edges["down"], ring.outer_edges["left"], (200, 20, 24), 1)
-        cv2.line(image, ring.center_coords, ring.center_coords, (43, 0, 123), 1)
-        cv2.imwrite(
-            "/Users/axelthor/Projects/object/images/test_draw.png", image
-            )
-        
-    def get_image_width(self, image, image_path):
-        """Return the width of the image.
+        for coord in ring.inner_edges:
+            pixel_matrix[ring.inner_edges[coord]] = black_pixel
 
-        Return the width of the image and save the compressed image.
+        for coord in ring.outer_edges:
+            pixel_matrix[ring.outer_edges[coord]] = black_pixel
 
-        Returns:
-            int: The width of the image.
-        """
-        compressed_image = self.compress(self.crop(image))
-        compressed_image.save(image_path)
+        pixel_matrix[ring.center_coords] = black_pixel
 
-        return compressed_image.size[0]
+        image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
     def preprocess_image(self):
         """Crop, compress, and filter to image.
@@ -116,38 +89,23 @@ class Detect:
         as an array, where as the processing happens on the image object.
 
         Returns:
-            np.array of np.array: The preprocessed image.
+            Image: The preprocessed image.
         """
         image = Image.open(self.image_path)
-        image_path = self.image_path[:-4] + "_preprocessed.png"
-        preprocessed_image = cv2.imread(image_path)
-        interpolated_image = cv2.bilateralFilter(preprocessed_image, 9, 75, 75)
+        filtered_image = image.filter(ImageFilter.MedianFilter())
 
-        return interpolated_image, self.get_image_width(image, image_path)
+        preprocessed_image = self.compress(self.crop(filtered_image))
 
-    def get_ring(self, image_width, preprocessed_image):
-        """Return the ring from an image.
-
-        If a ring exists in the photo, return the ring.
-
-        Returns:
-            Ring: The ring object.
-        """
-        center_pixel = int(image_width / 2)
-        starting_center_coords = [center_pixel, center_pixel]
-
-        # locate the ring colors using strategy
-        ring = self.strategy(preprocessed_image,
-            starting_center_coords, debug=self.debug)
-
-        if self.debug:
-            
-        return ring
+        return preprocessed_image
 
     def log_debug_info(self, preprocessed_image, ring):
         """Log debugging information.
 
         Log the overlay and ring dimensions and draw them onto the image.
+
+        Args:
+            image (Image): The preprocessed image.
+            ring (Ring): The detected ring.
         """
         self.draw_ring(preprocessed_image, ring)
 
@@ -156,11 +114,10 @@ class Detect:
         if ring.is_valid:
             print("Valid ring found at: {}".format(ring))
         else:
-            DetectionException("No valid ring found: {}".format(ring))
+            raise DetectionException("No valid ring found: {}".format(ring))
 
-
-    def detect_circle(self):
-        """Detect a circle in an image.
+    def detect_ring(self):
+        """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of
         the image, detected using a specified strategy.
@@ -169,13 +126,15 @@ class Detect:
             tuple of int: The colors of the ring.
         """
         # crop, compress, and blur image
-        preprocessed_image, image_width = self.preprocess_image()
+        image = self.preprocess_image()
         
-        ring = self.get_ring(image_width, preprocessed_image)
+        starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
+
+        ring = self.strategy(image, starting_coords, debug=self.debug)
 
         # draw the ring onto a photo for visual validation
         if self.debug:
-            self.log_debug_info(image_width, preprocessed_image)
+            self.log_debug_info(image, ring)
 
         return (ring.center_color, ring.ring_color)
 
@@ -185,11 +144,11 @@ class DetectionException(Exception):
 
 
 if __name__=="__main__":
-    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_circle()
-    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/circle.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/moon.png').detect_circle()
+    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_ring()
+    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/circle.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/moon.png').detect_ring()
