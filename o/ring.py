@@ -190,9 +190,6 @@ class SimpleRing(Ring):
         self.outer_radius = self.get_outer_radius()
         self.ring_color = self.get_ring_color()
         self.center_color = self.get_center_color()
-        # TODO: change later
-        self.center_color = max(dict(self.color_freq["inner"]).items(), key=itemgetter(1))[0]
-        self.ring_color = max(dict(self.color_freq["outer"]).items(), key=itemgetter(1))[0]
         self.is_valid = self.is_valid()
 
     def is_valid(self):
@@ -202,6 +199,29 @@ class SimpleRing(Ring):
             bool: Whether the ring is valid.
         """
         return self.ring_color != self.center_color
+
+    def get_center_color(self):
+        """Find the color inside the circle.
+
+        Return the "highest voted" color from the center. The color with the
+        highest combination of frequency and likelihood.
+
+        Returns:
+            str: The center color.
+        """
+        return max(dict(self.color_freq["inner"]).items(), key=itemgetter(1))[0]
+
+    def get_ring_color(self):
+        """Find the color inside the ring.
+
+        Return the "highest voted" color from the ring. The color with the
+        highest combination of frequency and likelihood.
+
+        Returns:
+            str: The ring color.
+        """
+
+        return max(dict(self.color_freq["outer"]).items(), key=itemgetter(1))[0]
 
     def get_inner_edges(self):
         """Return the inner edges of the ring.
@@ -228,7 +248,7 @@ class SimpleRing(Ring):
 
         To find the outer edge we begin walking from the inner edge until
         we reach the original color. We need to increment the inner edge
-        by 1 because it returns the pixel before the color change, so it
+        by one because it returns the pixel before the color change, so it
         would immeadiately exit otherwise.
 
         Returns:
@@ -410,11 +430,16 @@ class SimpleRing(Ring):
 
         Begining at the starting coordinates continue incrementally
         in the given direction until a new color is reached. At each new
-        pixel arrived at check the pixels color.
+        pixel arrived at check the pixels color. Given that the color name
+        detection can be unreliable we need to get the three most likely colors
+        and compare against the three most likely starting colors. If there are
+        no common elements for two iterations we consider an edge to be found
+        and exit. This provides us with minimal error recovery.
         
         Args:
             starting_coords (tuple of int): Coordinates of the starting pixel.
             direction (method): Direction to increment/decrement.
+            depth (str): Whether this is for inner or outer colours.
 
         Returns:
             tuple of int: The coordinates of a pixel.

@@ -13,7 +13,7 @@ class DetectionStrategy(Enum):
 
 class Detect:
     """
-    Detect a circle from a given image.
+    Detect a ring from a given image.
     """
 
     def __init__(self, image_path,
@@ -25,16 +25,13 @@ class Detect:
     def crop(self, image):
         """Crop a photo.
 
-        Crop the photo by creating to slightly larger than the circle overlay.
-
-        If debug is enabled save the newly cropped image to new path suffixed
-        with "_cropped.png".
+        Crop the photo by creating to slightly larger than the ring overlay.
 
         Args:
-            image (np.array of np.array): The path to the original image.
+            image (Image): The path to the original image.
 
         Returns:
-            np.array of np.array: The newly cropped image.
+            Image: The newly cropped image.
         """
         half_the_width = image.size[0] / 2
         half_the_height = image.size[1] / 2
@@ -48,10 +45,6 @@ class Detect:
                 half_the_height + (half_the_height * 0.35)
             )
         )
-
-        # if self.debug:
-        #     cropped_path = self.image_path[:-4] + "_cropped.png"
-        #     cropped_image.save(cropped_path)
         
         return cropped_image
 
@@ -59,10 +52,10 @@ class Detect:
         """Compress a photo.
 
         Args:
-            image (np.array of np.array): The path to the original image.
+            image (Image): The path to the original image.
 
         Returns:
-            np.array of np.array: The newly cropped image.
+            Image: The newly cropped image.
         """
         image.thumbnail((image.size[0], image.size[0]), Image.ANTIALIAS)
 
@@ -87,7 +80,7 @@ class Detect:
         for coord in ring.outer_edges:
             pixel_matrix[ring.outer_edges[coord]] = black_pixel
 
-        pixel_matrix[ring.center_coords] = (0, 250, 0)
+        pixel_matrix[ring.center_coords] = black_pixel
 
         image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
@@ -111,6 +104,10 @@ class Detect:
         """Log debugging information.
 
         Log the overlay and ring dimensions and draw them onto the image.
+
+        Args:
+            image (Image): The preprocessed image.
+            ring (Ring): The detected ring.
         """
         self.draw_ring(preprocessed_image, ring)
 
@@ -121,8 +118,8 @@ class Detect:
         else:
             raise DetectionException("No valid ring found: {}".format(ring))
 
-    def detect_circle(self):
-        """Detect a circle in an image.
+    def detect_ring(self):
+        """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of
         the image, detected using a specified strategy.
@@ -149,11 +146,11 @@ class DetectionException(Exception):
 
 
 if __name__=="__main__":
-    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_circle()
-    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/circle.png').detect_circle()
-    # Detect('/Users/axelthor/Projects/object/images/moon.png').detect_circle()
+    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_ring()
+    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/circle.png').detect_ring()
+    # Detect('/Users/axelthor/Projects/object/images/moon.png').detect_ring()
