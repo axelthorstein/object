@@ -1,5 +1,7 @@
 import pytest
 
+from o.overlay import Overlay
+
 
 @pytest.fixture()
 def starting_coordinates():
@@ -9,3 +11,8 @@ def starting_coordinates():
 @pytest.fixture()
 def color_freq():
 	return {"inner": {},"outer": {}}
+
+
+@pytest.fixture()
+def overlay():
+	return Overlay((100, 100))
