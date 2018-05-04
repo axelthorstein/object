@@ -7,7 +7,7 @@ from o.ring import Ring
 from o.move import Move
 from o.direction import Direction
 from o.overlay import Overlay
-from utils.color_utils import update_color_freq, get_highest_color
+from utils.color_utils import update_color_freq
 
 
 class SimpleRing(Ring):
@@ -43,12 +43,13 @@ class SimpleRing(Ring):
         Returns:
             bool: Whether the ring is valid.
         """
-        valid = (self.inner_radius < self.outer_radius
-                 and self.ring_color != self.center_color
-                 and self.inner_edges["left"][0] > self.outer_edges["left"][0]
-                 and self.inner_edges["up"][1] < self.outer_edges["up"][1]
-                 and self.inner_edges["right"][0] < self.outer_edges["right"][0]
-                 and self.inner_edges["down"][1] > self.outer_edges["down"][1])
+        x, y = 0, 1
+        valid = (self.inner_radius < self.outer_radius and
+                 self.ring_color != self.center_color and
+                 self.inner_edges["left"][x] > self.outer_edges["left"][x] and
+                 self.inner_edges["up"][y] < self.outer_edges["up"][y] and
+                 self.inner_edges["right"][x] < self.outer_edges["right"][x] and
+                 self.inner_edges["down"][y] > self.outer_edges["down"][y])
         return valid
 
     def get_center_color(self):
@@ -60,7 +61,7 @@ class SimpleRing(Ring):
         Returns:
             str: The center color.
         """
-        return get_highest_color(self.color_freq, "inner")
+        return self.color_freq["inner"].most_common(1)[0]
 
     def get_ring_color(self):
         """Find the color inside the ring.
@@ -71,7 +72,7 @@ class SimpleRing(Ring):
         Returns:
             str: The ring color.
         """
-        return get_highest_color(self.color_freq, "outer")
+        return self.color_freq["outer"].most_common(1)[0]
 
     def get_edge(self, move, starting_coords, direction):
         """Return the edge of the ring.
@@ -84,8 +85,8 @@ class SimpleRing(Ring):
             dictionary: The coordinates of the edge.
         """
         edge_coords, color_freq = move.walk(starting_coords, direction)
-        self.update_center_coords(edge_coords)
         self.color_freq[move.depth] += color_freq[move.depth]
+        self.update_center_coords(edge_coords)
 
         return edge_coords
 
@@ -157,12 +158,13 @@ class SimpleRing(Ring):
         Returns:
             int: The average radius.
         """
+        x, y = 0, 1
         average_radius = 0
 
-        average_radius += abs(self.center_coords[0] - edges["left"][0])
-        average_radius += abs(self.center_coords[1] - edges["up"][1])
-        average_radius += abs(self.center_coords[1] - edges["down"][1])
-        average_radius += abs(self.center_coords[0] - edges["right"][0])
+        average_radius += abs(self.center_coords[x] - edges["left"][x])
+        average_radius += abs(self.center_coords[y] - edges["up"][y])
+        average_radius += abs(self.center_coords[y] - edges["down"][y])
+        average_radius += abs(self.center_coords[x] - edges["right"][x])
 
         return int(average_radius / 4)
 
