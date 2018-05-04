@@ -1,6 +1,8 @@
 from collections import Counter
 from profilehooks import timecall
 
+from collections import Counter
+
 from o.ring import Ring
 from o.move import Move
 from o.direction import Direction
@@ -26,7 +28,7 @@ class SimpleRing(Ring):
         self.debug = debug
         self.center_coords = starting_coords
         self.overlay = Overlay(starting_coords)
-        self.color_freq = {"inner": {}, "outer": {}}
+        self.color_freq = {"inner": Counter(), "outer": Counter()}
         self.inner_edges = self.get_inner_edges()
         self.outer_edges = self.get_outer_edges()
         self.inner_radius = self.get_inner_radius()
@@ -83,8 +85,7 @@ class SimpleRing(Ring):
         """
         edge_coords, color_freq = move.walk(starting_coords, direction)
         self.update_center_coords(edge_coords)
-        print(color_freq, tuple(color_freq.keys()))
-        self.color_freq = update_color_freq(color_freq, tuple(color_freq.keys()), move.depth)
+        self.color_freq[move.depth] += color_freq[move.depth]
 
         return edge_coords
 

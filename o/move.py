@@ -1,3 +1,5 @@
+from collections import Counter
+
 from o.direction import Direction
 from utils.color_utils import get_color, update_color_freq
 
@@ -49,7 +51,7 @@ class Move(Direction):
         current_coords = starting_coords
         current_colors = self.get_pixel(direction(current_coords))
         last_failed = False
-        color_freq = {"inner": {}, "outer": {}}
+        color_freq = {"inner": Counter(), "outer": Counter()}
 
         # compare the three most likely colors against the three starting colors
         # because the color identification can be unreliable

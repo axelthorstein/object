@@ -1,4 +1,5 @@
 import pytest
+from collections import Counter
 
 from o.overlay import Overlay
 from utils.color_utils import update_color_freq
@@ -11,7 +12,7 @@ def starting_coordinates():
 
 @pytest.fixture()
 def color_freq():
-	return {"inner": {},"outer": {}}
+	return {"inner": Counter(),"outer": Counter()}
 
 
 @pytest.fixture()

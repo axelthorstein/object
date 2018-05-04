@@ -35,18 +35,18 @@ def get_color(rgb):
 
 
 def update_color_freq(color_freq, current_colors, depth):
-    """Update the color local freq dictionary.
+    """Update the color local freq Counter.
 
     Track the frequency of a color for the given depth and direction, and
     multiply it by the likelihood that the correct color was identified.
     
     Args:
-        color_freq (dictionary): The freq of colors.
+        color_freq (Counter): The freq of colors.
         current_colors (tuple): The next pixel's color.
         depth (str): Whether this is for inner or outer colours.
 
     Returns:
-        color_freq (dictionary): The freq of colors.
+        color_freq (Counter): The freq of colors.
     """
     for i, color in enumerate(reversed(list(current_colors))):
         if color in color_freq[depth].keys():
@@ -64,7 +64,7 @@ def get_highest_color(color_freq, depth):
     highest combination of frequency and likelihood.
 
     Args:
-        color_freq (dictionary): The freq of colors.
+        color_freq (Counter): The freq of colors.
         depth (str): Whether this is for inner or outer colours.
 
     Returns:
