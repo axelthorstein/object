@@ -2,7 +2,8 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from ring import SimpleRing, HoughTransformRing
+from simple_ring import SimpleRing
+from hough_transform_ring import HoughTransformRing
 
 
 class DetectionStrategy(Enum):
@@ -143,14 +144,3 @@ class Detect:
 
 class DetectionException(Exception):
     pass
-
-
-if __name__=="__main__":
-    Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=DetectionStrategy.SIMPLE, debug=True).detect_ring()
-    # Detect("/Users/axelthor/Projects/object/images/test3.png", strategy=HOUGH_TRANSFORM, debug=False).detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/ring.png').detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/thick_ring.png').detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/two_rings.png').detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/moon_ring.png').detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/circle.png').detect_ring()
-    # Detect('/Users/axelthor/Projects/object/images/moon.png').detect_ring()
