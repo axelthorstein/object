@@ -1,0 +1,11 @@
+{
+  "tests/test_color_utils.py::test_get_color_name_raises_error_on_incorrect_rgb": true,
+  "tests/test_move.py::test_move_down": true,
+  "tests/test_move.py::test_move_down_raises_error_on_negative_coord": true,
+  "tests/test_move.py::test_move_left": true,
+  "tests/test_move.py::test_move_left_five": true,
+  "tests/test_move.py::test_move_left_raises_error_on_negative_coord": true,
+  "tests/test_move.py::test_move_right": true,
+  "tests/test_move.py::test_move_up": true,
+  "tests/test_ring.py::test_move_left": true
+}

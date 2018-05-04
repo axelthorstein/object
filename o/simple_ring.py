@@ -1,11 +1,11 @@
 from collections import Counter
-from operator import itemgetter
 from profilehooks import timecall
 
 from o.ring import Ring
 from o.move import Move
+from o.direction import Direction
 from o.overlay import Overlay
-from utils.color_utils import get_color, update_color_freq
+from utils.color_utils import update_color_freq, get_highest_color
 
 
 class SimpleRing(Ring):
@@ -41,7 +41,13 @@ class SimpleRing(Ring):
         Returns:
             bool: Whether the ring is valid.
         """
-        return self.ring_color != self.center_color
+        valid = (self.inner_radius < self.outer_radius
+                 and self.ring_color != self.center_color
+                 and self.inner_edges["left"][0] > self.outer_edges["left"][0]
+                 and self.inner_edges["up"][1] < self.outer_edges["up"][1]
+                 and self.inner_edges["right"][0] < self.outer_edges["right"][0]
+                 and self.inner_edges["down"][1] > self.outer_edges["down"][1])
+        return valid
 
     def get_center_color(self):
         """Find the color inside the circle.
@@ -52,7 +58,7 @@ class SimpleRing(Ring):
         Returns:
             str: The center color.
         """
-        return max(dict(self.color_freq["inner"]).items(), key=itemgetter(1))[0]
+        return get_highest_color(self.color_freq, "inner")
 
     def get_ring_color(self):
         """Find the color inside the ring.
@@ -63,19 +69,40 @@ class SimpleRing(Ring):
         Returns:
             str: The ring color.
         """
-        return max(dict(self.color_freq["outer"]).items(), key=itemgetter(1))[0]
+        return get_highest_color(self.color_freq, "outer")
+
+    def get_edge(self, move, starting_coords, direction):
+        """Return the edge of the ring.
+
+        Walk from the starting coordinate to in the given direction until an
+        edge is found. Then with the coordinates and colors of this edge update
+        the attributes of the ring.
+
+        Returns:
+            dictionary: The coordinates of the edge.
+        """
+        edge_coords, color_freq = move.walk(starting_coords, direction)
+        self.update_center_coords(edge_coords)
+        print(color_freq, tuple(color_freq.keys()))
+        self.color_freq = update_color_freq(color_freq, tuple(color_freq.keys()), move.depth)
+
+        return edge_coords
 
     @timecall
     def get_inner_edges(self):
         """Return the inner edges of the ring.
 
+        On each iteration update the value of the center coordinates based on
+        the new information from the last edge.
+
         Returns:
-            int: The inner edges.
+            dictionary: The inner edges.
         """
-        left = self.walk(self.center_coords, Move.left, depth="inner")
-        up = self.walk(self.center_coords, Move.up, depth="inner")
-        right = self.walk(self.center_coords, Move.right, depth="inner")
-        down = self.walk(self.center_coords, Move.down, depth="inner")
+        move = Move(self.image, depth="inner")
+        left = self.get_edge(move, self.center_coords, Direction.left)
+        up = self.get_edge(move, self.center_coords, Direction.up)
+        right = self.get_edge(move, self.center_coords, Direction.right)
+        down = self.get_edge(move, self.center_coords, Direction.down)
 
         inner_edges = {
             "left": left,
@@ -96,16 +123,18 @@ class SimpleRing(Ring):
         would immeadiately exit otherwise.
 
         Returns:
-            int: The outer edges.
+            dictionary: The outer edges.
         """
-        left = self.walk(Move.left(self.inner_edges["left"]),
-           Move.left, depth="outer")
-        up = self.walk(Move.up(self.inner_edges["up"]),
-           Move.up, depth="outer")
-        right = self.walk(Move.right(self.inner_edges["right"]),
-           Move.right, depth="outer")
-        down = self.walk(Move.down(self.inner_edges["down"]),
-           Move.down, depth="outer")
+        move = Move(self.image, depth="outer")
+
+        left = self.get_edge(move,
+            Direction.left(self.inner_edges["left"]), Direction.left)
+        up = self.get_edge(move,
+            Direction.up(self.inner_edges["up"]), Direction.up)
+        right = self.get_edge(move,
+            Direction.right(self.inner_edges["right"]), Direction.right)
+        down = self.get_edge(move,
+            Direction.down(self.inner_edges["down"]), Direction.down)
 
         outer_edges = {
             "left": left,
@@ -185,69 +214,7 @@ class SimpleRing(Ring):
                 offset = abs(center[x] - coords[x]) - overlay_radius
             self.center_coords = (center[x] + offset, center[y])
 
-    def get_pixel(self, coords):
-        """Get the pixel at the given coordinate.
-        
-        Args:
-            coords (tuple of int): The coordinates of the pixel.
 
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        return get_color(self.image.getpixel(coords))
-
-    def walk(self, starting_coords, direction, depth=True):
-        """Walk a stright line of pixels until a new color is reached.
-
-        Begining at the starting coordinates continue incrementally
-        in the given direction until a new color is reached. At each new
-        pixel arrived at check the pixels color. Given that the color name
-        detection can be unreliable we need to get the three most likely colors
-        and compare against the three most likely starting colors. If there are
-        no common elements for two iterations we consider an edge to be found
-        and exit. This provides us with minimal error recovery.
-        
-        Args:
-            starting_coords (tuple of int): Coordinates of the starting pixel.
-            direction (method): Direction to increment/decrement.
-            depth (str): Whether this is for inner or outer colours.
-
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        # advance one past just to be safe and away from the edge
-        starting_coords = direction(starting_coords)
-
-        # get all the starting values
-        starting_colors = self.get_pixel(starting_coords)
-        current_coords = starting_coords
-        next_colors = self.get_pixel(direction(current_coords))
-        last_failed = False
-
-        # compare the three most likely colors against the three starting colors
-        # because the color identification can be unreliable
-        while bool(starting_colors & next_colors) or last_failed == False:
-
-            # checking if the last iteration failed provides a small error
-            # recovery scheme in case we find a single unrepresentative pixel
-            if bool(starting_colors & next_colors):
-                last_failed = True
-            else:
-                last_failed = False
-
-            # track color frequency
-            self.color_freq = update_color_freq(self.color_freq, next_colors, depth)
-
-            # increment and update the next values
-            current_coords = direction(current_coords)
-            next_colors = self.get_pixel(current_coords)
-
-        # update the value of the center coordinates based on the new
-        # information we have found
-        if depth == "inner":
-            self.update_center_coords(current_coords)
-
-        return current_coords
 
     def __str__(self):
         """Return a string representation of the ring.

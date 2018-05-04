@@ -1,3 +1,9 @@
+# Object ignore
+images/*_preprocessed*
+images/*_thumbnail*
+images/*_cropped*
+images/*_draw*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

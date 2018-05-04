@@ -1,6 +1,6 @@
 import pytest
 
-from utils.color_utils import get_color, update_color_freq
+from utils.color_utils import get_color, update_color_freq, get_highest_color
 
 
 def test_get_color_name_returns_three_colors():
@@ -71,5 +71,27 @@ def test_update_inner_and_outer_color_freq(color_freq):
 		"inner": {'black': 1, 'blue': 2, 'red': 3},
 		"outer": {}
 		}
+
+	assert expected == actual
+
+
+def test_get_highest_color(updated_color_freq):
+	"""
+	Test the the highest voted colour is returned for the inner depth.
+	"""
+	depth = "inner"
+	actual = get_highest_color(updated_color_freq, depth)
+	expected = "red"
+
+	assert expected == actual
+
+
+def test_get_highest_color(updated_color_freq):
+	"""
+	Test the the highest voted colour is returned for the inner depth.
+	"""
+	depth = "outer"
+	actual = get_highest_color(updated_color_freq, depth)
+	expected = "black"
 
 	assert expected == actual

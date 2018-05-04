@@ -1,4 +1,5 @@
 import webcolors
+from operator import itemgetter
 
 
 class ColorException(Exception):
@@ -32,7 +33,7 @@ def get_color(rgb):
     # Return the 3 most likely colors in order of likelihood.
     return set(min_colors[:3])
 
-    
+
 def update_color_freq(color_freq, current_colors, depth):
     """Update the color local freq dictionary.
 
@@ -54,3 +55,29 @@ def update_color_freq(color_freq, current_colors, depth):
             color_freq[depth][color] = 1 * i
 
     return color_freq
+
+
+def get_highest_color(color_freq, depth):
+    """Get the highest voted color.
+    
+    Return the "highest voted" color from the center. The color with the
+    highest combination of frequency and likelihood.
+
+    Args:
+        color_freq (dictionary): The freq of colors.
+        depth (str): Whether this is for inner or outer colours.
+
+    Returns:
+        str: The highest voted color color.
+    """
+    highest_voted_color = None
+    highest_value = 0
+    # convert from Counter
+    colors = dict(color_freq[depth])
+
+    for color in colors:
+        if colors[color] >= highest_value:
+            highest_voted_color = color
+            highest_value = colors[color]
+            
+    return highest_voted_color

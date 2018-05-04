@@ -1,78 +1,72 @@
-class CoordinateException(Exception):
-    pass
-        
+from o.direction import Direction
+from utils.color_utils import get_color, update_color_freq
 
-class Move(object):
+
+class Move(Direction):
     """
     An interface for incrementing coordinates in a pixel matrix.
-
-    TODO: Maybe make this an instance that knows the current coords
-    move based on those.
     """
 
-    @staticmethod
-    def valid_coordinate(coord):
-        """Return the coordinate if it is valid.
+    def __init__(self, image, depth):
+        self.image = image
+        self.depth = depth
+
+    def get_pixel(self, coords):
+        """Get the pixel at the given coordinate.
         
         Args:
-            coord (int): The coordinate.
-
-        Return:
-            int: The valid coordinate.
-        """
-        if coord >= 0:
-            return coord
-        raise CoordinateException(
-            "A coordinate cannot be less than zero. {}".format(coord))
-
-    @staticmethod
-    def left(coords, jump=1):
-        """Decrement the x value by 1.
-
-        Args:
-            coords (tuple of int): The coordinates of a pixel.
+            coords (tuple of int): The coordinates of the pixel.
 
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Move.valid_coordinate(coords[0] - jump)
+        return get_color(self.image.getpixel(coords))
 
-        return (new_coordinate, coords[1])
+    def walk(self, starting_coords, direction):
+        """Walk a stright line of pixels until a new color is reached.
 
-    @staticmethod
-    def up(coords, jump=1):
-        """Increment the y value by 1.
-
+        Begining at the starting coordinates continue incrementally
+        in the given direction until a new color is reached. At each new
+        pixel arrived at check the pixels color. Given that the color name
+        detection can be unreliable we need to get the three most likely colors
+        and compare against the three most likely starting colors. If there are
+        no common elements for two iterations we consider an edge to be found
+        and exit. This provides us with minimal error recovery.
+        
         Args:
-            coords (tuple of int): The coordinates of a pixel.
+            starting_coords (tuple of int): Coordinates of the starting pixel.
+            direction (method): Direction to increment/decrement.
+            depth (str): Whether this is for inner or outer colours.
 
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return (coords[0], coords[1] + jump)
+        # advance one past just to be safe and away from the edge
+        starting_coords = direction(starting_coords)
 
-    @staticmethod
-    def down(coords, jump=1):
-        """Decrement the y value by 1.
+        # get all the starting values
+        starting_colors = self.get_pixel(starting_coords)
+        current_coords = starting_coords
+        current_colors = self.get_pixel(direction(current_coords))
+        last_failed = False
+        color_freq = {"inner": {}, "outer": {}}
 
-        Args:
-            coords (tuple of int): The coordinates of a pixel.
+        # compare the three most likely colors against the three starting colors
+        # because the color identification can be unreliable
+        while bool(starting_colors & current_colors) or last_failed == False:
 
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        new_coordinate = Move.valid_coordinate(coords[1] - jump)
+            # checking if the last iteration failed provides a small error
+            # recovery scheme in case we find a single unrepresentative pixel
+            if bool(starting_colors & current_colors):
+                last_failed = True
+            else:
+                last_failed = False
 
-        return (coords[0], coords[1] - jump)
+            # track color frequency
+            color_freq = update_color_freq(color_freq, current_colors, self.depth)
 
-    @staticmethod
-    def right(coords, jump=1):
-        """Increment the x value by 1.
+            # increment and update the current values
+            current_coords = direction(current_coords)
+            current_colors = self.get_pixel(current_coords)
 
-        Args:
-            coords (tuple of int): The coordinates of a pixel.
-
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        return (coords[0] + jump, coords[1])
+        return current_coords, color_freq
