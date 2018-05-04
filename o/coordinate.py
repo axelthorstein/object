@@ -12,8 +12,9 @@ class Coordinate:
     def __init__(self, image, depth):
         self.image = image
         self.depth = depth
+        self.color_freq = {"inner": Counter(), "outer": Counter()}
 
-    def get_pixel(self, coords):
+    def get_pixel_colors(self, coords):
         """Get the pixel at the given coordinate.
         
         Args:
@@ -43,15 +44,11 @@ class Coordinate:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        # advance one past just to be safe and away from the edge
-        starting_coords = direction(starting_coords)
-
         # get all the starting values
-        starting_colors = self.get_pixel(starting_coords)
-        current_coords = starting_coords
-        current_colors = self.get_pixel(direction(current_coords))
+        starting_colors = self.get_pixel_colors(direction(starting_coords))
+        current_coords = direction(starting_coords, jump=2)
+        current_colors = self.get_pixel_colors(current_coords)
         last_failed = False
-        color_freq = {"inner": Counter(), "outer": Counter()}
 
         # compare the three most likely colors against the three starting colors
         # because the color identification can be unreliable
@@ -65,10 +62,10 @@ class Coordinate:
                 last_failed = False
 
             # track color frequency
-            color_freq = update_color_freq(color_freq, current_colors, self.depth)
+            update_color_freq(self.color_freq, current_colors, self.depth)
 
             # increment and update the current values
             current_coords = direction(current_coords)
-            current_colors = self.get_pixel(current_coords)
+            current_colors = self.get_pixel_colors(current_coords)
 
-        return current_coords, color_freq
+        return current_coords

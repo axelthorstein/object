@@ -26,13 +26,17 @@ class SimpleRing(Ring):
         self.center_coords = starting_coords
         self.overlay = Overlay(starting_coords)
         self.color_freq = {"inner": Counter(), "outer": Counter()}
+
+    def create(self):
+        """Set all of the dynamic attributes of the Ring.
+        """
         self.inner_edges = self.get_inner_edges()
         self.outer_edges = self.get_outer_edges()
         self.inner_radius = self.get_inner_radius()
         self.outer_radius = self.get_outer_radius()
         self.ring_color = self.get_ring_color()
         self.center_color = self.get_center_color()
-        self.is_valid = self.is_valid()
+        self.valid = self.is_valid()
 
     def is_valid(self):
         """Determine if the ring is valid.
@@ -82,54 +86,89 @@ class SimpleRing(Ring):
         Returns:
             tuple of int: The coordinates of the edge.
         """
-        edge_coords, color_freq = coordinate.move(starting_coords, direction)
-        self.color_freq[coordinate.depth] += color_freq[coordinate.depth]
+        edge_coords = coordinate.move(starting_coords, direction)
         self.update_center_coords(edge_coords)
 
         return edge_coords
 
+    def get_inner_edge(self, coordinate, directions, direction):
+        """Return the inner edge of the ring.
+
+        Args:
+            directions (dictionary): Mapping of directions to movement methods.
+            depth: The direction to move.
+
+        Returns:
+            tuple of int: The coordinates of the inner edge.
+        """
+        return self.get_edge(coordinate, self.center_coords, directions[direction])
+ 
+    def get_outer_edge(self, coordinate, directions, direction):
+        """Return the outer edge of the ring.
+
+        Args:
+            directions (dictionary): Mapping of directions to movement methods.
+            depth: The direction to move.
+
+        Returns:
+            tuple of int: The coordinates of the outer edge.
+        """
+        starting_coords = directions[direction](self.inner_edges[direction])
+        return self.get_edge(coordinate, starting_coords, directions[direction])
+
     @timecall
-    def get_inner_edges(self):
-        """Return the inner edges of the ring.
+    def get_edges(self, get_edge, depth):
+        """Return the edges of the ring.
 
         On each iteration update the value of the center coordinates based on
         the new information from the last edge.
-
-        Returns:
-            dictionary: The inner edges.
-        """
-        coordinate = Coordinate(self.image, depth="inner")
-        inner_edges = {}
-        directions = Direction.get_directions()
-
-        for direction in directions:
-            inner_edges[direction] = self.get_edge(coordinate,
-                self.center_coords, directions[direction])
-
-        return inner_edges
-
-    @timecall
-    def get_outer_edges(self):
-        """Return the outer edges of the ring.
 
         To find the outer edge we begin moving from the inner edge until
         we reach the original color. We need to increment the inner edge
         by one because it returns the pixel before the color change, so it
         would immeadiately exit otherwise.
 
+        Args:
+            get_edge (method): The method for getting edges.
+            depth: The inner or outer depth.
+
+        Returns:
+            dictionary: The edges.
+        """
+        edges = {}
+        directions = Direction.get_directions()
+        coordinate = Coordinate(self.image, depth=depth)
+
+        for direction in directions:
+            edges[direction] = get_edge(coordinate, directions, direction)
+
+        self.color_freq[depth] += coordinate.color_freq[depth]
+
+        return edges  
+
+    @timecall
+    def get_inner_edges(self):
+        """Return the inner edges of the ring.
+
+        Returns:
+            dictionary: The inner edges.
+        """
+        depth = "inner"
+        get_edge = self.get_inner_edge
+
+        return self.get_edges(get_edge, depth)
+
+    @timecall
+    def get_outer_edges(self):
+        """Return the outer edges of the ring.
+
         Returns:
             dictionary: The outer edges.
         """
-        coordinate = Coordinate(self.image, depth="outer")
-        outer_edges = {}
-        directions = Direction.get_directions()
+        depth = "outer"
+        get_edge = self.get_outer_edge
 
-        for direction in directions:
-            outer_edges[direction] = self.get_edge(coordinate,
-                directions[direction](self.inner_edges[direction]),
-                directions[direction])
-
-        return outer_edges
+        return self.get_edges(get_edge, depth)
 
     def get_average_radius(self, edges):
         """Find the average radius from the edges.
