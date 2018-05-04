@@ -4,7 +4,7 @@ from o.direction import Direction
 from utils.color_utils import get_color, update_color_freq
 
 
-class Move(Direction):
+class Coordinate:
     """
     An interface for incrementing coordinates in a pixel matrix.
     """
@@ -24,7 +24,7 @@ class Move(Direction):
         """
         return get_color(self.image.getpixel(coords))
 
-    def walk(self, starting_coords, direction):
+    def move(self, starting_coords, direction):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally

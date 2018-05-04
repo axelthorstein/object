@@ -7,6 +7,22 @@ class Direction:
     """
 
     @staticmethod
+    def get_directions():
+        """Return a mapping of directions to methods.
+        
+        Return:
+            dictionary: The directions mapping.
+        """
+        directions = {
+            "left": Direction.left,
+            "up": Direction.up,
+            "right": Direction.right,
+            "down": Direction.down
+        }
+
+        return directions
+
+    @staticmethod
     def valid_coordinate(coord):
         """Return the coordinate if it is valid.
         
