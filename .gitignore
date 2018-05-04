@@ -3,7 +3,6 @@ images/*_preprocessed*
 images/*_thumbnail*
 images/*_cropped*
 images/*_draw*
-*.pytest_cache/*
 
 
 # Byte-compiled / optimized / DLL files
