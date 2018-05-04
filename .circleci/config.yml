@@ -19,7 +19,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pipenv shell
+            pip install pipenv
             pipenv install
 
       - save_cache:
@@ -30,8 +30,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            pipenv shell
-            pytest
+            pipenv run pytest
 
       - store_artifacts:
           path: test-reports
