@@ -19,7 +19,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pip install --user pipenv
+            sudo pip install --user pipenv
             pipenv --python 3.6
             pipenv install
 
