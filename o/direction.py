@@ -17,7 +17,11 @@ class Direction:
             "left": Direction.left,
             "up": Direction.up,
             "right": Direction.right,
-            "down": Direction.down
+            "down": Direction.down,
+            "left_and_down": Direction.left_and_down,
+            "left_and_up": Direction.left_and_up,
+            "right_and_up": Direction.right_and_up,
+            "right_and_down": Direction.right_and_down,
         }
 
         return directions
@@ -88,3 +92,57 @@ class Direction:
             tuple of int: The coordinates of a pixel.
         """
         return (coords[0] + jump, coords[1])
+
+    @staticmethod
+    def left_and_up(coords, jump=1):
+        """Increment the x and y values by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        new_coordinate = Direction.valid_coordinate(coords[0] - jump)
+
+        return (new_coordinate, coords[1] + jump)
+
+    @staticmethod
+    def right_and_up(coords, jump=1):
+        """Increment the x and y values by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        return (coords[0] + jump, coords[1] + jump)
+
+    @staticmethod
+    def right_and_down(coords, jump=1):
+        """Increment the x and y values by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        new_coordinate = Direction.valid_coordinate(coords[1] - jump)
+
+        return (coords[0] + jump, new_coordinate)
+
+    @staticmethod
+    def left_and_down(coords, jump=1):
+        """Increment the x and y values by 1.
+
+        Args:
+            coords (tuple of int): The coordinates of a pixel.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        new_coordinate = Direction.valid_coordinate(coords[1] - jump)
+
+        return (coords[0] - jump, new_coordinate)

@@ -134,6 +134,7 @@ class Detect:
         # find the ring in the image
         starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
         ring = self.strategy(image, starting_coords, debug=self.debug)
+        ring.create()
 
         # draw the ring onto a photo for visual validation
         if self.debug:

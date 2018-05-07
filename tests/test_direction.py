@@ -26,6 +26,30 @@ def test_direction_down(starting_coordinates):
 	assert Direction.down(starting_coordinates) == (10, 9)
 
 
+def test_direction_left_and_up(starting_coordinates):
+	"""Test that the x and y coordinate is decremented by 1.
+	"""
+	assert Direction.left_and_up(starting_coordinates) == (9, 11)
+
+
+def test_direction_right_and_up(starting_coordinates):
+	"""Test that the x and y coordinate is incremented by 1.
+	"""
+	assert Direction.right_and_up(starting_coordinates) == (11, 11)
+
+
+def test_direction_right_and_down(starting_coordinates):
+	"""Test that the x and y coordinate is incremented by 1.
+	"""
+	assert Direction.right_and_down(starting_coordinates) == (11, 9)
+
+
+def test_direction_left_and_down(starting_coordinates):
+	"""Test that the x and y coordinate is decremented by 1.
+	"""
+	assert Direction.left_and_down(starting_coordinates) == (9, 9)
+
+
 def test_direction_left_five(starting_coordinates):
 	"""Test that the x coordinate is decremented by 5.
 	"""

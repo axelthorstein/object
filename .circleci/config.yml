@@ -19,7 +19,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pip install pipenv
+            sudo pip install --user pipenv
+            pipenv --python 3.6
             pipenv install
 
       - save_cache:
