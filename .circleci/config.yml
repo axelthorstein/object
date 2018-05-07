@@ -20,7 +20,7 @@ jobs:
           name: install dependencies
           command: |
             pip install --user pipenv
-            pipenv run install
+            pipenv install
 
       - save_cache:
           paths:
