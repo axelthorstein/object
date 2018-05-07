@@ -76,37 +76,39 @@ class SimpleRing(Ring):
         """
         return self.color_freq["outer"].most_common(1)[0][0]
 
-    def get_edge(self, coordinate, starting_coords, direction):
-        """Return the edge of the ring.
+    def get_inner_edge(self, coordinate, directions, direction):
+        """Return the inner edge of the ring.
 
         Walk from the starting coordinate to in the given direction until an
         edge is found. Then with the coordinates and colors of this edge update
         the attributes of the ring.
 
-        Returns:
-            tuple of int: The coordinates of the edge.
-        """
-        edge_coords = coordinate.move(starting_coords, direction)
-        self.update_center_coords(edge_coords)
-
-        return edge_coords
-
-    def get_inner_edge(self, coordinate, directions, direction):
-        """Return the inner edge of the ring.
-
         Args:
+            coordinate: (Coordinate): Interface for pixel coordinate movements.
             directions (dictionary): Mapping of directions to movement methods.
             depth: The direction to move.
 
         Returns:
             tuple of int: The coordinates of the inner edge.
         """
-        return self.get_edge(coordinate, self.center_coords, directions[direction])
+        edge_coords = coordinate.move(
+            self.center_coords, directions[direction])
+
+        if direction in ["left", "right", "up", "down"]:
+            self.update_center_coords(edge_coords)
+
+        return edge_coords
  
     def get_outer_edge(self, coordinate, directions, direction):
         """Return the outer edge of the ring.
 
+        Walk from the starting coordinate to in the given direction until an
+        edge is found. The center coordinates will have already been adjusted
+        to the real center, so we don't need to update them based on the outer
+        coordinates.
+
         Args:
+            coordinate: (Coordinate): Interface for pixel coordinate movements.
             directions (dictionary): Mapping of directions to movement methods.
             depth: The direction to move.
 
@@ -114,7 +116,7 @@ class SimpleRing(Ring):
             tuple of int: The coordinates of the outer edge.
         """
         starting_coords = directions[direction](self.inner_edges[direction])
-        return self.get_edge(coordinate, starting_coords, directions[direction])
+        return coordinate.move(starting_coords, directions[direction])
 
     @timecall
     def get_edges(self, get_edge, depth):
@@ -208,6 +210,32 @@ class SimpleRing(Ring):
         """
         return self.get_average_radius(self.outer_edges)
 
+    def get_center_offset(self, coords, radius, axis):
+        """Find the offset from the coordinate to the center.
+
+        Use the given radius to determine how far away the new coordinate
+        is from the center coordinate on either the x or y axis. Compare
+        the distance to the radius and return how much the center should
+        be adjusted in order for the new coordinate to have matched the
+        center coordinate.
+
+        Args:
+            center (tuple of int): The coordinates of the ring center.
+            coords (tuple of int): The coordinates of the ring edge.
+            axis (int): The x or y axis.
+
+        Returns:
+            int: The offset to adjust the center coordinate.
+        """
+        offset = 0
+
+        if self.center_coords[axis] < coords[axis]:
+            offset += abs(self.center_coords[axis] - coords[axis]) - radius
+        elif self.center_coords[axis] > coords[axis]:
+            offset += radius - abs(self.center_coords[axis] - coords[axis])
+
+        return offset
+
     def update_center_coords(self, coords):
         """Set the center coordinates of the circle.
 
@@ -219,29 +247,11 @@ class SimpleRing(Ring):
         """
         x, y = 0, 1
 
-        center = self.center_coords
-        overlay_radius = self.overlay.inner_radius        
+        x_offset = self.get_center_offset(coords, self.overlay.inner_radius, x)
+        y_offset = self.get_center_offset(coords, self.overlay.inner_radius, y)
 
-        # we are updating the y coordinate (up | down)
-        if center[x] == coords[x]:
-            # get the distance between the center and the inner edge minus
-            # the overlay radius. Update the center to be closer to the true
-            # center
-            if center[y] > coords[y]:
-                offset = overlay_radius - abs(center[y] - coords[y])
-            else:
-                offset = abs(center[y] - coords[y]) - overlay_radius
-            self.center_coords = (center[x], center[y] + offset)
-
-        # we are updating the x coordinate (left | right)
-        else:
-            if center[x] > coords[x]:
-                offset = overlay_radius - abs(center[x] - coords[x])
-            else:
-                offset = abs(center[x] - coords[x]) - overlay_radius
-            self.center_coords = (center[x] + offset, center[y])
-
-
+        self.center_coords = (self.center_coords[x] + x_offset,
+                              self.center_coords[y] + y_offset)
 
     def __str__(self):
         """Return a string representation of the ring.
