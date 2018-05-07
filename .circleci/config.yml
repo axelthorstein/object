@@ -19,8 +19,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pip install pipenv
-            sudo pipenv run install
+            pip install --user pipenv
+            pipenv run install
 
       - save_cache:
           paths:
