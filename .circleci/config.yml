@@ -20,7 +20,8 @@ jobs:
           name: install dependencies
           command: |
             pip install --user pipenv
-            pip install -r requirements.txt
+            pipenv --python 3.6
+            pipenv install
 
       - save_cache:
           paths:
@@ -30,7 +31,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            pytest
+            pipenv run pytest
 
       - store_artifacts:
           path: test-reports

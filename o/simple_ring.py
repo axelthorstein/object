@@ -148,7 +148,6 @@ class SimpleRing(Ring):
 
         return edges  
 
-    @timecall
     def get_inner_edges(self):
         """Return the inner edges of the ring.
 
@@ -160,7 +159,6 @@ class SimpleRing(Ring):
 
         return self.get_edges(get_edge, depth)
 
-    @timecall
     def get_outer_edges(self):
         """Return the outer edges of the ring.
 
