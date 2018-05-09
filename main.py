@@ -35,6 +35,7 @@ def create_checkout(target):
 @app.route('/images/<id>', methods=["GET"])
 def images(id):
     print("here")
+    
     file_path = "images/" + id + ".png"
 
     db = Firebase(file_path)

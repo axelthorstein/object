@@ -6,7 +6,7 @@ from firebase_admin import storage
 
 
 global admin
-admin = firebase_admin.initialize_app(credentials.Certificate('firebase_credentials.json'),
+admin = firebase_admin.initialize_app(credentials.Certificate('/Users/axelthor/credentials/firebase_credentials.json'),
                                       name='object-is',
                                       options={"databaseURL": "https://object-is.firebaseio.com/"})
 

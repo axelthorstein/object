@@ -3,8 +3,10 @@
   // width to the value defined here, but the height will be
   // calculated based on the aspect ratio of the input stream.
 
-  var width = 320;    // We will scale the photo width to this
-  var height = 0;     // This will be computed based on the input stream
+  // TODO: This is hardcoded to fit the Pixel 2 XL aspect ratio of 18:9
+  // for testing on desktop Chrome, but in production lines 25 & 26 should be uncommented.
+  var width = 360;    // We will scale the photo width to this
+  var height = 720;     // This will be computed based on the input stream
 
   // |streaming| indicates whether or not we're currently streaming
   // video from the camera. Obviously, we start at false.
@@ -20,13 +22,13 @@
   var startbutton = null;
 
   function startup() {
+    // height = screen.height;
+    // width = screen.width;
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
     canvasCircleOverlay = document.getElementById('canvas-circle-overlay');
     photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
-    canvas.setAttribute('width', 100);
-    canvas.setAttribute('height', 100);
 
     navigator.getMedia = ( navigator.getUserMedia ||
                            navigator.webkitGetUserMedia ||
@@ -35,8 +37,19 @@
 
     navigator.getMedia(
       {
-        video: true,
-        audio: false
+        audio: false,
+        // asks the users camera for a a specfic aspect ratio, but if it isn't
+        // able to oblige it give up to the min/max values specfied
+        video: {
+          width: { min: 360, ideal: width, max: 1440 },
+          height: { min: 720, ideal: height, max: 2880 },
+          // prefer that the rear camera is used. If on mobile this will be true,
+          // if on desktop the front camera will be used. In production this should
+          // be disabled
+          facingMode: "environment",
+          // limit the video framerate for streaming so that 
+          frameRate: { ideal: 30, max: 60 }
+        }
       },
       function(stream) {
         if (navigator.mozGetUserMedia) {
@@ -51,35 +64,26 @@
         video.play();
       },
       function(err) {
-        console.log("An error occured! " + err);
+        console.log(err.name + ": " + err.message); // always check for errors at the end.
       }
     );
 
     video.addEventListener('canplay', function(ev){
       if (!streaming) {
-        height = video.videoHeight / (video.videoWidth/width);
-      
-        // Firefox currently has a bug where the height can't be read from
-        // the video, so we will make assumptions if this happens.
-      
-        if (isNaN(height)) {
-          height = width / (4/3);
-        }
         
-        video.setAttribute('width', width);
-        video.setAttribute('height', height);
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
-        canvasCircleOverlay.setAttribute('width', width);
-        canvasCircleOverlay.setAttribute('height', height);
+        canvasCircleOverlay.setAttribute('width', width * 2);
+        canvasCircleOverlay.setAttribute('height', height * 2);
 
         // Draw the circle overlay
         var context = canvasCircleOverlay.getContext('2d');
         context.beginPath();
-        context.lineWidth = 20;
+        context.lineWidth = 45;
         context.strokeStyle = "#f1d3ff";
-        context.globalAlpha = 0.5;
-        context.arc(width/2, height/2, 90, 0, Math.PI * 2, true); // Outer circle
+        context.globalAlpha = 0.75;
+        var overlaySize = 200
+        context.arc(width, height, overlaySize, 0, Math.PI * 2, true); // Outer circle
         context.stroke();
 
         streaming = true;
@@ -131,18 +135,18 @@
     
       var data = canvas.toDataURL('image/png');
         ref.putString(data, 'data_url').then(function(snapshot) {
-        console.log('Uploaded a data_url string!');
-        var xhr = new XMLHttpRequest();
-        var baseUrl = window.location.href.split('/capture')[0];
-        xhr.open('GET', baseUrl + "/images/" + id, true);
-        xhr.send();
-        xhr.onreadystatechange = processRequest;
-        function processRequest(e) {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                console.log(xhr.responseText);
-                window.location.replace(xhr.responseText);
-            }
-        }
+          console.log('Uploaded a data_url string!');
+          var xhr = new XMLHttpRequest();
+          var baseUrl = window.location.href.split('/capture')[0];
+          xhr.open('GET', baseUrl + "/images/" + id, true);
+          xhr.send();
+          xhr.onreadystatechange = processRequest;
+          function processRequest(e) {
+              if (xhr.readyState == 4 && xhr.status == 200) {
+                  console.log(xhr.responseText);
+                  window.location.replace(xhr.responseText);
+              }
+          }
         });
       if (photo != null) {
         photo.setAttribute('src', data);

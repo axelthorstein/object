@@ -2,8 +2,8 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from simple_ring import SimpleRing
-from hough_transform_ring import HoughTransformRing
+from o.simple_ring import SimpleRing
+from o.hough_transform_ring import HoughTransformRing
 
 
 class DetectionStrategy(Enum):

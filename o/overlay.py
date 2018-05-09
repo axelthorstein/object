@@ -1,4 +1,4 @@
-from ring import Ring
+from o.ring import Ring
 
 
 class Overlay(Ring):
