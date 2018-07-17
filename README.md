@@ -5,5 +5,5 @@ Culture.
 
 # Authors
 
-*Axel Steignrimsson*
+*Axel Steingrimsson*
 *Hanna Steingrimsdottir*
