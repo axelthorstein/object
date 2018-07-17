@@ -62,7 +62,6 @@ def get_color(rgb):
     saturation = hsv[1]
     brightness = hsv[2] / 255
     color_name = get_hue_name(hue)
-    print(hue, saturation, brightness)
 
     if brightness < 0.3:
         color = 'black'

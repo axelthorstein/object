@@ -12,6 +12,24 @@ def test_get_color_name_returns_three_colors():
 	assert colors == {"midnightblue", "black", "darkgreen"}
 
 
+def test_get_color_name_returns_a_light_color():
+	"""
+	Test that the method returns a light color.
+	"""
+	color = get_color((81, 255, 152))
+
+	assert color == {"light-green"}
+
+
+def test_get_color_name_returns_a_dark_color():
+	"""
+	Test that the method returns a dark color.
+	"""
+	color = get_color((0, 117, 46))
+
+	assert color == {"dark-green"}
+
+
 def test_update_inner_color_freq(color_freq):
 	"""
 	Test that the color frequencies are updated properly.
@@ -25,6 +43,7 @@ def test_update_inner_color_freq(color_freq):
 		}
 
 	assert expected == actual
+
 
 def test_update_inner_color_freq_updated_twice(color_freq):
 	"""
