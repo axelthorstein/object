@@ -1,13 +1,13 @@
 import pytest
 
-from utils.color_utils import get_color, update_color_freq
+from utils.color_utils import get_color, get_most_likely_colors, update_color_freq
 
 
 def test_get_color_name_returns_three_colors():
 	"""
 	Test that the method returns a set of three likely colors.
 	"""
-	colors = get_color((0, 0, 0))
+	colors = get_most_likely_colors((0, 0, 0))
 
 	assert colors == {"midnightblue", "black", "darkgreen"}
 
@@ -20,7 +20,7 @@ def test_update_inner_color_freq(color_freq):
 	actual = update_color_freq(color_freq, current_colors, depth="inner")
 
 	expected = {
-		"inner": {'black': 2, 'blue': 0, 'red': 1},
+		"inner": {'black': 3, 'blue': 1, 'red': 2},
 		"outer": {}
 		}
 
@@ -35,7 +35,7 @@ def test_update_inner_color_freq_updated_twice(color_freq):
 	actual = update_color_freq(color_freq, current_colors, depth="inner")
 
 	expected = {
-		"inner": {'black': 4, 'blue': 0, 'red': 2},
+		"inner": {'black': 6, 'blue': 2, 'red': 4},
 		"outer": {}
 		}
 
@@ -51,8 +51,8 @@ def test_update_inner_and_outer_color_freq(color_freq):
 	actual = update_color_freq(color_freq, current_colors, depth="outer")
 
 	expected = {
-		"inner": {'black': 4, 'blue': 0, 'red': 2},
-		"outer": {'black': 4, 'blue': 0, 'red': 2}
+		"inner": {'black': 6, 'blue': 2, 'red': 4},
+		"outer": {'black': 6, 'blue': 2, 'red': 4}
 		}
 
 	assert expected == actual
@@ -68,7 +68,7 @@ def test_update_inner_and_outer_color_freq(color_freq):
 	actual = update_color_freq(color_freq, current_colors, depth="inner")
 
 	expected = {
-		"inner": {'black': 1, 'blue': 2, 'red': 3},
+		"inner": {'black': 3, 'blue': 4, 'red': 5},
 		"outer": {}
 		}
 
