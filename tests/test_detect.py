@@ -1,4 +1,4 @@
-from o.detect import Detect, DetectionStrategy
+from obj.detect import Detect, DetectionStrategy
 
 
 def test_detect():

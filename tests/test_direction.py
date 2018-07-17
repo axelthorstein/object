@@ -1,6 +1,6 @@
 import pytest
 
-from o.direction import Direction, DirectionException
+from obj.direction import Direction, DirectionException
 
 def test_direction_left(starting_coordinates):
 	"""Test that the x coordinate is decremented by 1.

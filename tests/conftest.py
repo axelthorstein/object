@@ -2,9 +2,9 @@ import pytest
 from unittest.mock import Mock
 from collections import Counter
 
-from o.coordinate import Coordinate
-from o.simple_ring import SimpleRing
-from o.overlay import Overlay
+from obj.coordinate import Coordinate
+from obj.simple_ring import SimpleRing
+from obj.overlay import Overlay
 from utils.color_utils import update_color_freq
 
 

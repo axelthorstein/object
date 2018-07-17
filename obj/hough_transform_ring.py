@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from o.ring import Ring
+from obj.ring import Ring
 
 
 class HoughTransformRing(Ring):

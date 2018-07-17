@@ -1,10 +1,10 @@
 from collections import Counter
 from profilehooks import timecall
 
-from o.ring import Ring
-from o.coordinate import Coordinate
-from o.direction import Direction
-from o.overlay import Overlay
+from obj.ring import Ring
+from obj.coordinate import Coordinate
+from obj.direction import Direction
+from obj.overlay import Overlay
 
 
 class SimpleRing(Ring):

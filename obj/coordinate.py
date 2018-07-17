@@ -1,6 +1,6 @@
 from collections import Counter
 
-from o.direction import Direction
+from obj.direction import Direction
 from utils.color_utils import get_color, update_color_freq
 
 
