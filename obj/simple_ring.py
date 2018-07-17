@@ -7,7 +7,7 @@ from obj.direction import Direction
 from obj.overlay import Overlay
 
 
-class SimpleRing(Ring):
+class Simple(Ring):
     """
     A ring based on the radii and edge points of two circles. This ring
     bounded by the same color inside and surrounding.

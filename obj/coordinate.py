@@ -1,7 +1,7 @@
 from collections import Counter
 
 from obj.direction import Direction
-from utils.color_utils import get_color, update_color_freq
+from utils.color_utils import get_color, get_most_likely_colors, update_color_freq
 
 
 class Coordinate:
@@ -9,13 +9,16 @@ class Coordinate:
     An interface for incrementing coordinates in a pixel matrix.
     """
 
-    def __init__(self, image, depth):
+    def __init__(self, image, depth, confidence='high'):
         self.image = image
         self.depth = depth
+        self.confidence = confidence
         self.color_freq = {"inner": Counter(), "outer": Counter()}
 
     def get_pixel_colors(self, coords):
         """Get the pixel at the given coordinate.
+
+        The confidence level determines the range of colors to search through.
         
         Args:
             coords (tuple of int): The coordinates of the pixel.
@@ -23,7 +26,10 @@ class Coordinate:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return get_color(self.image.getpixel(coords))
+        if self.confidence == 'high':
+            return get_color(self.image.getpixel(coords))
+        else:
+            return get_most_likely_colors(self.image.getpixel(coords))
 
     def move(self, starting_coords, direction):
         """Walk a stright line of pixels until a new color is reached.
@@ -46,7 +52,7 @@ class Coordinate:
         """
         # get all the starting values
         starting_colors = self.get_pixel_colors(direction(starting_coords))
-        current_coords = direction(starting_coords, jump=2)
+        current_coords = direction(starting_coords, jump=1)
         current_colors = self.get_pixel_colors(current_coords)
         last_failed = False
 

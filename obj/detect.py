@@ -2,13 +2,15 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from obj.simple_ring import SimpleRing
-from obj.hough_transform_ring import HoughTransformRing
+from obj.simple_ring import Simple
+from obj.hough_transform_ring import HoughTransform
+from obj.dashed_ring import Dashed
 
 
 class DetectionStrategy(Enum):
-    SIMPLE = SimpleRing
-    HOUGH_TRANSFORM = HoughTransformRing
+    SIMPLE = Simple
+    HOUGH_TRANSFORM = HoughTransform
+    DASHED_RING = Dashed
 
 
 class Detect:

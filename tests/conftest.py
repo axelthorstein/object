@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from collections import Counter
 
 from obj.coordinate import Coordinate
-from obj.simple_ring import SimpleRing
+from obj.simple_ring import Simple
 from obj.overlay import Overlay
 from utils.color_utils import update_color_freq
 
@@ -75,7 +75,7 @@ def ring(image, starting_coordinates):
 	"""
 	A Ring.
 	"""
-	ring = SimpleRing(image, starting_coordinates)
+	ring = Simple(image, starting_coordinates)
 	return ring
 
 

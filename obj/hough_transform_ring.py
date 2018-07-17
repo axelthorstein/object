@@ -4,7 +4,7 @@ import numpy as np
 from obj.ring import Ring
 
 
-class HoughTransformRing(Ring):
+class HoughTransform(Ring):
     """
     A ring object with a center point, and a distance radius to it's inner
     and outer rings.
@@ -74,7 +74,7 @@ class HoughTransformRing(Ring):
         def round(nums, precision=0):
             return np.uint16(np.around(nums, precision))
 
-        greyscale_image = HoughTransformRing.get_greyscale_image(self.image)
+        greyscale_image = HoughTransform.get_greyscale_image(self.image)
 
         c1 = round(cv2.HoughCircles(
             greyscale_image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0]
