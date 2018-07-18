@@ -76,6 +76,7 @@ def get_color(rgb):
     else:
         color = color_name
 
+    print(color)
     return set([color])
 
 

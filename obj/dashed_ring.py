@@ -30,5 +30,11 @@ class Dashed(Ring):
         """
         coordinate = Coordinate(self.image, 'inner')
         print(self.center_coords)
-        print(coordinate.get_pixel_colors((65, 276)))
-        print(coordinate.get_pixel_colors((255, 276)))
+        edge_coords = coordinate.move(self.center_coords, Direction.left)
+        print(coordinate.get_pixel_colors((75, 255)))
+        exit()
+        while 0 in edge_coords:
+
+            self.center_coords = (self.center_coords[0], self.center_coords[1] + 1)
+            edge_coords = coordinate.move(self.center_coords, Direction.left)
+

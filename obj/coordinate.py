@@ -73,5 +73,7 @@ class Coordinate:
             # increment and update the current values
             current_coords = direction(current_coords)
             current_colors = self.get_pixel_colors(current_coords)
-
+            print(current_coords)
+            if 0 in current_coords:
+                return current_coords
         return current_coords

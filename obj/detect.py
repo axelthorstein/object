@@ -10,7 +10,7 @@ from obj.dashed_ring import Dashed
 class DetectionStrategy(Enum):
     SIMPLE = Simple
     HOUGH_TRANSFORM = HoughTransform
-    DASHED_RING = Dashed
+    DASHED = Dashed
 
 
 class Detect:
@@ -98,7 +98,8 @@ class Detect:
         image = Image.open(self.image_path)
         filtered_image = image.filter(ImageFilter.MedianFilter())
 
-        preprocessed_image = self.compress(self.crop(filtered_image))
+        # preprocessed_image = self.compress(self.crop(filtered_image))
+        preprocessed_image = self.compress(filtered_image)
 
         return preprocessed_image
 
@@ -135,6 +136,14 @@ class Detect:
 
         # find the ring in the image
         starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
+
+        # pixel_matrix = image.load()
+        # black_pixel = (0,0,0)
+        # pixel_matrix[(81, 252)] = black_pixel
+
+        # image.save("/Users/axelthor/Projects/object/images/test_draw.png")
+        # exit()
+
         ring = self.strategy(image, starting_coords, debug=self.debug)
         ring.create()
 
