@@ -7,12 +7,12 @@ class Pixel:
         self.confidence = confidence
         self.x = self.coords[0]
         self.y = self.coords[1]
-        
+
     def get_color(self):
         """Get the pixel at the given coordinate.
 
         The confidence level determines the range of colors to search through.
-        
+
         Args:
             coords (tuple of int): The coordinates of the pixel.
 
