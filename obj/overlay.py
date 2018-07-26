@@ -67,12 +67,12 @@ class Overlay(Ring):
         Returns:
             str: The overlay attributes.
         """
-        return "".join(["\nOverlay:\n"
-                "  Center coordinates: {}\n".format(self.center_coords),
-                "  Inner radius: {}\n".format(self.inner_radius),
-                "  Outer radius: {}\n".format(self.outer_radius),      
-                "  Inner edges: {}\n".format(
-                    Ring.format_edges(self.inner_edges)),
-                "  Outer edges: {}\n".format(
-                    Ring.format_edges(self.outer_edges))
-                ])
+        return "".join([
+            "\nOverlay:\n"
+            "  Center coordinates: {}\n".format(self.center_coords),
+            "  Inner radius: {}\n".format(
+                self.inner_radius), "  Outer radius: {}\n".format(
+                    self.outer_radius), "  Inner edges: {}\n".format(
+                        Ring.format_edges(self.inner_edges)),
+            "  Outer edges: {}\n".format(Ring.format_edges(self.outer_edges))
+        ])

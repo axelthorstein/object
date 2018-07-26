@@ -18,8 +18,10 @@ class Detect:
     Detect a ring from a given image.
     """
 
-    def __init__(self, image_path,
-                 strategy=DetectionStrategy.SIMPLE, debug=True):
+    def __init__(self,
+                 image_path,
+                 strategy=DetectionStrategy.SIMPLE,
+                 debug=True):
         self.image_path = image_path
         self.strategy = strategy.value
         self.debug = debug
@@ -39,15 +41,11 @@ class Detect:
         half_the_height = image.size[1] / 2
 
         # TODO: Will need to adjust these values to match the actual overlay.
-        cropped_image = image.crop(
-            (
-                half_the_width - (half_the_width * 0.5),
-                half_the_height - (half_the_height * 0.5),
-                half_the_width + (half_the_width * 0.5),
-                half_the_height + (half_the_height * 0.5)
-            )
-        )
-        
+        cropped_image = image.crop((half_the_width - (half_the_width * 0.5),
+                                    half_the_height - (half_the_height * 0.5),
+                                    half_the_width + (half_the_width * 0.5),
+                                    half_the_height + (half_the_height * 0.5)))
+
         return cropped_image
 
     def compress(self, image):
@@ -74,7 +72,7 @@ class Detect:
             coords (tuple of int): The coordinates of a pixel.
         """
         pixel_matrix = image.load()
-        black_pixel = (0,0,0)
+        black_pixel = (0, 0, 0)
 
         for coord in ring.inner_edges:
             pixel_matrix[ring.inner_edges[coord]] = black_pixel

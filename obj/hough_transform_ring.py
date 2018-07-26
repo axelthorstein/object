@@ -71,17 +71,18 @@ class HoughTransform(Ring):
         Returns:
             bool: Whether the ring is valid.
         """
+
         def round(nums, precision=0):
             return np.uint16(np.around(nums, precision))
 
         greyscale_image = HoughTransform.get_greyscale_image(self.image)
 
-        c1 = round(cv2.HoughCircles(
-            greyscale_image, cv2.HOUGH_GRADIENT, .5, 10, 10, 10, 10, 10)[0][0]
-        )
-        c2 = round(cv2.HoughCircles(
-            greyscale_image, cv2.HOUGH_GRADIENT, 1.5, 10, 10, 10, 10, 10)[0][0]
-        )
+        c1 = round(
+            cv2.HoughCircles(greyscale_image, cv2.HOUGH_GRADIENT, .5, 10, 10,
+                             10, 10, 10)[0][0])
+        c2 = round(
+            cv2.HoughCircles(greyscale_image, cv2.HOUGH_GRADIENT, 1.5, 10, 10,
+                             10, 10, 10)[0][0])
 
         if c1[2] > c2[2]:
             outer_circle = c1
@@ -100,12 +101,14 @@ class HoughTransform(Ring):
         Returns:
             str: The ring attributes.
         """
-        return "".join(["\nRing:\n"
-                "  Center coordinates: {}\n".format(self.center_coords),
-                "  Inner circle: {}\n".format(self.inner_circle),
-                "  Outer circle: {}\n".format(self.outer_circle),
-                "  Inner radius: {}\n".format(self.inner_radius),
-                "  Outer radius: {}\n".format(self.outer_radius),
-                "  Center color: {}\n".format(self.center_color),
-                "  Ring color:   {}\n".format(self.ring_color)
-                ])
+        return "".join([
+            "\nRing:\n"
+            "  Center coordinates: {}\n".format(self.center_coords),
+            "  Inner circle: {}\n".format(self.inner_circle),
+            "  Outer circle: {}\n".format(
+                self.outer_circle), "  Inner radius: {}\n".format(
+                    self.inner_radius), "  Outer radius: {}\n".format(
+                        self.outer_radius), "  Center color: {}\n".format(
+                            self.center_color), "  Ring color:   {}\n".format(
+                                self.ring_color)
+        ])

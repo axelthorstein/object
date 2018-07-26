@@ -4,7 +4,7 @@ from operator import itemgetter
 
 
 class ColorException(Exception):
-    pass        
+    pass
 
 
 def get_hue_name(hue):
@@ -76,7 +76,7 @@ def get_color(rgb):
     else:
         color = color_name
 
-    return set([color])
+    return [color]
 
 
 def get_most_likely_colors(rgb):
@@ -94,17 +94,18 @@ def get_most_likely_colors(rgb):
 
     for key, name in webcolors.css3_hex_to_names.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - rgb[0]) ** 2
-        gd = (g_c - rgb[1]) ** 2
-        bd = (b_c - rgb[2]) ** 2
+        rd = (r_c - rgb[0])**2
+        gd = (g_c - rgb[1])**2
+        bd = (b_c - rgb[2])**2
         min_colors[(rd + gd + bd)] = name
 
     # Sort the keys based on the minimum values, indicating liklihood.
-    min_colors = [min_colors[key] for key in sorted(
-        min_colors.keys(), reverse=False)]
+    min_colors = [
+        min_colors[key] for key in sorted(min_colors.keys(), reverse=False)
+    ]
 
     # Return the 3 most likely colors in order of likelihood.
-    return set(min_colors[:3])
+    return min_colors[:3]
 
 
 def update_color_freq(color_freq, current_colors, depth):
@@ -121,7 +122,7 @@ def update_color_freq(color_freq, current_colors, depth):
     Returns:
         color_freq (Counter): The freq of colors.
     """
-    for i, color in enumerate(reversed(list(current_colors))):
+    for i, color in enumerate(reversed(current_colors)):
         i += 1
         if color in color_freq[depth].keys():
             color_freq[depth][color] += 1 * i

@@ -1,7 +1,9 @@
 import os
 
+
 def get_env():
     return os.environ.get("ENV", "local")
+
 
 def set_config():
     env = get_env()
@@ -12,5 +14,6 @@ def set_config():
         os.environ["URL"] = "https://object-is.appspot.com"
 
     return env
+
 
 env = set_config()

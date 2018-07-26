@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:3.6.5
       
     working_directory: ~/Projects/object
 
@@ -20,7 +20,7 @@ jobs:
           name: install dependencies
           command: |
             sudo pip install --user pipenv
-            pipenv --python 3.6
+            pipenv --python 3.6.5
             pipenv install
 
       - save_cache:

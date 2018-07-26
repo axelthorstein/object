@@ -45,12 +45,12 @@ class Simple(Ring):
             bool: Whether the ring is valid.
         """
         x, y = 0, 1
-        valid = (self.inner_radius < self.outer_radius
-                 and self.ring_color != self.center_color
-                 and self.inner_edges["left"][x] > self.outer_edges["left"][x]
-                 and self.inner_edges["up"][y] < self.outer_edges["up"][y]
-                 and self.inner_edges["right"][x] < self.outer_edges["right"][x]
-                 and self.inner_edges["down"][y] > self.outer_edges["down"][y])
+        valid = (self.inner_radius < self.outer_radius and
+                 self.ring_color != self.center_color and
+                 self.inner_edges["left"][x] > self.outer_edges["left"][x] and
+                 self.inner_edges["up"][y] < self.outer_edges["up"][y] and
+                 self.inner_edges["right"][x] < self.outer_edges["right"][x] and
+                 self.inner_edges["down"][y] > self.outer_edges["down"][y])
 
         return valid
 
@@ -91,14 +91,14 @@ class Simple(Ring):
         Returns:
             tuple of int: The coordinates of the inner edge.
         """
-        edge_coords = coordinate.move(
-            self.center_coords, directions[direction])
+        edge_coords = coordinate.move(self.center_coords,
+                                      directions[direction]).coords
 
         if direction in ["left", "right", "up", "down"]:
             self.update_center_coords(edge_coords)
 
         return edge_coords
- 
+
     def get_outer_edge(self, coordinate, directions, direction):
         """Return the outer edge of the ring.
 
@@ -146,7 +146,7 @@ class Simple(Ring):
 
         self.color_freq[depth] += coordinate.color_freq[depth]
 
-        return edges  
+        return edges
 
     def get_inner_edges(self):
         """Return the inner edges of the ring.
@@ -257,14 +257,13 @@ class Simple(Ring):
         Returns:
             str: The ring attributes.
         """
-        return "".join(["\nRing:\n"
-                "  Center coordinates: {}\n".format(self.center_coords),
-                "  Inner radius: {}\n".format(self.inner_radius),
-                "  Outer radius: {}\n".format(self.outer_radius),
-                "  Inner edges: {}\n".format(
-                    Ring.format_edges(self.inner_edges)),
-                "  Outer edges: {}\n".format(
-                    Ring.format_edges(self.outer_edges)),
-                "  Center color: {}\n".format(self.center_color),
-                "  Ring color:   {}\n".format(self.ring_color),
-                ])
+        return "".join([
+            "\nRing:\n"
+            "  Center coordinates: {}\n".format(self.center_coords),
+            "  Inner radius: {}\n".format(self.inner_radius),
+            "  Outer radius: {}\n".format(self.outer_radius),
+            "  Inner edges: {}\n".format(Ring.format_edges(self.inner_edges)),
+            "  Outer edges: {}\n".format(Ring.format_edges(self.outer_edges)),
+            "  Center color: {}\n".format(self.center_color),
+            "  Ring color:   {}\n".format(self.ring_color),
+        ])

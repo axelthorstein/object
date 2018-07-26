@@ -1,7 +1,8 @@
 from collections import Counter
 
 from obj.direction import Direction
-from utils.color_utils import get_color, get_most_likely_colors, update_color_freq
+from utils.color_utils import update_color_freq
+from obj.pixel import Pixel
 
 
 class Coordinate:
@@ -9,15 +10,13 @@ class Coordinate:
     An interface for incrementing coordinates in a pixel matrix.
     """
 
-    def __init__(self, image, depth, confidence='high'):
+    def __init__(self, image, depth, color_range='css2'):
         self.image = image
         self.depth = depth
-        self.confidence = confidence
+        self.color_range = color_range
         self.color_freq = {"inner": Counter(), "outer": Counter()}
 
-
-
-    def move(self, starting_coords, direction, jump=1):
+    def move(self, starting_coords, direction, steps=1):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -35,88 +34,67 @@ class Coordinate:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        # get all the starting values
-        starting_colors = self.get_pixel_colors(direction(starting_coords))
-        current_coords = direction(starting_coords, jump=jump)
-        current_colors = self.get_pixel_colors(current_coords)
-        last_failed = False
+        starting_colors = Pixel(self.image, starting_coords).colors
+        pixel = Pixel(self.image, starting_coords)
 
-        # compare the three most likely colors against the three starting colors
-        # because the color identification can be unreliable
-        while bool(starting_colors & current_colors) or last_failed == False:
+        while pixel.colors_intersect(
+                starting_colors) and not pixel.out_of_bounds():
 
-            # checking if the last iteration failed provides a small error
-            # recovery scheme in case we find a single unrepresentative pixel
-            if bool(starting_colors & current_colors):
-                last_failed = True
-            else:
-                last_failed = False
+            update_color_freq(self.color_freq, pixel.colors, self.depth)
+            pixel.move(direction, steps)
 
-            # track color frequency
-            update_color_freq(self.color_freq, current_colors, self.depth)
+        return pixel
 
-            # increment and update the current values
-            current_coords = direction(current_coords)
-            current_colors = self.get_pixel_colors(current_coords)
+    def side_step(self, rows_checked, direction):
+        """Move to a perpendicular row to the one that was just checked.
 
-            # Return if we have reached the end of the image.
-            # TODO: Add max pixel range.
-            if (((starting_coords[0] * 2 - jump) <= current_coords[0]) or
-                (current_coords[0] <= jump) or
-                ((starting_coords[1] * 2 - jump) <= current_coords[1]) or
-                (current_coords[1] <= jump)):
-                return current_coords
+        Alternate the direction to move to based on the number of rows that
+        have been checked so far.
 
-        return current_coords
+        Args:
+            rows_checked (int): The number of rows checked.
+            direction (method): Direction to increment/decrement.
 
-    def side_step(self, iteration, direction):
+        Returns:
+            Direction: The perpendicular direction to move to.
         """
-
-        """
-
         if direction in [Direction.left, Direction.right]:
-            if iteration % 2 == 1:
+            if rows_checked % 2 == 0:
                 return Direction.up
             else:
                 return Direction.down
         else:
-            if iteration % 2 == 1:
+            if rows_checked % 2 == 0:
                 return Direction.left
             else:
                 return Direction.right
 
-
-    def probe(self, starting_coords, direction, jump=2):
+    def probe(self, starting_coords, direction, steps=2):
         """Probe the direction until part of the ring is found.
 
         In some cases we may not have a fully formed ring, so in order to
         determine where the ring begins we need to check along a line of pixels
         and if not part of the ring is found, we skew slightly and try again.
-        check up to (10 * jump) rows of pixels for a colored pixel that isn't
-        the same color as the center.
+        Continue checking until an edge is found.
+
+        TODO: We may need to have a limit to the number of rows checked. 
 
         Args:
             starting_coords (tuple of int): Coordinates of the starting pixel.
             direction (method): Direction to increment/decrement.
-            jump (int): The amount of pixels to skew on each interation.
+            steps (int): The amount of pixels to skew on each interation.
 
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        iteration = 0
-        current_coords = self.move(starting_coords, direction)
-        center_color = self.get_pixel_colors(starting_coords)
-        current_color = center_color
-        step_direction = self.side_step(iteration, direction)
+        rows_checked = 0
+        pixel = self.move(starting_coords, direction)
+        step_direction = self.side_step(rows_checked, direction)
 
-        while center_color == current_color:
-            starting_coords = step_direction(starting_coords, iteration)
+        while pixel.out_of_bounds():
+            starting_coords = step_direction(starting_coords, steps=rows_checked)
+            pixel = self.move(starting_coords, direction)
+            step_direction = self.side_step(rows_checked, direction)
+            rows_checked += 1
 
-            current_coords = self.move(starting_coords, direction)
-            current_color = self.get_pixel_colors(current_coords)
-            step_direction = self.side_step(iteration, direction)
-            iteration += jump
-            print(current_coords, direction, step_direction, iteration)
-
-        return current_coords
-
+        return pixel

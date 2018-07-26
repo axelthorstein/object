@@ -1,6 +1,7 @@
 class DirectionException(Exception):
     pass
-        
+
+
 class Direction:
     """
     An interface for incrementing coordinates in a pixel matrix.
@@ -15,13 +16,13 @@ class Direction:
         """
         directions = {
             "left": Direction.left,
+            "left_and_up": Direction.left_and_up,
             "up": Direction.up,
+            "right_and_up": Direction.right_and_up,
             "right": Direction.right,
+            "right_and_down": Direction.right_and_down,
             "down": Direction.down,
             "left_and_down": Direction.left_and_down,
-            "left_and_up": Direction.left_and_up,
-            "right_and_up": Direction.right_and_up,
-            "right_and_down": Direction.right_and_down,
         }
 
         return directions
@@ -42,7 +43,7 @@ class Direction:
             "A coordinate cannot be less than zero. {}".format(coord))
 
     @staticmethod
-    def left(coords, jump=1):
+    def left(coords, steps=1):
         """Decrement the x value by 1.
 
         Args:
@@ -51,12 +52,12 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[0] - jump)
+        new_coordinate = Direction.valid_coordinate(coords[0] - steps)
 
         return (new_coordinate, coords[1])
 
     @staticmethod
-    def up(coords, jump=1):
+    def up(coords, steps=1):
         """Increment the y value by 1.
 
         Args:
@@ -65,10 +66,10 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return (coords[0], coords[1] - jump)
+        return (coords[0], coords[1] - steps)
 
     @staticmethod
-    def down(coords, jump=1):
+    def down(coords, steps=1):
         """Decrement the y value by 1.
 
         Args:
@@ -77,12 +78,12 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] - jump)
+        new_coordinate = Direction.valid_coordinate(coords[1] - steps)
 
-        return (coords[0], coords[1] + jump)
+        return (coords[0], coords[1] + steps)
 
     @staticmethod
-    def right(coords, jump=1):
+    def right(coords, steps=1):
         """Increment the x value by 1.
 
         Args:
@@ -91,10 +92,10 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return (coords[0] + jump, coords[1])
+        return (coords[0] + steps, coords[1])
 
     @staticmethod
-    def left_and_up(coords, jump=1):
+    def left_and_up(coords, steps=1):
         """Increment the x and y values by 1.
 
         Args:
@@ -103,12 +104,12 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[0] - jump)
+        new_coordinate = Direction.valid_coordinate(coords[0] - steps)
 
-        return (new_coordinate, coords[1] + jump)
+        return (new_coordinate, coords[1] - steps)
 
     @staticmethod
-    def right_and_up(coords, jump=1):
+    def right_and_up(coords, steps=1):
         """Increment the x and y values by 1.
 
         Args:
@@ -117,10 +118,10 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return (coords[0] + jump, coords[1] + jump)
+        return (coords[0] + steps, coords[1] - steps)
 
     @staticmethod
-    def right_and_down(coords, jump=1):
+    def right_and_down(coords, steps=1):
         """Increment the x and y values by 1.
 
         Args:
@@ -129,12 +130,12 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] - jump)
+        new_coordinate = Direction.valid_coordinate(coords[1] + steps)
 
-        return (coords[0] + jump, new_coordinate)
+        return (coords[0] + steps, new_coordinate)
 
     @staticmethod
-    def left_and_down(coords, jump=1):
+    def left_and_down(coords, steps=1):
         """Increment the x and y values by 1.
 
         Args:
@@ -143,6 +144,6 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] - jump)
+        new_coordinate = Direction.valid_coordinate(coords[1] + steps)
 
-        return (coords[0] - jump, new_coordinate)
+        return (coords[0] - steps, new_coordinate)
