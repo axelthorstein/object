@@ -29,12 +29,13 @@ class Dashed(Ring):
         """Set all of the dynamic attributes of the Ring.
         """
         coordinate = Coordinate(self.image, 'inner')
-        print(self.center_coords)
-        edge_coords = coordinate.move(self.center_coords, Direction.left)
-        print(coordinate.get_pixel_colors((75, 255)))
+        left_coords = coordinate.probe(self.center_coords, Direction.left)
+        print(left_coords, coordinate.get_pixel_colors(left_coords))
+        up_coords = coordinate.probe(self.center_coords, Direction.up)
+        print(up_coords, coordinate.get_pixel_colors(up_coords))
+        right_coords = coordinate.probe(self.center_coords, Direction.right)
+        print(right_coords, coordinate.get_pixel_colors(right_coords))
+        down_coords = coordinate.probe(self.center_coords, Direction.down)
+        print(down_coords, coordinate.get_pixel_colors(down_coords))
+
         exit()
-        while 0 in edge_coords:
-
-            self.center_coords = (self.center_coords[0], self.center_coords[1] + 1)
-            edge_coords = coordinate.move(self.center_coords, Direction.left)
-

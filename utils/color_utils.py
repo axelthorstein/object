@@ -67,16 +67,15 @@ def get_color(rgb):
         color = 'black'
     elif saturation < 0.05 and brightness > 0.95:
         color = 'white'
-    elif (saturation < 0.05 and brightness > 0.30) or (saturation < 0.1 and brightness < 0.50):
-        color = 'grey'
-    elif brightness < 0.75:
-        color = 'dark-' + color_name
-    elif saturation < 0.75 and brightness > 0.95:
-        color = 'light-' + color_name
+    # elif (saturation < 0.05 and brightness > 0.30) or (saturation < 0.1 and brightness < 0.50):
+    #     color = 'grey'
+    # elif brightness < 0.75:
+    #     color = 'dark-' + color_name
+    # elif saturation < 0.75 and brightness > 0.95:
+    #     color = 'light-' + color_name
     else:
         color = color_name
 
-    print(color)
     return set([color])
 
 

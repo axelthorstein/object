@@ -41,10 +41,10 @@ class Detect:
         # TODO: Will need to adjust these values to match the actual overlay.
         cropped_image = image.crop(
             (
-                half_the_width - (half_the_width * 0.25),
-                half_the_height - (half_the_height * 0.35),
-                half_the_width + (half_the_width * 0.25),
-                half_the_height + (half_the_height * 0.35)
+                half_the_width - (half_the_width * 0.5),
+                half_the_height - (half_the_height * 0.5),
+                half_the_width + (half_the_width * 0.5),
+                half_the_height + (half_the_height * 0.5)
             )
         )
         
@@ -98,8 +98,7 @@ class Detect:
         image = Image.open(self.image_path)
         filtered_image = image.filter(ImageFilter.MedianFilter())
 
-        # preprocessed_image = self.compress(self.crop(filtered_image))
-        preprocessed_image = self.compress(filtered_image)
+        preprocessed_image = self.compress(self.crop(filtered_image))
 
         return preprocessed_image
 
@@ -136,13 +135,6 @@ class Detect:
 
         # find the ring in the image
         starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
-
-        # pixel_matrix = image.load()
-        # black_pixel = (0,0,0)
-        # pixel_matrix[(81, 252)] = black_pixel
-
-        # image.save("/Users/axelthor/Projects/object/images/test_draw.png")
-        # exit()
 
         ring = self.strategy(image, starting_coords, debug=self.debug)
         ring.create()

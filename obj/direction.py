@@ -65,7 +65,7 @@ class Direction:
         Returns:
             tuple of int: The coordinates of a pixel.
         """
-        return (coords[0], coords[1] + jump)
+        return (coords[0], coords[1] - jump)
 
     @staticmethod
     def down(coords, jump=1):
@@ -79,7 +79,7 @@ class Direction:
         """
         new_coordinate = Direction.valid_coordinate(coords[1] - jump)
 
-        return (coords[0], coords[1] - jump)
+        return (coords[0], coords[1] + jump)
 
     @staticmethod
     def right(coords, jump=1):

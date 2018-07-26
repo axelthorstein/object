@@ -15,23 +15,9 @@ class Coordinate:
         self.confidence = confidence
         self.color_freq = {"inner": Counter(), "outer": Counter()}
 
-    def get_pixel_colors(self, coords):
-        """Get the pixel at the given coordinate.
 
-        The confidence level determines the range of colors to search through.
-        
-        Args:
-            coords (tuple of int): The coordinates of the pixel.
 
-        Returns:
-            tuple of int: The coordinates of a pixel.
-        """
-        if self.confidence == 'high':
-            return get_color(self.image.getpixel(coords))
-        else:
-            return get_most_likely_colors(self.image.getpixel(coords))
-
-    def move(self, starting_coords, direction):
+    def move(self, starting_coords, direction, jump=1):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -45,14 +31,13 @@ class Coordinate:
         Args:
             starting_coords (tuple of int): Coordinates of the starting pixel.
             direction (method): Direction to increment/decrement.
-            depth (str): Whether this is for inner or outer colours.
 
         Returns:
             tuple of int: The coordinates of a pixel.
         """
         # get all the starting values
         starting_colors = self.get_pixel_colors(direction(starting_coords))
-        current_coords = direction(starting_coords, jump=1)
+        current_coords = direction(starting_coords, jump=jump)
         current_colors = self.get_pixel_colors(current_coords)
         last_failed = False
 
@@ -73,7 +58,65 @@ class Coordinate:
             # increment and update the current values
             current_coords = direction(current_coords)
             current_colors = self.get_pixel_colors(current_coords)
-            print(current_coords)
-            if 0 in current_coords:
+
+            # Return if we have reached the end of the image.
+            # TODO: Add max pixel range.
+            if (((starting_coords[0] * 2 - jump) <= current_coords[0]) or
+                (current_coords[0] <= jump) or
+                ((starting_coords[1] * 2 - jump) <= current_coords[1]) or
+                (current_coords[1] <= jump)):
                 return current_coords
+
         return current_coords
+
+    def side_step(self, iteration, direction):
+        """
+
+        """
+
+        if direction in [Direction.left, Direction.right]:
+            if iteration % 2 == 1:
+                return Direction.up
+            else:
+                return Direction.down
+        else:
+            if iteration % 2 == 1:
+                return Direction.left
+            else:
+                return Direction.right
+
+
+    def probe(self, starting_coords, direction, jump=2):
+        """Probe the direction until part of the ring is found.
+
+        In some cases we may not have a fully formed ring, so in order to
+        determine where the ring begins we need to check along a line of pixels
+        and if not part of the ring is found, we skew slightly and try again.
+        check up to (10 * jump) rows of pixels for a colored pixel that isn't
+        the same color as the center.
+
+        Args:
+            starting_coords (tuple of int): Coordinates of the starting pixel.
+            direction (method): Direction to increment/decrement.
+            jump (int): The amount of pixels to skew on each interation.
+
+        Returns:
+            tuple of int: The coordinates of a pixel.
+        """
+        iteration = 0
+        current_coords = self.move(starting_coords, direction)
+        center_color = self.get_pixel_colors(starting_coords)
+        current_color = center_color
+        step_direction = self.side_step(iteration, direction)
+
+        while center_color == current_color:
+            starting_coords = step_direction(starting_coords, iteration)
+
+            current_coords = self.move(starting_coords, direction)
+            current_color = self.get_pixel_colors(current_coords)
+            step_direction = self.side_step(iteration, direction)
+            iteration += jump
+            print(current_coords, direction, step_direction, iteration)
+
+        return current_coords
+
