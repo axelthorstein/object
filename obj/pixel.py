@@ -30,8 +30,11 @@ class Pixel:
             return get_most_likely_colors(self.image.getpixel(coords))
 
     def move(self, direction, steps):
-        """
+        """Increment the pixels location and update relevant attributes.
 
+        Args:
+            direction (Direction): The direction to increment/decrement.
+            steps (int): The amount of pixel spaces to move.
         """
         self.coords = direction(self.coords, steps=steps)
         self.x = self.coords[0]
@@ -39,8 +42,7 @@ class Pixel:
         self.update_colors()
 
     def update_colors(self):
-        """
-
+        """Update the most recent colors the pixel has seen.
         """
         if len(self.colors) > self.variance:
             new_colors = self.get_color(self.coords)
@@ -49,19 +51,27 @@ class Pixel:
             self.colors += self.get_color(self.coords)
 
     def colors_intersect(self, other_color):
-        """Determine if last colors the pixel has seend, within the variance,
-        does not contain the other color. 
+        """Determine if last colors the pixel has seen.
 
-        Example:
-            row = ['w', 'w', 'w', 'g', 'w', 'w', 'g', 'g']
+        Check within the variance that the pixel does not contain the other
+        color.
 
+        Args:
+            other_color (list of str): The color to compare against.
 
+        Returns:
+            bool: Whether if we've entered a new color space.
         """
         return other_color[0] in self.colors[-self.variance:]
 
     def out_of_bounds(self, steps=2):
-        """
+        """Check if the pixel is at the edge of the image.
 
+        Args:
+            steps (int): The pixel margin to check.
+
+        Returns:
+            bool: Whether the pixel is at the edge of the image..
         """
         width, height = self.image.size
 
@@ -69,6 +79,11 @@ class Pixel:
                 (height - steps <= self.y) or (self.y <= steps))
 
     def __str__(self):
+        """Return a description of the Pixel.
+
+        Returns:
+            str: The string representation of the Pixel.
+        """
         desc = f'\n{self.__class__.__name__}:\n'
 
         for attribute in self.__dict__:

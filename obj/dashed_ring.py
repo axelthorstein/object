@@ -1,4 +1,3 @@
-from collections import Counter
 from profilehooks import timecall
 from PIL import Image, ImageFont, ImageDraw
 from math import cos, sin, hypot, degrees, atan2
@@ -40,7 +39,7 @@ class Dashed(Ring):
         self.inner_edges = self.get_inner_edges()
         self.outer_edges = self.get_outer_edges()
         self.radius = self.get_mid_ring_radius()
-        self.color_code = self.get_ring_color_code()
+        self.color_sequence = self.get_ring_color_sequence()
 
     def is_valid(self):
         """Determine if the ring is valid.
@@ -51,10 +50,11 @@ class Dashed(Ring):
         # TODO: Add real validity check.
         return True
 
+    @timecall
     @staticmethod
     def sort_coordinates(coordinates, center):
         """Sort the coordinates counter clockwise around the center.
-        
+
         The coordinates need to be sorted so that they are in order of how they
         appear arround the center so that we can get an accurate ordering of
         colors in the dashes. 
@@ -83,6 +83,7 @@ class Dashed(Ring):
         return sorted(coordinates, key=lambda coord: (lowest_degree - degrees(
             atan2(*tuple(map(sub, coord, center))[::-1]))) % 360)
 
+    @timecall
     @staticmethod
     def get_points_on_circumference(center_point, radius, grain=360):
         """Find all the points on the circumference on the ring.
@@ -111,7 +112,7 @@ class Dashed(Ring):
 
         return points
 
-    def get_ring_color_code(self):
+    def get_ring_color_sequence(self):
         """Get the colors from each dash in the ring.
 
         Get each color from each dash, deduplicating using the center color as
@@ -133,11 +134,11 @@ class Dashed(Ring):
         ring_colors = next(zip(*groupby(ring_colors)))
 
         # Filter out center color.
-        color_code = list(
+        color_sequence = list(
             filter(lambda color: color != self.center_point.colors[0],
                    ring_colors))
 
-        return color_code
+        return color_sequence
 
     def get_inner_edge(self, coordinate, directions, direction):
         """Return the inner edge of the ring.
@@ -314,6 +315,11 @@ class Dashed(Ring):
                                     self.center_point.y + y_offset)
 
     def __str__(self):
+        """Return a description of the Pixel.
+        
+        Returns:
+            str: The string representation of the Pixel.
+        """
         desc = f'\n{self.__class__.__name__}:\n'
 
         for attribute in self.__dict__:
