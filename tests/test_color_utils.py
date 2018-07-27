@@ -29,7 +29,6 @@ def test_get_color_name_returns_a_color():
 
 #     assert color == ["light-green"]
 
-
 # def test_get_color_name_returns_a_dark_color():
 #     """
 # 	Test that the method returns a dark color.

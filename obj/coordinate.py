@@ -16,6 +16,18 @@ class Coordinate:
         self.color_range = color_range
         self.color_freq = {"inner": Counter(), "outer": Counter()}
 
+    def probe_adjacent_pixel(self, coords, direction, steps, starting_colors):
+        adjacent_directions = Direction.get_adjacent_direction(direction)
+
+        for direction in adjacent_directions:
+            pixel = Pixel(self.image, coords)
+            pixel.move(direction, steps)
+
+            if pixel.colors_intersect(starting_colors):
+                return pixel
+
+        return pixel
+
     def move(self, starting_coords, direction, steps=1):
         """Walk a stright line of pixels until a new color is reached.
 
@@ -39,9 +51,14 @@ class Coordinate:
 
         while pixel.colors_intersect(
                 starting_colors) and not pixel.out_of_bounds():
-
             update_color_freq(self.color_freq, pixel.colors, self.depth)
+
             pixel.move(direction, steps)
+
+            if self.depth == 'outer':
+                if not pixel.colors_intersect(starting_colors):
+                    pixel = self.probe_adjacent_pixel(pixel.coords, direction,
+                                                      steps, starting_colors)
 
         return pixel
 
@@ -92,7 +109,8 @@ class Coordinate:
         step_direction = self.side_step(rows_checked, direction)
 
         while pixel.out_of_bounds():
-            starting_coords = step_direction(starting_coords, steps=rows_checked)
+            starting_coords = step_direction(
+                starting_coords, steps=rows_checked)
             pixel = self.move(starting_coords, direction)
             step_direction = self.side_step(rows_checked, direction)
             rows_checked += 1

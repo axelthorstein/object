@@ -28,6 +28,28 @@ class Direction:
         return directions
 
     @staticmethod
+    def get_adjacent_direction(direction):
+        """Return the directions that are adjacent to the original direction.
+        
+        Return:
+            tuple of Directions: The adjacent directions.
+        """
+        if direction in (Direction.left, Direction.right):
+            return (Direction.up, Direction.down)
+        elif direction in (Direction.up, Direction.down):
+            return (Direction.left, Direction.right)
+        elif direction == Direction.left_and_down:
+            return (Direction.left, Direction.down)
+        elif direction == Direction.left_and_up:
+            return (Direction.left, Direction.up)
+        elif direction == Direction.right_and_up:
+            return (Direction.right, Direction.up)
+        elif direction == Direction.right_and_down:
+            return (Direction.right, Direction.down)
+        else:
+            raise DirectionException(f"Direction {direction.__name__} not found.")
+
+    @staticmethod
     def valid_coordinate(coord):
         """Return the coordinate if it is valid.
         
@@ -39,8 +61,7 @@ class Direction:
         """
         if coord >= 0:
             return coord
-        raise DirectionException(
-            "A coordinate cannot be less than zero. {}".format(coord))
+        raise DirectionException(f"A coordinate cannot be less than zero. {coord}")
 
     @staticmethod
     def left(coords, steps=1):

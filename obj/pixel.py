@@ -8,12 +8,12 @@ class Pixel:
         self.image = image
         self.coords = coords
         self.color_range = color_range
-        self.colors = self.get_color()
+        self.colors = self.get_color(coords)
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.variance = variance
 
-    def get_color(self):
+    def get_color(self, coords):
         """Get the pixel at the given coordinate.
 
         The color range determines the range of colors to search through.
@@ -25,9 +25,9 @@ class Pixel:
             tuple of int: The coordinates of a pixel.
         """
         if self.color_range == 'css2':
-            return get_color(self.image.getpixel(self.coords))
+            return get_color(self.image.getpixel(coords))
         else:
-            return get_most_likely_colors(self.image.getpixel(self.coords))
+            return get_most_likely_colors(self.image.getpixel(coords))
 
     def move(self, direction, steps):
         """
@@ -43,10 +43,10 @@ class Pixel:
 
         """
         if len(self.colors) > self.variance:
-            new_colors = self.get_color()
+            new_colors = self.get_color(self.coords)
             self.colors = self.colors[len(new_colors):] + new_colors
         else:
-            self.colors += self.get_color()
+            self.colors += self.get_color(self.coords)
 
     def colors_intersect(self, other_color):
         """Determine if last colors the pixel has seend, within the variance,
