@@ -69,11 +69,10 @@ class Pixel:
                 (height - steps <= self.y) or (self.y <= steps))
 
     def __str__(self):
-        desc = '\nPixel:\n'
+        desc = f'\n{self.__class__.__name__}:\n'
 
         for attribute in self.__dict__:
             desc += f'    {attribute.capitalize()} = {self.__dict__[attribute]},\n'
-        desc += f'    Out of bounds = {self.out_of_bounds()}'
 
         return desc
 

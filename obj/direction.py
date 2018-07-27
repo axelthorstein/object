@@ -47,7 +47,8 @@ class Direction:
         elif direction == Direction.right_and_down:
             return (Direction.right, Direction.down)
         else:
-            raise DirectionException(f"Direction {direction.__name__} not found.")
+            raise DirectionException(
+                f"Direction {direction.__name__} not found.")
 
     @staticmethod
     def valid_coordinate(coord):
@@ -61,7 +62,8 @@ class Direction:
         """
         if coord >= 0:
             return coord
-        raise DirectionException(f"A coordinate cannot be less than zero. {coord}")
+        raise DirectionException(
+            f"A coordinate cannot be less than zero. {coord}")
 
     @staticmethod
     def left(coords, steps=1):

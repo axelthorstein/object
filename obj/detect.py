@@ -80,7 +80,7 @@ class Detect:
         for coord in ring.outer_edges:
             pixel_matrix[ring.outer_edges[coord]] = black_pixel
 
-        pixel_matrix[ring.center_coords] = black_pixel
+        pixel_matrix[ring.center_point.coords] = black_pixel
 
         image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
@@ -141,7 +141,7 @@ class Detect:
         if self.debug:
             self.log_debug_info(image, ring)
 
-        return (ring.center_color, ring.ring_color)
+        return (ring)
 
 
 class DetectionException(Exception):
