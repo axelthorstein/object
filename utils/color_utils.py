@@ -7,6 +7,82 @@ class ColorException(Exception):
     pass
 
 
+def code_to_color(code):
+    if code == '00':
+        return 'red'
+    elif code == '01':
+        return 'orange'
+    elif code == '02':
+        return 'yellow'
+    elif code == '03':
+        return 'lime'
+    elif code == '04':
+        return 'green'
+    elif code == '05':
+        return 'turquoise'
+    elif code == '06':
+        return 'cyan'
+    elif code == '07':
+        return 'lightblue'
+    elif code == '08':
+        return 'blue'
+    elif code == '09':
+        return 'purple'
+    elif code == '10':
+        return 'magenta'
+    elif code == '11':
+        return 'pink'
+    else:
+        raise ColorException(f"Code {code} not found.")
+
+
+def color_to_code(color):
+    if color == 'red':
+        return '00'
+    elif color == 'orange':
+        return '01'
+    elif color == 'yellow':
+        return '02'
+    elif color == 'lime':
+        return '03'
+    elif color == 'green':
+        return '04'
+    elif color == 'turquoise':
+        return '05'
+    elif color == 'cyan':
+        return '06'
+    elif color == 'lightblue':
+        return '07'
+    elif color == 'blue':
+        return '08'
+    elif color == 'purple':
+        return '09'
+    elif color == 'magenta':
+        return '10'
+    elif color == 'pink':
+        return '11'
+    else:
+        raise ColorException(f"Color {color} not found.")
+
+
+def code_to_sequence(code):
+    sequence = ''
+
+    for i in code:
+        sequence += code_to_color(i)
+
+    return sequence
+
+
+def sequence_to_code(sequence):
+    code = ''
+
+    for color in sequence:
+        code += color_to_code(color)
+
+    return code
+
+
 def get_hue_name(hue):
     """Get the name of a hue.
 

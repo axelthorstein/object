@@ -17,6 +17,24 @@ class Coordinate:
         self.color_freq = {"inner": Counter(), "outer": Counter()}
 
     def probe_adjacent_pixel(self, coords, direction, steps, starting_colors):
+        """Probe the two adjacent pixels if the first pixel returns a new color.
+
+        Check the two pixels beside the pixel that was just checked to see
+        if the edge is increasing or decreasing on an angle that is less than
+        45 degrees.
+        
+        TODO: May need to return the original direciton pixel so it doesn't
+        always veer off to certain direction.
+
+        Args:
+            coords (tuple of int): The original coordinates of the pixel.
+            direction (Direction): The direction that was being checked.
+            steps (int): How many pixels to increment/decrement.
+            starting_colors (list of str): The original colors to check against.
+
+        Returns:
+            Pixel: The pixel to move to.
+        """
         adjacent_directions = Direction.get_adjacent_direction(direction)
 
         for direction in adjacent_directions:

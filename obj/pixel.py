@@ -50,6 +50,17 @@ class Pixel:
         else:
             self.colors += self.get_color(self.coords)
 
+    def update_coords(self, x, y):
+        """Update the pixels coordinates to specified values.
+
+        Args:
+            x (int): The x coordinate.
+            y (int): The y coordinate.
+        """
+        self.coords = (x, y)
+        self.x = x
+        self.y = y
+
     def colors_intersect(self, other_color):
         """Determine if last colors the pixel has seen.
 
@@ -79,7 +90,15 @@ class Pixel:
                 (height - steps <= self.y) or (self.y <= steps))
 
     def __str__(self):
-        """Return a description of the Pixel.
+        """Return a short, in line, description of the Pixel.
+
+        Returns:
+            str: The string representation of the Pixel.
+        """
+        return f'Pixel {self.coords} with {self.colors} colors.'
+
+    def __repr__(self):
+        """Return a full description of the Pixel.
 
         Returns:
             str: The string representation of the Pixel.
@@ -87,9 +106,7 @@ class Pixel:
         desc = f'\n{self.__class__.__name__}:\n'
 
         for attribute in self.__dict__:
-            desc += f'    {attribute.capitalize()} = {self.__dict__[attribute]},\n'
+            key = attribute.replace('_', ' ').capitalize()
+            desc += f'    {key}: {self.__dict__[attribute]},\n'
 
         return desc
-
-    def __repr__(self):
-        return self.__str__()

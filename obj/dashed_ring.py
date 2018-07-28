@@ -10,6 +10,16 @@ from obj.coordinate import Coordinate
 from obj.direction import Direction
 from obj.overlay import Overlay
 from obj.pixel import Pixel
+from utils.color_utils import sequence_to_code
+
+SEQUENCES = {
+    '0000000000000101010101010101010101010101080808080808080808080808080101010101010101010101010000000000':
+    'circle_1',
+    '020202040404040404080808080808101010101010000000000000010101010101020202':
+    'circle_36',
+    '020404040808081010100000000101010202':
+    'circle_18'
+}
 
 
 class Dashed(Ring):
@@ -28,7 +38,7 @@ class Dashed(Ring):
     def __init__(self, image, starting_coords, debug=True):
         self.image = image
         self.debug = debug
-        self.overlay = Overlay(starting_coords)
+        self.overlay = Overlay(image, starting_coords)
         self.center_point = Pixel(image, starting_coords)
         self.center_radii = []
         self.ring_radii = []
@@ -36,10 +46,33 @@ class Dashed(Ring):
     def create(self):
         """Set all of the dynamic attributes of the Ring.
         """
-        self.inner_edges = self.get_inner_edges()
-        self.outer_edges = self.get_outer_edges()
-        self.radius = self.get_mid_ring_radius()
-        self.color_sequence = self.get_ring_color_sequence()
+        self.approximate_color_sequence()
+
+        if not self.color_sequence in SEQUENCES:
+            print("Approximation failed.")
+            self.inner_edges = self.get_inner_edges()
+            self.outer_edges = self.get_outer_edges()
+            self.inner_radius = self.get_inner_radius()
+            self.outer_radius = self.get_outer_radius()
+            self.radius = self.get_mid_ring_radius()
+
+            self.color_sequence = Dashed.get_ring_color_sequence(
+                self.image, self.center_point, self.radius)
+
+    def approximate_color_sequence(self):
+        """Use the overlay to approximate the color sequence.
+
+        By using the overlays assumed radius of the ring we can potentially
+        find the color sequence with minimal calculations. With only the center
+        point and the radius we can retrieve the color values for every pixel
+        on the circumference.
+
+        Returns:
+            list of str: The appoximated color sequence.
+        """
+        self.radius = self.overlay.radius
+        self.color_sequence = Dashed.get_ring_color_sequence(
+            self.image, self.overlay.center_point, self.overlay.radius)
 
     def is_valid(self):
         """Determine if the ring is valid.
@@ -48,9 +81,9 @@ class Dashed(Ring):
             bool: Whether the ring is valid.
         """
         # TODO: Add real validity check.
-        return True
+        return len(
+            self.color_sequence) % 18 == 0 and self.color_sequence in SEQUENCES
 
-    @timecall
     @staticmethod
     def sort_coordinates(coordinates, center):
         """Sort the coordinates counter clockwise around the center.
@@ -83,9 +116,8 @@ class Dashed(Ring):
         return sorted(coordinates, key=lambda coord: (lowest_degree - degrees(
             atan2(*tuple(map(sub, coord, center))[::-1]))) % 360)
 
-    @timecall
     @staticmethod
-    def get_points_on_circumference(center_point, radius, grain=360):
+    def get_points_on_circumference(center_point, radius, grain):
         """Find all the points on the circumference on the ring.
 
         Increasing the grain will potentially increase accuracy, but will be
@@ -112,7 +144,8 @@ class Dashed(Ring):
 
         return points
 
-    def get_ring_color_sequence(self):
+    @staticmethod
+    def get_ring_color_sequence(image, center_point, radius, grain=360):
         """Get the colors from each dash in the ring.
 
         Get each color from each dash, deduplicating using the center color as
@@ -124,21 +157,19 @@ class Dashed(Ring):
         Returns:
             list of str: The list of colors from each dash.
         """
-        points = self.get_points_on_circumference(self.center_point,
-                                                  self.radius)
+        points = Dashed.get_points_on_circumference(center_point, radius, grain)
 
         # Get the colors for each pixel on the rings circumference.
-        ring_colors = [Pixel(self.image, (point)).colors[0] for point in points]
+        ring_colors = [Pixel(image, (point)).colors[0] for point in points]
 
         # Fold together like elements.
         ring_colors = next(zip(*groupby(ring_colors)))
 
         # Filter out center color.
         color_sequence = list(
-            filter(lambda color: color != self.center_point.colors[0],
-                   ring_colors))
+            filter(lambda color: color != center_point.colors[0], ring_colors))
 
-        return color_sequence
+        return sequence_to_code(color_sequence)
 
     def get_inner_edge(self, coordinate, directions, direction):
         """Return the inner edge of the ring.
@@ -194,7 +225,6 @@ class Dashed(Ring):
 
         return outer_pixel.coords
 
-    @timecall
     def get_edges(self, get_edge, depth):
         """Return the edges of the ring.
 
@@ -239,6 +269,7 @@ class Dashed(Ring):
         Returns:
             dictionary: The outer edges.
         """
+        self.update_center_coords()
         depth = "outer"
         get_edge = self.get_outer_edge
 
@@ -266,10 +297,7 @@ class Dashed(Ring):
         Returns:
             int: The average radius.
         """
-        inner_radius = self.get_inner_radius()
-        outer_radius = self.get_outer_radius()
-
-        return int(inner_radius + (outer_radius / 2))
+        return int(self.inner_radius + (self.outer_radius / 2))
 
     def get_center_offset(self, coords, radius, axis):
         """Find the offset from the coordinate to the center.
@@ -290,14 +318,16 @@ class Dashed(Ring):
         """
         offset = 0
 
-        if self.center_coords[axis] < coords[axis]:
-            offset += abs(self.center_coords[axis] - coords[axis]) - radius
-        elif self.center_coords[axis] > coords[axis]:
-            offset += radius - abs(self.center_coords[axis] - coords[axis])
+        if self.center_point.coords[axis] < coords[axis]:
+            offset += abs(self.center_point.coords[axis] -
+                          coords[axis]) - radius
+        elif self.center_point.coords[axis] > coords[axis]:
+            offset += radius - abs(self.center_point.coords[axis] -
+                                   coords[axis])
 
         return offset
 
-    def update_center_coords(self, coords):
+    def update_center_coords(self):
         """Set the center coordinates of the circle.
 
         Update the ring's center coordinates as the inner edges are found.
@@ -306,26 +336,50 @@ class Dashed(Ring):
         Args:
             coords (tuple of int): The coordinates of the ring edge.
         """
-        x, y = 0, 1
+        x_offset = int(
+            (self.inner_edges['right'][0] - self.inner_edges['left'][0]) / 2)
+        y_offset = int(
+            (self.inner_edges['down'][1] - self.inner_edges['up'][1]) / 2)
+        x = self.inner_edges['left'][0] + x_offset
+        y = self.inner_edges['up'][1] + y_offset
 
-        x_offset = self.get_center_offset(coords, self.overlay.inner_radius, x)
-        y_offset = self.get_center_offset(coords, self.overlay.inner_radius, y)
+        self.center_point.update_coords(x, y)
 
-        self.center_point.coords = (self.center_point.x + x_offset,
-                                    self.center_point.y + y_offset)
+    # def update_center_coords(self, coords):
+    #     """Set the center coordinates of the circle.
+
+    #     Update the ring's center coordinates as the inner edges are found.
+    #     This will provide more accurate results as it progresses.
+
+    #     Args:
+    #         coords (tuple of int): The coordinates of the ring edge.
+    #     """
+    #     x, y = 0, 1
+
+    #     x_offset = self.get_center_offset(coords, self.overlay.inner_radius, x)
+    #     y_offset = self.get_center_offset(coords, self.overlay.inner_radius, y)
+
+    #     self.center_point.coords = (self.center_point.x + x_offset,
+    #                                 self.center_point.y + y_offset)
 
     def __str__(self):
-        """Return a description of the Pixel.
+        """Return a description of the dashed ring.
         
         Returns:
-            str: The string representation of the Pixel.
+            str: The string representation of the dashed ring.
         """
         desc = f'\n{self.__class__.__name__}:\n'
 
         for attribute in self.__dict__:
-            desc += f'    {attribute.capitalize()} = {self.__dict__[attribute]},\n'
+            key = attribute.replace('_', ' ').capitalize()
+            desc += f'    {key}: {self.__dict__[attribute]},\n'
 
         return desc
 
     def __repr__(self):
+        """Return a description of the dashed ring.
+        
+        Returns:
+            str: The string representation of the dashed ring.
+        """
         return self.__str__()

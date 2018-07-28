@@ -84,6 +84,7 @@ class Detect:
 
         image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
+    # @timecall
     def preprocess_image(self):
         """Crop, compress, and filter to image.
 
@@ -94,11 +95,11 @@ class Detect:
             Image: The preprocessed image.
         """
         image = Image.open(self.image_path)
-        filtered_image = image.filter(ImageFilter.MedianFilter())
+        # filtered_image = image.filter(ImageFilter.MedianFilter())
 
-        preprocessed_image = self.compress(self.crop(filtered_image))
+        # preprocessed_image = self.compress(self.crop(filtered_image))
 
-        return preprocessed_image
+        return image
 
     def log_debug_info(self, preprocessed_image, ring):
         """Log debugging information.
@@ -135,13 +136,14 @@ class Detect:
         starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
 
         ring = self.strategy(image, starting_coords, debug=self.debug)
+
         ring.create()
 
         # draw the ring onto a photo for visual validation
         if self.debug:
             self.log_debug_info(image, ring)
 
-        return (ring)
+        return ring
 
 
 class DetectionException(Exception):

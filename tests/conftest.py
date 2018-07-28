@@ -52,11 +52,11 @@ def updated_color_freq(color_freq):
 
 
 @pytest.fixture()
-def overlay():
+def overlay(image):
     """
 	An overlay instantiated with the center coordinates at (100, 100).
 	"""
-    return Overlay((100, 100))
+    return Overlay(image, (100, 100))
 
 
 @pytest.fixture()
