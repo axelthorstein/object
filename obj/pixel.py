@@ -19,15 +19,15 @@ class Pixel:
         The color range determines the range of colors to search through.
 
         Args:
-            coords (tuple of int): The coordinates of the pixel.
+            coords (Tuple[int]): The coordinates of the pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            Tuple[int]: The coordinates of a pixel.
         """
         if self.color_range == 'css2':
             return get_color(self.image.getpixel(coords))
-        else:
-            return get_most_likely_colors(self.image.getpixel(coords))
+
+        return get_most_likely_colors(self.image.getpixel(coords))
 
     def move(self, direction, steps):
         """Increment the pixels location and update relevant attributes.

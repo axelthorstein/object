@@ -1,25 +1,12 @@
+from math import hypot
 from profilehooks import timecall
-from PIL import Image, ImageFont, ImageDraw
-from math import cos, sin, hypot, degrees, atan2
-from itertools import groupby
-from functools import reduce
-from operator import sub
 
 from obj.ring import Ring
 from obj.coordinate import Coordinate
 from obj.direction import Direction
 from obj.overlay import Overlay
 from obj.pixel import Pixel
-from utils.color_utils import sequence_to_code
-
-SEQUENCES = {
-    '0000000000000101010101010101010101010101080808080808080808080808080101010101010101010101010000000000':
-    'circle_1',
-    '020202040404040404080808080808101010101010000000000000010101010101020202':
-    'circle_36',
-    '020404040808081010100000000101010202':
-    'circle_18'
-}
+from obj.color_sequence import ColorSequence
 
 
 class Dashed(Ring):
@@ -48,7 +35,7 @@ class Dashed(Ring):
         """
         self.approximate_color_sequence()
 
-        if not self.color_sequence in SEQUENCES:
+        if not self.color_sequence.is_valid:
             print("Approximation failed.")
             self.inner_edges = self.get_inner_edges()
             self.outer_edges = self.get_outer_edges()
@@ -56,8 +43,8 @@ class Dashed(Ring):
             self.outer_radius = self.get_outer_radius()
             self.radius = self.get_mid_ring_radius()
 
-            self.color_sequence = Dashed.get_ring_color_sequence(
-                self.image, self.center_point, self.radius)
+            self.color_sequence = ColorSequence(self.image, self.center_point,
+                                                self.radius)
 
     def approximate_color_sequence(self):
         """Use the overlay to approximate the color sequence.
@@ -71,7 +58,7 @@ class Dashed(Ring):
             list of str: The appoximated color sequence.
         """
         self.radius = self.overlay.radius
-        self.color_sequence = Dashed.get_ring_color_sequence(
+        self.color_sequence = ColorSequence(
             self.image, self.overlay.center_point, self.overlay.radius)
 
     def is_valid(self):
@@ -81,95 +68,7 @@ class Dashed(Ring):
             bool: Whether the ring is valid.
         """
         # TODO: Add real validity check.
-        return len(
-            self.color_sequence) % 18 == 0 and self.color_sequence in SEQUENCES
-
-    @staticmethod
-    def sort_coordinates(coordinates, center):
-        """Sort the coordinates counter clockwise around the center.
-
-        The coordinates need to be sorted so that they are in order of how they
-        appear arround the center so that we can get an accurate ordering of
-        colors in the dashes. 
-
-        Implementation from Stack Overflow commnent:
-        https://stackoverflow.com/questions/51074984/
-        sorting-according-to-clockwise-point-coordinates/51075419
-
-        "On second thought that actually won't work, since for every coordinate
-        on the list there's always another coordinate whose vector to the
-        centroid is clockwise to that of the said coordinate, so there will be
-        no "bottom" to the comparison. In OP's case, we need -135 degrees to be
-        the "bottom" of the sorted list of coordinates. The sign of the 2D
-        cross-product can only help determine if one vector is clockwise to
-        another but cannot help establish how far away from the "bottom"
-        (i.e. -135 degrees) a vector is."
-
-        Args:
-            coordinates (list of tuple of int): The ring coordinates.
-            center (tuple of int): The center coordinate.
-
-        Returns:
-            list of tuple of int: The sorted coordinates.
-        """
-        lowest_degree = -135
-        return sorted(coordinates, key=lambda coord: (lowest_degree - degrees(
-            atan2(*tuple(map(sub, coord, center))[::-1]))) % 360)
-
-    @staticmethod
-    def get_points_on_circumference(center_point, radius, grain):
-        """Find all the points on the circumference on the ring.
-
-        Increasing the grain will potentially increase accuracy, but will be
-        negligable beyond a certain point and will also increase runtime.
-
-        Args:
-            center_point (Pixel): The center point of the circle.
-            radius (int): The radius of the circle.
-            grain (int): The amount of points to get.
-
-        Returns:
-            list of tuple: The sorted points on the circumference of the circle.
-        """
-        points = []
-
-        for point in range(grain):
-            x = int(radius * cos(point) + center_point.x)
-            y = int(radius * sin(point) + center_point.y)
-
-            points.append((x, y))
-
-        # Sort counter clockwise around the center.
-        points = Dashed.sort_coordinates(points, center_point.coords)
-
-        return points
-
-    @staticmethod
-    def get_ring_color_sequence(image, center_point, radius, grain=360):
-        """Get the colors from each dash in the ring.
-
-        Get each color from each dash, deduplicating using the center color as
-        a delimiter, then removing occurances of the center color.
-
-        Args:
-            Points (list of tuple of int): The points on the circumference.
-
-        Returns:
-            list of str: The list of colors from each dash.
-        """
-        points = Dashed.get_points_on_circumference(center_point, radius, grain)
-
-        # Get the colors for each pixel on the rings circumference.
-        ring_colors = [Pixel(image, (point)).colors[0] for point in points]
-
-        # Fold together like elements.
-        ring_colors = next(zip(*groupby(ring_colors)))
-
-        # Filter out center color.
-        color_sequence = list(
-            filter(lambda color: color != center_point.colors[0], ring_colors))
-
-        return sequence_to_code(color_sequence)
+        return self.color_sequence.is_valid
 
     def get_inner_edge(self, coordinate, directions, direction):
         """Return the inner edge of the ring.
@@ -364,7 +263,7 @@ class Dashed(Ring):
 
     def __str__(self):
         """Return a description of the dashed ring.
-        
+
         Returns:
             str: The string representation of the dashed ring.
         """
@@ -378,7 +277,7 @@ class Dashed(Ring):
 
     def __repr__(self):
         """Return a description of the dashed ring.
-        
+
         Returns:
             str: The string representation of the dashed ring.
         """
