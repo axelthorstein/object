@@ -1,8 +1,8 @@
 from collections import Counter
 
+from obj.pixel import Pixel
 from obj.direction import Direction
 from utils.color_utils import update_color_freq
-from obj.pixel import Pixel
 
 
 class Coordinate:
@@ -22,31 +22,31 @@ class Coordinate:
         Check the two pixels beside the pixel that was just checked to see
         if the edge is increasing or decreasing on an angle that is less than
         45 degrees.
-        
+
         TODO: May need to return the original direciton pixel so it doesn't
         always veer off to certain direction.
 
         Args:
-            coords (tuple of int): The original coordinates of the pixel.
+            coords (Tuple[int, int]): The original coordinates of the pixel.
             direction (Direction): The direction that was being checked.
             steps (int): How many pixels to increment/decrement.
-            starting_colors (list of str): The original colors to check against.
+            starting_colors (List[str]): The original colors to check against.
 
         Returns:
             Pixel: The pixel to move to.
         """
         adjacent_directions = Direction.get_adjacent_direction(direction)
 
-        for direction in adjacent_directions:
+        for adjacent_direction in adjacent_directions:
             pixel = Pixel(self.image, coords)
-            pixel.move(direction, steps)
+            pixel.move(adjacent_direction, steps)
 
             if pixel.colors_intersect(starting_colors):
                 return pixel
 
         return pixel
 
-    def move(self, starting_coords, direction, steps=1):
+    def move(self, starting_coords, direction, steps):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -56,13 +56,14 @@ class Coordinate:
         and compare against the three most likely starting colors. If there are
         no common elements for two iterations we consider an edge to be found
         and exit. This provides us with minimal error recovery.
-        
+
         Args:
-            starting_coords (tuple of int): Coordinates of the starting pixel.
+            starting_coords (Tuple[int, int]): Coordinates of the starting pixel.
             direction (method): Direction to increment/decrement.
+            steps (int): The amount of pixels to skew on each interation.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            Tuple[int, int]: The coordinates of a pixel.
         """
         starting_colors = Pixel(self.image, starting_coords).colors
         pixel = Pixel(self.image, starting_coords)
@@ -80,7 +81,8 @@ class Coordinate:
 
         return pixel
 
-    def side_step(self, rows_checked, direction):
+    @staticmethod
+    def side_step(rows_checked, direction):
         """Move to a perpendicular row to the one that was just checked.
 
         Alternate the direction to move to based on the number of rows that
@@ -96,15 +98,12 @@ class Coordinate:
         if direction in [Direction.left, Direction.right]:
             if rows_checked % 2 == 0:
                 return Direction.up
-            else:
-                return Direction.down
-        else:
-            if rows_checked % 2 == 0:
-                return Direction.left
-            else:
-                return Direction.right
+            return Direction.down
+        if rows_checked % 2 == 0:
+            return Direction.left
+        return Direction.right
 
-    def probe(self, starting_coords, direction, steps=2):
+    def probe(self, starting_coords, direction, steps=1):
         """Probe the direction until part of the ring is found.
 
         In some cases we may not have a fully formed ring, so in order to
@@ -112,25 +111,25 @@ class Coordinate:
         and if not part of the ring is found, we skew slightly and try again.
         Continue checking until an edge is found.
 
-        TODO: We may need to have a limit to the number of rows checked. 
+        TODO: We may need to have a limit to the number of rows checked.
 
         Args:
-            starting_coords (tuple of int): Coordinates of the starting pixel.
+            starting_coords (Tuple[int, int]): Coordinates of the starting pixel.
             direction (method): Direction to increment/decrement.
             steps (int): The amount of pixels to skew on each interation.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            Tuple[int, int]: The coordinates of a pixel.
         """
         rows_checked = 0
-        pixel = self.move(starting_coords, direction)
-        step_direction = self.side_step(rows_checked, direction)
+        pixel = self.move(starting_coords, direction, steps)
+        step_direction = Coordinate.side_step(rows_checked, direction)
 
         while pixel.out_of_bounds():
             starting_coords = step_direction(
                 starting_coords, steps=rows_checked)
-            pixel = self.move(starting_coords, direction)
-            step_direction = self.side_step(rows_checked, direction)
+            pixel = self.move(starting_coords, direction, steps)
+            step_direction = Coordinate.side_step(rows_checked, direction)
             rows_checked += 1
 
         return pixel

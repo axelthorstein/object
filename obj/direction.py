@@ -1,7 +1,3 @@
-class DirectionException(Exception):
-    pass
-
-
 class Direction:
     """
     An interface for incrementing coordinates in a pixel matrix.
@@ -10,8 +6,8 @@ class Direction:
     @staticmethod
     def get_directions():
         """Return a mapping of directions to methods.
-        
-        Return:
+
+        Returns:
             dictionary: The directions mapping.
         """
         directions = {
@@ -30,35 +26,43 @@ class Direction:
     @staticmethod
     def get_adjacent_direction(direction):
         """Return the directions that are adjacent to the original direction.
-        
-        Return:
-            tuple of Directions: The adjacent directions.
+
+        Args:
+            direction (Direction): The direction to increment/decrement.
+
+        Returns:
+            tuple: The adjacent directions.
+
+        Raises:
+            DirectionException: If the direction can't be found.
         """
-        if direction in (Direction.left, Direction.right):
+        if direction in (Direction.left, Direction.right):  # pylint: disable=comparison-with-callable
             return (Direction.up, Direction.down)
-        elif direction in (Direction.up, Direction.down):
+        if direction in (Direction.up, Direction.down):
             return (Direction.left, Direction.right)
-        elif direction == Direction.left_and_down:
+        if direction == Direction.left_and_down:
             return (Direction.left, Direction.down)
-        elif direction == Direction.left_and_up:
+        if direction == Direction.left_and_up:
             return (Direction.left, Direction.up)
-        elif direction == Direction.right_and_up:
+        if direction == Direction.right_and_up:
             return (Direction.right, Direction.up)
-        elif direction == Direction.right_and_down:
+        if direction == Direction.right_and_down:
             return (Direction.right, Direction.down)
-        else:
-            raise DirectionException(
-                f"Direction {direction.__name__} not found.")
+
+        raise DirectionException(f"Direction {direction.__name__} not found.")
 
     @staticmethod
     def valid_coordinate(coord):
         """Return the coordinate if it is valid.
-        
+
         Args:
             coord (int): The coordinate.
 
-        Return:
+        Returns:
             int: The valid coordinate.
+
+        Raises:
+            DirectionException: If a coordindate is less than zero.
         """
         if coord >= 0:
             return coord
@@ -73,7 +77,7 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
         new_coordinate = Direction.valid_coordinate(coords[0] - steps)
 
@@ -87,9 +91,11 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        return (coords[0], coords[1] - steps)
+        new_y = Direction.valid_coordinate(coords[1] - steps)
+
+        return (coords[0], new_y)
 
     @staticmethod
     def down(coords, steps=1):
@@ -99,11 +105,11 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] - steps)
+        new_y = Direction.valid_coordinate(coords[1] + steps)
 
-        return (coords[0], coords[1] + steps)
+        return (coords[0], new_y)
 
     @staticmethod
     def right(coords, steps=1):
@@ -113,23 +119,26 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        return (coords[0] + steps, coords[1])
+        new_x = Direction.valid_coordinate(coords[0] + steps)
+
+        return (new_x, coords[1])
 
     @staticmethod
     def left_and_up(coords, steps=1):
-        """Increment the x and y values by 1.
+        """Decrement the x and y values by 1.
 
         Args:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[0] - steps)
+        new_x = Direction.valid_coordinate(coords[0] - steps)
+        new_y = Direction.valid_coordinate(coords[1] - steps)
 
-        return (new_coordinate, coords[1] - steps)
+        return (new_x, new_y)
 
     @staticmethod
     def right_and_up(coords, steps=1):
@@ -139,9 +148,12 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        return (coords[0] + steps, coords[1] - steps)
+        new_x = Direction.valid_coordinate(coords[0] + steps)
+        new_y = Direction.valid_coordinate(coords[1] - steps)
+
+        return (new_x, new_y)
 
     @staticmethod
     def right_and_down(coords, steps=1):
@@ -151,11 +163,12 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] + steps)
+        new_x = Direction.valid_coordinate(coords[0] + steps)
+        new_y = Direction.valid_coordinate(coords[1] + steps)
 
-        return (coords[0] + steps, new_coordinate)
+        return (new_x, new_y)
 
     @staticmethod
     def left_and_down(coords, steps=1):
@@ -165,8 +178,13 @@ class Direction:
             coords (tuple of int): The coordinates of a pixel.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            tuple: The coordinates of a pixel.
         """
-        new_coordinate = Direction.valid_coordinate(coords[1] + steps)
+        new_x = Direction.valid_coordinate(coords[0] - steps)
+        new_y = Direction.valid_coordinate(coords[1] + steps)
 
-        return (coords[0] - steps, new_coordinate)
+        return (new_x, new_y)
+
+
+class DirectionException(Exception):
+    pass

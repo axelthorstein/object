@@ -5,7 +5,6 @@ from flask import render_template
 
 from obj.graphql import GraphQL
 from obj.detect import Detect
-from obj.config import env
 from obj.firebase import Firebase
 
 app = Flask(__name__)

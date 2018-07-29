@@ -2,13 +2,13 @@ import os
 
 
 def get_env():
-    return os.environ.get("ENV", "local")
+    return os.environ.get("ENV", "development")
 
 
 def set_config():
     env = get_env()
 
-    if env == "local":
+    if env == "development":
         os.environ["URL"] = "https://localhost:8080"
     elif env == "production":
         os.environ["URL"] = "https://object-is.appspot.com"
@@ -16,4 +16,4 @@ def set_config():
     return env
 
 
-env = set_config()
+ENV = set_config()
