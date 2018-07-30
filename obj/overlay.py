@@ -7,8 +7,8 @@ class Overlay(Ring):
     An object to represent the overlay over the camera.
     """
 
-    def __init__(self, image, starting_coords):
-        self.center_point = Pixel(image, starting_coords)
+    def __init__(self, center_point):
+        self.center_point = center_point
         self.inner_radius = self.get_inner_radius()
         self.outer_radius = self.get_outer_radius()
         self.radius = self.get_mid_ring_radius()

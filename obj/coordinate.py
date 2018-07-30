@@ -1,8 +1,5 @@
-from collections import Counter
-
 from obj.pixel import Pixel
 from obj.direction import Direction
-from utils.color_utils import update_color_freq
 
 
 class Coordinate:
@@ -10,13 +7,11 @@ class Coordinate:
     An interface for incrementing coordinates in a pixel matrix.
     """
 
-    def __init__(self, image, depth, color_range='css2'):
+    def __init__(self, image, depth):
         self.image = image
         self.depth = depth
-        self.color_range = color_range
-        self.color_freq = {"inner": Counter(), "outer": Counter()}
 
-    def probe_adjacent_pixel(self, coords, direction, steps, starting_colors):
+    def scan_adjacent_pixel(self, coords, direction, steps, starting_colors):
         """Probe the two adjacent pixels if the first pixel returns a new color.
 
         Check the two pixels beside the pixel that was just checked to see
@@ -46,7 +41,7 @@ class Coordinate:
 
         return pixel
 
-    def move(self, starting_coords, direction, steps):
+    def walk(self, starting_coords, direction, steps=1):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -58,52 +53,29 @@ class Coordinate:
         and exit. This provides us with minimal error recovery.
 
         Args:
-            starting_coords (Tuple[int, int]): Coordinates of the starting pixel.
-            direction (method): Direction to increment/decrement.
+            starting_coords (Pixel): Coordinates of the starting pixel.
+            direction (function): Direction to increment/decrement.
             steps (int): The amount of pixels to skew on each interation.
 
         Returns:
-            Tuple[int, int]: The coordinates of a pixel.
+            Pixel: The coordinates of a pixel.
         """
-        starting_colors = Pixel(self.image, starting_coords).colors
+        starting_coords = starting_coords.coords
         pixel = Pixel(self.image, starting_coords)
+        starting_colors = pixel.colors
 
         while pixel.colors_intersect(
                 starting_colors) and not pixel.out_of_bounds():
-            update_color_freq(self.color_freq, pixel.colors, self.depth)
-
             pixel.move(direction, steps)
 
             if self.depth == 'outer':
                 if not pixel.colors_intersect(starting_colors):
-                    pixel = self.probe_adjacent_pixel(pixel.coords, direction,
-                                                      steps, starting_colors)
+                    pixel = self.scan_adjacent_pixel(pixel.coords, direction,
+                                                     steps, starting_colors)
 
         return pixel
 
-    @staticmethod
-    def side_step(rows_checked, direction):
-        """Move to a perpendicular row to the one that was just checked.
-
-        Alternate the direction to move to based on the number of rows that
-        have been checked so far.
-
-        Args:
-            rows_checked (int): The number of rows checked.
-            direction (method): Direction to increment/decrement.
-
-        Returns:
-            Direction: The perpendicular direction to move to.
-        """
-        if direction in [Direction.left, Direction.right]:
-            if rows_checked % 2 == 0:
-                return Direction.up
-            return Direction.down
-        if rows_checked % 2 == 0:
-            return Direction.left
-        return Direction.right
-
-    def probe(self, starting_coords, direction, steps=1):
+    def scan(self, starting_pixel, direction):
         """Probe the direction until part of the ring is found.
 
         In some cases we may not have a fully formed ring, so in order to
@@ -114,22 +86,21 @@ class Coordinate:
         TODO: We may need to have a limit to the number of rows checked.
 
         Args:
-            starting_coords (Tuple[int, int]): Coordinates of the starting pixel.
-            direction (method): Direction to increment/decrement.
-            steps (int): The amount of pixels to skew on each interation.
+            starting_pixel (Pixel): Coordinates of the starting pixel.
+            direction (function): Direction to increment/decrement.
 
         Returns:
-            Tuple[int, int]: The coordinates of a pixel.
+            Pixel: The coordinates of a pixel.
         """
         rows_checked = 0
-        pixel = self.move(starting_coords, direction, steps)
-        step_direction = Coordinate.side_step(rows_checked, direction)
+        starting_coords = starting_pixel.coords
+        pixel = self.walk(starting_pixel, direction)
 
         while pixel.out_of_bounds():
-            starting_coords = step_direction(
-                starting_coords, steps=rows_checked)
-            pixel = self.move(starting_coords, direction, steps)
-            step_direction = Coordinate.side_step(rows_checked, direction)
+            # Reset the pixel.
+            pixel = Pixel(self.image, starting_coords)
+            pixel.side_step(direction, rows_checked)
+            pixel = self.walk(pixel, direction)
             rows_checked += 1
 
         return pixel

@@ -100,9 +100,9 @@ def get_hue_name(hue):
         return 'yellow'
     elif 70 < hue <= 90:
         return 'lime'
-    elif 90 < hue <= 145:
+    elif 90 < hue <= 150:
         return 'green'
-    elif 145 < hue <= 160:
+    elif 150 < hue <= 160:
         return 'turquoise'
     elif 160 < hue <= 185:
         return 'cyan'

@@ -1,6 +1,7 @@
 from math import atan2, cos, degrees, sin
 from itertools import groupby
 from operator import sub
+from collections import Counter
 from profilehooks import timecall
 
 from obj.pixel import Pixel
@@ -85,10 +86,33 @@ class ColorSequence:
 
             points.append((x, y))
 
+        # m = self.image.load()
+        # for point in points:
+
+        #     m[(point[0],point[1])] = (0,0,0)
+        # self.image.save("/Users/axelthor/Projects/object/images/test_draw.png")
+
         # Sort counter clockwise around the center.
         points = self.sort_coordinates(points)
 
         return points
+
+    def collapse(self, colors):
+
+        # Remove any initial occurances of the center color.
+        colors = colors[next(
+            colors.index(x) for x in colors if x != self.center_point.colors[0]):]
+
+        sequence = []
+        j = 0
+
+        for i, color in enumerate(colors):
+            if color == self.center_point.colors[0] or i == len(colors) - 1:
+                if colors[j + 1:i]:
+                    sequence.append(Counter(colors[j:i]).most_common(1)[0][0])
+                j = i
+
+        return sequence
 
     @timecall
     def calculate_sequence(self):
@@ -103,10 +127,11 @@ class ColorSequence:
         points = self.get_points_on_circumference()
 
         # Get the colors for each pixel on the rings circumference.
+        # TODO: Make colors not a list.
         ring_colors = [Pixel(self.image, (point)).colors[0] for point in points]
 
-        # Fold together like elements.
-        ring_colors = next(zip(*groupby(ring_colors)))
+        # Collapse duplicates.
+        ring_colors = self.collapse(ring_colors)
 
         # Filter out center color.
         color_sequence = list(

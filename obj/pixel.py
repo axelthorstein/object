@@ -1,3 +1,4 @@
+from obj.direction import Direction
 from utils.color_utils import get_color, get_most_likely_colors
 
 
@@ -12,6 +13,7 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.variance = variance
+        self.distance_moved = 0
 
     def get_color(self, coords):
         """Get the pixel at the given coordinate.
@@ -29,6 +31,30 @@ class Pixel:
 
         return get_most_likely_colors(self.image.getpixel(coords))
 
+    def side_step(self, direction, steps):
+        """Move to a perpendicular row to the one that was just checked.
+
+        Alternate the direction to move to based on the number of rows that
+        have been checked so far.
+
+        TODO: Change the function name to something more explicit.
+
+        Args:
+            steps (int): The number of rows checked.
+            direction (method): Direction to increment/decrement.
+        """
+        if direction in [Direction.left, Direction.right]:
+            if steps % 2 == 0:
+                direction = Direction.up
+            else:
+                direction = Direction.down
+        elif steps % 2 == 0:
+            direction = Direction.left
+        else:
+            direction = Direction.right
+
+        self.move(direction, steps=steps)
+
     def move(self, direction, steps):
         """Increment the pixels location and update relevant attributes.
 
@@ -40,6 +66,7 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.update_colors()
+        self.distance_moved += 1
 
     def update_colors(self):
         """Update the most recent colors the pixel has seen.
@@ -89,7 +116,7 @@ class Pixel:
         return ((width - steps <= self.x) or (self.x <= steps) or
                 (height - steps <= self.y) or (self.y <= steps))
 
-    def __str__(self):
+    def __repr__(self):
         """Return a short, in line, description of the Pixel.
 
         Returns:
@@ -97,7 +124,7 @@ class Pixel:
         """
         return f'Pixel {self.coords} with {self.colors} colors.'
 
-    def __repr__(self):
+    def __str__(self):
         """Return a full description of the Pixel.
 
         Returns:

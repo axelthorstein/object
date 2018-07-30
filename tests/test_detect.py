@@ -55,13 +55,12 @@ def test_detect_circle_thick_18_round():
 
     assert ring.is_valid()
 
+def test_detect_circle_thin_18_square():
+    ring = get_dashed_ring("circle_thin_18_square.png")
 
-# def test_detect_circle_thin_18_square():
-#     ring = get_dashed_ring("circle_thin_18_square.png")
+    assert ring.is_valid()
 
-#     assert ring.is_valid()
+def test_detect_circle_thin_18_round():
+    ring = get_dashed_ring("circle_thin_18_round.png")
 
-# def test_detect_circle_thin_18_round():
-#     ring = get_dashed_ring("circle_thin_18_round.png")
-
-#     assert ring.is_valid()
+    assert ring.is_valid()

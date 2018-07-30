@@ -137,11 +137,14 @@ class Detect:
 
         ring = self.strategy(image, starting_coords, debug=self.debug)
 
-        ring.create()
+        ring.approximate()
+
+        if not ring.is_valid():
+            ring.calculate()
 
         # draw the ring onto a photo for visual validation
-        if self.debug:
-            self.log_debug_info(image, ring)
+        # if self.debug:
+        #     self.log_debug_info(image, ring)
 
         return ring
 
