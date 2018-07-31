@@ -1,5 +1,4 @@
 from obj.ring import Ring
-from obj.pixel import Pixel
 
 
 class Overlay(Ring):
@@ -56,10 +55,10 @@ class Overlay(Ring):
         return edges
 
     def __str__(self):
-        """Return a description of the Pixel.
+        """Return a description of the overlay.
 
         Returns:
-            str: The string representation of the Pixel.
+            str: The string representation of the overlay.
         """
         return f'Overlay {self.center_point} with {self.radius} radius.'
 

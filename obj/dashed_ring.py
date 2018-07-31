@@ -1,5 +1,4 @@
 from math import hypot
-from profilehooks import timecall
 
 from obj.ring import Ring
 from obj.coordinate import Coordinate
@@ -7,19 +6,15 @@ from obj.direction import Direction
 from obj.overlay import Overlay
 from obj.pixel import Pixel
 from obj.color_sequence import ColorSequence
+from obj.logs import logger
+
+LOGGER = logger('object')
 
 
 class Dashed(Ring):
     """
-    A ring based on the radii and edge points of two circles. This ring
-    bounded by the same color inside and surrounding.
-
-    Using a simple method of linearly analyzing pixels determine if a
-    ring exists in an image. If a ring is found to be in the image,
-    determine the two colors that the ring consists of.
-
-    The description for this simple method can be found here:
-    https://gist.github.com/axelthorstein/337312d5030af4b965e5a40271ba0361
+    A ring based on any number of primary and secondary colored dashes that are
+    surrounded inside and outside by the same color.
     """
 
     def __init__(self, image, starting_coords, debug=True):
@@ -29,29 +24,39 @@ class Dashed(Ring):
         self.radius = 0
         self.color_sequence = None
 
-    @timecall
-    def approximate(self):
+    def approximate(self, grain):
         """Use the overlay to approximate the color sequence.
 
         By using the overlays assumed radius of the ring we can potentially
         find the color sequence with minimal calculations. With only the center
         point and the radius we can retrieve the color values for every pixel
         on the circumference.
+
+        Args:
+            grain (int): The number of pixels to sample.
         """
         overlay = Overlay(self.center_point)
 
         self.color_sequence = ColorSequence(self.image, overlay.center_point,
-                                            overlay.radius)
+                                            overlay.radius, grain=grain)
 
-    def calculate(self):
-        """Set all of the dynamic attributes of the Ring.
+    def calculate(self, grain):
+        """Find the edges of the ring to calculate the color sequence.
+
+        If the approximation failed the center point is most likely off, or the
+        ring is smaller or larger than we expect by a significant margin. In
+        this case scan each direction to find the inner and outer edges of the
+        ring and use them to find the average radius. Use the radius to find the
+        color sequence.
+        
+        Args:
+            grain (int): The number of pixels to sample.
         """
-        print('Approximation failed.')
-
+        LOGGER.info('Approximation failed.')
         radius = self.get_radius()
 
         self.color_sequence = ColorSequence(self.image, self.center_point,
-                                            radius)
+                                            radius, grain=grain)
 
     def is_valid(self):
         """Determine if the ring is valid.

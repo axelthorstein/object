@@ -1,30 +1,24 @@
 from math import atan2, cos, degrees, sin
-from itertools import groupby
 from operator import sub
 from collections import Counter
-from profilehooks import timecall
 
 from obj.pixel import Pixel
+from obj.logs import logger
 from utils.color_utils import sequence_to_code
+from configs.config import SEQUENCES
 
-SEQUENCES = {
-    '0000000000000101010101010101010101010101080808080808080808080808080101010101010101010101010000000000':
-    'circle_1',
-    '020202040404040404080808080808101010101010000000000000010101010101020202':
-    'circle_36',
-    '020404040808081010100000000101010202':
-    'circle_18'
-}
+LOGGER = logger('object')
 
 
 class ColorSequence:
     """The sequence of colors in a dashed ring from an image."""
 
-    def __init__(self, image, center_point, radius, grain=360):
+    def __init__(self, image, center_point, radius, grain):
         self.image = image
         self.center_point = center_point
         self.radius = radius
         self.grain = grain
+        self.points = self.get_points_on_circumference()
         self.sequence = self.calculate_sequence()
         self.is_valid = self.is_valid()
 
@@ -34,10 +28,12 @@ class ColorSequence:
         Check the color sequence generated from the image against all known
         sequences. If the sequence is not known return that is is not valid.
 
+        TODO: Add back `and len(self.sequence) % 18 == 0` check.
+
         Returns:
             bool: The validity of the color sequence.
         """
-        return self.sequence in SEQUENCES and len(self.sequence) % 18 == 0
+        return self.sequence in SEQUENCES
 
     def sort_coordinates(self, coordinates):
         """Sort the coordinates counter clockwise around the center.
@@ -86,35 +82,51 @@ class ColorSequence:
 
             points.append((x, y))
 
-        # m = self.image.load()
-        # for point in points:
-
-        #     m[(point[0],point[1])] = (0,0,0)
-        # self.image.save("/Users/axelthor/Projects/object/images/test_draw.png")
-
         # Sort counter clockwise around the center.
         points = self.sort_coordinates(points)
 
         return points
 
     def collapse(self, colors):
+        """Collapse the colors into a sequence.
 
+        The numbers of colors in the list will be determined by how many points
+        were sampled from the image so we need to collapse them into one color
+        per distinct change in color. A distinct change in color is indicated by
+        changing from the delimiting color (center color) to a new color and
+        back to the delimiting color. The max of each of these groups is taken
+        in cause there is a small margin of error in the color identification.
+        The end result being a list of one color per dash in the sequence and
+        all of the delimiting colors removed.
+
+        Args:
+            List[str]: The sequence of colors from the image.
+
+        Returns:
+            List[str]: The collapsed sequence of colors.
+        """
         # Remove any initial occurances of the center color.
-        colors = colors[next(
-            colors.index(x) for x in colors if x != self.center_point.colors[0]):]
 
         sequence = []
         j = 0
 
-        for i, color in enumerate(colors):
-            if color == self.center_point.colors[0] or i == len(colors) - 1:
-                if colors[j + 1:i]:
-                    sequence.append(Counter(colors[j:i]).most_common(1)[0][0])
-                j = i
+        try:
+            if len(set(colors)) > 1:
+                colors = colors[next(
+                    colors.index(x)
+                    for x in colors
+                    if x != self.center_point.colors[0]):]
+
+                for i, color in enumerate(colors):
+                    if color == self.center_point.colors[0] or i == len(colors) - 1:
+                        if colors[j + 1:i]:
+                            sequence.append(Counter(colors[j:i]).most_common(1)[0][0])
+                        j = i
+        except:
+            LOGGER.info("Collapse failed.")
 
         return sequence
 
-    @timecall
     def calculate_sequence(self):
         """Get the colors from each dash in the ring.
 
@@ -122,13 +134,13 @@ class ColorSequence:
         a delimiter, then removing occurances of the center color.
 
         Returns:
-            List[str]: The list of colors from each dash.
+            str: The integer representation of a color sequence.
         """
-        points = self.get_points_on_circumference()
-
         # Get the colors for each pixel on the rings circumference.
         # TODO: Make colors not a list.
-        ring_colors = [Pixel(self.image, (point)).colors[0] for point in points]
+        ring_colors = [
+            Pixel(self.image, (point)).colors[0] for point in self.points
+        ]
 
         # Collapse duplicates.
         ring_colors = self.collapse(ring_colors)

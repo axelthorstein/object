@@ -3,6 +3,7 @@ import requests
 
 class GraphQL:
 
+    @staticmethod
     def request(query):
         return requests.post(
             'https://axelteststore.myshopify.com/api/graphql',
@@ -14,6 +15,7 @@ class GraphQL:
                 '98b4b577fbc417686bc9354af95c735b'
             }).json()
 
+    @staticmethod
     def get_products():
         products = {}
         all_products = requests.get(
@@ -25,17 +27,20 @@ class GraphQL:
 
         return products
 
+    @staticmethod
     def get_product(product_name):
         query = '{shop {productByHandle(handle: "' + product_name + '") {id}}}'
 
         return GraphQL.request(query)
 
+    @staticmethod
     def get_product_variants(product_name):
         query = '{ shop { productByHandle(handle: "' + product_name + '")\
                  { variants(first:3) { edges { node { id }}}}}}'
 
         return GraphQL.request(query)
 
+    @staticmethod
     def build_line_items(variants):
         variants = variants['data']['shop']['productByHandle']['variants'][
             'edges']
@@ -45,6 +50,7 @@ class GraphQL:
 
         return str(line_items + ']')
 
+    @staticmethod
     def create_checkout(product_name):
         variants = GraphQL.get_product_variants(product_name)
         line_items = GraphQL.build_line_items(variants)

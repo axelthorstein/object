@@ -1,4 +1,4 @@
-class Ring(object):
+class Ring:
     """
     An abstract Ring object.
     """

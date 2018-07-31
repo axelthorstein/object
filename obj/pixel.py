@@ -66,6 +66,7 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.update_colors()
+        # TODO: Try to use this instead of actually calculating the radius.
         self.distance_moved += 1
 
     def update_colors(self):

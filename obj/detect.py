@@ -2,13 +2,14 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from obj.simple_ring import Simple
 from obj.hough_transform_ring import HoughTransform
 from obj.dashed_ring import Dashed
+from obj.logs import logger
+
+LOGGER = logger('object')
 
 
 class DetectionStrategy(Enum):
-    SIMPLE = Simple
     HOUGH_TRANSFORM = HoughTransform
     DASHED = Dashed
 
@@ -20,7 +21,7 @@ class Detect:
 
     def __init__(self,
                  image_path,
-                 strategy=DetectionStrategy.SIMPLE,
+                 strategy=DetectionStrategy.DASHED,
                  debug=True):
         self.image_path = image_path
         self.strategy = strategy.value
@@ -69,27 +70,22 @@ class Detect:
 
         Args:
             image (Image): The original image.
-            coords (tuple of int): The coordinates of a pixel.
+            ring (Ring): The ring.
         """
         pixel_matrix = image.load()
-        black_pixel = (0, 0, 0)
 
-        for coord in ring.inner_edges:
-            pixel_matrix[ring.inner_edges[coord]] = black_pixel
-
-        for coord in ring.outer_edges:
-            pixel_matrix[ring.outer_edges[coord]] = black_pixel
-
-        pixel_matrix[ring.center_point.coords] = black_pixel
+        for point in ring.color_sequence.points:
+            pixel_matrix[point] = (0, 0, 0)
 
         image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
-    # @timecall
     def preprocess_image(self):
         """Crop, compress, and filter to image.
 
         The image needs to be saved and reopened so that it can be manipulated
         as an array, where as the processing happens on the image object.
+
+        TODO: Preprocessing the image is super slow for some reason.
 
         Returns:
             Image: The preprocessed image.
@@ -112,15 +108,13 @@ class Detect:
         """
         self.draw_ring(preprocessed_image, ring)
 
-        print(ring.overlay)
-
         if ring.is_valid:
-            print("Valid ring found at: {}".format(ring))
+            LOGGER.info("Valid ring found at: {}".format(ring))
         else:
             raise DetectionException("No valid ring found: {}".format(ring))
 
     @timecall
-    def detect_ring(self):
+    def detect_ring(self, grain=360):
         """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of
@@ -137,14 +131,13 @@ class Detect:
 
         ring = self.strategy(image, starting_coords, debug=self.debug)
 
-        ring.approximate()
+        ring.approximate(grain)
 
         if not ring.is_valid():
-            ring.calculate()
+            ring.calculate(grain)
 
-        # draw the ring onto a photo for visual validation
-        # if self.debug:
-        #     self.log_debug_info(image, ring)
+        if self.debug:
+            self.log_debug_info(image, ring)
 
         return ring
 

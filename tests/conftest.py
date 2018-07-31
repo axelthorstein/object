@@ -2,10 +2,9 @@ import pytest
 from unittest.mock import Mock
 from collections import Counter
 
+from obj.dashed_ring import Dashed
 from obj.coordinate import Coordinate
-from obj.simple_ring import Simple
 from obj.overlay import Overlay
-from utils.color_utils import update_color_freq
 
 
 @pytest.fixture()
@@ -17,38 +16,11 @@ def starting_coordinates():
 
 
 @pytest.fixture()
-def color_freq():
-    """
-	An empty color frequencies map for the inner and outer colors
-	"""
-    return {"inner": Counter(), "outer": Counter()}
-
-
-@pytest.fixture()
 def depths():
     """
 	The inner and outer depths.
 	"""
     return ["inner", "outer"]
-
-
-@pytest.fixture()
-def updated_color_freq(color_freq):
-    """
-	A color frequencies map for the inner and outer colors already populated
-	with test data.
-	"""
-    current_colors = ("red", "black", "blue")
-    for i in range(3):
-        color_freq = update_color_freq(
-            color_freq, current_colors, depth="inner")
-
-    current_colors = ("black", "blue", "red")
-    for i in range(3):
-        color_freq = update_color_freq(
-            color_freq, current_colors, depth="outer")
-
-    return color_freq
 
 
 @pytest.fixture()
@@ -75,7 +47,7 @@ def ring(image, starting_coordinates):
     """
 	A Ring.
 	"""
-    ring = Simple(image, starting_coordinates)
+    ring = Dashed(image, starting_coordinates)
     return ring
 
 

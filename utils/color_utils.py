@@ -7,35 +7,6 @@ class ColorException(Exception):
     pass
 
 
-def code_to_color(code):
-    if code == '00':
-        return 'red'
-    elif code == '01':
-        return 'orange'
-    elif code == '02':
-        return 'yellow'
-    elif code == '03':
-        return 'lime'
-    elif code == '04':
-        return 'green'
-    elif code == '05':
-        return 'turquoise'
-    elif code == '06':
-        return 'cyan'
-    elif code == '07':
-        return 'lightblue'
-    elif code == '08':
-        return 'blue'
-    elif code == '09':
-        return 'purple'
-    elif code == '10':
-        return 'magenta'
-    elif code == '11':
-        return 'pink'
-    else:
-        raise ColorException(f"Code {code} not found.")
-
-
 def color_to_code(color):
     if color == 'red':
         return '00'
@@ -65,15 +36,6 @@ def color_to_code(color):
         raise ColorException(f"Color {color} not found.")
 
 
-def code_to_sequence(code):
-    sequence = ''
-
-    for i in code:
-        sequence += code_to_color(i)
-
-    return sequence
-
-
 def sequence_to_code(sequence):
     code = ''
 
@@ -100,9 +62,9 @@ def get_hue_name(hue):
         return 'yellow'
     elif 70 < hue <= 90:
         return 'lime'
-    elif 90 < hue <= 150:
+    elif 90 < hue <= 145:
         return 'green'
-    elif 150 < hue <= 160:
+    elif 145 < hue <= 160:
         return 'turquoise'
     elif 160 < hue <= 185:
         return 'cyan'
@@ -126,6 +88,8 @@ def get_color(rgb):
     Resolve the human readable names for a RBG value. This method is a great
     speed increase over the `get_most_likely_colors` method, however it assumes
     that the hue is the exact color name and is limited to 16 colors (for now).
+
+    TODO: Add back grey checking.
 
     Args:
         rgb (list of int): The Red, Green, Blue triplet.
@@ -182,27 +146,3 @@ def get_most_likely_colors(rgb):
 
     # Return the 3 most likely colors in order of likelihood.
     return min_colors[:3]
-
-
-def update_color_freq(color_freq, current_colors, depth):
-    """Update the color local freq Counter.
-
-    Track the frequency of a color for the given depth and direction, and
-    multiply it by the likelihood that the correct color was identified.
-    
-    Args:
-        color_freq (Counter): The freq of colors.
-        current_colors (tuple): The next pixel's color.
-        depth (str): Whether this is for inner or outer colours.
-
-    Returns:
-        color_freq (Counter): The freq of colors.
-    """
-    for i, color in enumerate(reversed(current_colors)):
-        i += 1
-        if color in color_freq[depth].keys():
-            color_freq[depth][color] += 1 * i
-        else:
-            color_freq[depth][color] = 1 * i
-
-    return color_freq
