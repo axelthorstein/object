@@ -4,7 +4,45 @@ from operator import itemgetter
 
 
 class ColorException(Exception):
-    pass        
+    pass
+
+
+def color_to_code(color):
+    if color == 'red':
+        return '00'
+    elif color == 'orange':
+        return '01'
+    elif color == 'yellow':
+        return '02'
+    elif color == 'lime':
+        return '03'
+    elif color == 'green':
+        return '04'
+    elif color == 'turquoise':
+        return '05'
+    elif color == 'cyan':
+        return '06'
+    elif color == 'lightblue':
+        return '07'
+    elif color == 'blue':
+        return '08'
+    elif color == 'purple':
+        return '09'
+    elif color == 'magenta':
+        return '10'
+    elif color == 'pink':
+        return '11'
+    else:
+        raise ColorException(f"Color {color} not found.")
+
+
+def sequence_to_code(sequence):
+    code = ''
+
+    for color in sequence:
+        code += color_to_code(color)
+
+    return code
 
 
 def get_hue_name(hue):
@@ -51,6 +89,8 @@ def get_color(rgb):
     speed increase over the `get_most_likely_colors` method, however it assumes
     that the hue is the exact color name and is limited to 16 colors (for now).
 
+    TODO: Add back grey checking.
+
     Args:
         rgb (list of int): The Red, Green, Blue triplet.
 
@@ -67,16 +107,16 @@ def get_color(rgb):
         color = 'black'
     elif saturation < 0.05 and brightness > 0.95:
         color = 'white'
-    elif (saturation < 0.05 and brightness > 0.30) or (saturation < 0.1 and brightness < 0.50):
-        color = 'grey'
-    elif brightness < 0.75:
-        color = 'dark-' + color_name
-    elif saturation < 0.75 and brightness > 0.95:
-        color = 'light-' + color_name
+    # elif (saturation < 0.05 and brightness > 0.30) or (saturation < 0.1 and brightness < 0.50):
+    #     color = 'grey'
+    # elif brightness < 0.75:
+    #     color = 'dark-' + color_name
+    # elif saturation < 0.75 and brightness > 0.95:
+    #     color = 'light-' + color_name
     else:
         color = color_name
 
-    return set([color])
+    return [color]
 
 
 def get_most_likely_colors(rgb):
@@ -94,38 +134,15 @@ def get_most_likely_colors(rgb):
 
     for key, name in webcolors.css3_hex_to_names.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
-        rd = (r_c - rgb[0]) ** 2
-        gd = (g_c - rgb[1]) ** 2
-        bd = (b_c - rgb[2]) ** 2
+        rd = (r_c - rgb[0])**2
+        gd = (g_c - rgb[1])**2
+        bd = (b_c - rgb[2])**2
         min_colors[(rd + gd + bd)] = name
 
     # Sort the keys based on the minimum values, indicating liklihood.
-    min_colors = [min_colors[key] for key in sorted(
-        min_colors.keys(), reverse=False)]
+    min_colors = [
+        min_colors[key] for key in sorted(min_colors.keys(), reverse=False)
+    ]
 
     # Return the 3 most likely colors in order of likelihood.
-    return set(min_colors[:3])
-
-
-def update_color_freq(color_freq, current_colors, depth):
-    """Update the color local freq Counter.
-
-    Track the frequency of a color for the given depth and direction, and
-    multiply it by the likelihood that the correct color was identified.
-    
-    Args:
-        color_freq (Counter): The freq of colors.
-        current_colors (tuple): The next pixel's color.
-        depth (str): Whether this is for inner or outer colours.
-
-    Returns:
-        color_freq (Counter): The freq of colors.
-    """
-    for i, color in enumerate(reversed(list(current_colors))):
-        i += 1
-        if color in color_freq[depth].keys():
-            color_freq[depth][color] += 1 * i
-        else:
-            color_freq[depth][color] = 1 * i
-
-    return color_freq
+    return min_colors[:3]

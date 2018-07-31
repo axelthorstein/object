@@ -1,7 +1,5 @@
-from collections import Counter
-
+from obj.pixel import Pixel
 from obj.direction import Direction
-from utils.color_utils import get_color, get_most_likely_colors, update_color_freq
 
 
 class Coordinate:
@@ -9,29 +7,41 @@ class Coordinate:
     An interface for incrementing coordinates in a pixel matrix.
     """
 
-    def __init__(self, image, depth, confidence='high'):
+    def __init__(self, image, depth):
         self.image = image
         self.depth = depth
-        self.confidence = confidence
-        self.color_freq = {"inner": Counter(), "outer": Counter()}
 
-    def get_pixel_colors(self, coords):
-        """Get the pixel at the given coordinate.
+    def scan_adjacent_pixel(self, coords, direction, steps, starting_colors):
+        """Probe the two adjacent pixels if the first pixel returns a new color.
 
-        The confidence level determines the range of colors to search through.
-        
+        Check the two pixels beside the pixel that was just checked to see
+        if the edge is increasing or decreasing on an angle that is less than
+        45 degrees.
+
+        TODO: May need to return the original direciton pixel so it doesn't
+        always veer off to certain direction.
+
         Args:
-            coords (tuple of int): The coordinates of the pixel.
+            coords (Tuple[int, int]): The original coordinates of the pixel.
+            direction (Direction): The direction that was being checked.
+            steps (int): How many pixels to increment/decrement.
+            starting_colors (List[str]): The original colors to check against.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            Pixel: The pixel to move to.
         """
-        if self.confidence == 'high':
-            return get_color(self.image.getpixel(coords))
-        else:
-            return get_most_likely_colors(self.image.getpixel(coords))
+        adjacent_directions = Direction.get_adjacent_direction(direction)
 
-    def move(self, starting_coords, direction):
+        for adjacent_direction in adjacent_directions:
+            pixel = Pixel(self.image, coords)
+            pixel.move(adjacent_direction, steps)
+
+            if pixel.colors_intersect(starting_colors):
+                return pixel
+
+        return pixel
+
+    def walk(self, starting_coords, direction, steps=1):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -41,37 +51,56 @@ class Coordinate:
         and compare against the three most likely starting colors. If there are
         no common elements for two iterations we consider an edge to be found
         and exit. This provides us with minimal error recovery.
-        
+
         Args:
-            starting_coords (tuple of int): Coordinates of the starting pixel.
-            direction (method): Direction to increment/decrement.
-            depth (str): Whether this is for inner or outer colours.
+            starting_coords (Pixel): Coordinates of the starting pixel.
+            direction (function): Direction to increment/decrement.
+            steps (int): The amount of pixels to skew on each interation.
 
         Returns:
-            tuple of int: The coordinates of a pixel.
+            Pixel: The coordinates of a pixel.
         """
-        # get all the starting values
-        starting_colors = self.get_pixel_colors(direction(starting_coords))
-        current_coords = direction(starting_coords, jump=1)
-        current_colors = self.get_pixel_colors(current_coords)
-        last_failed = False
+        starting_coords = starting_coords.coords
+        pixel = Pixel(self.image, starting_coords)
+        starting_colors = pixel.colors
 
-        # compare the three most likely colors against the three starting colors
-        # because the color identification can be unreliable
-        while bool(starting_colors & current_colors) or last_failed == False:
+        while pixel.colors_intersect(
+                starting_colors) and not pixel.out_of_bounds():
+            pixel.move(direction, steps)
 
-            # checking if the last iteration failed provides a small error
-            # recovery scheme in case we find a single unrepresentative pixel
-            if bool(starting_colors & current_colors):
-                last_failed = True
-            else:
-                last_failed = False
+            if self.depth == 'outer':
+                if not pixel.colors_intersect(starting_colors):
+                    pixel = self.scan_adjacent_pixel(pixel.coords, direction,
+                                                     steps, starting_colors)
 
-            # track color frequency
-            update_color_freq(self.color_freq, current_colors, self.depth)
+        return pixel
 
-            # increment and update the current values
-            current_coords = direction(current_coords)
-            current_colors = self.get_pixel_colors(current_coords)
+    def scan(self, starting_pixel, direction):
+        """Probe the direction until part of the ring is found.
 
-        return current_coords
+        In some cases we may not have a fully formed ring, so in order to
+        determine where the ring begins we need to check along a line of pixels
+        and if not part of the ring is found, we skew slightly and try again.
+        Continue checking until an edge is found.
+
+        TODO: We may need to have a limit to the number of rows checked.
+
+        Args:
+            starting_pixel (Pixel): Coordinates of the starting pixel.
+            direction (function): Direction to increment/decrement.
+
+        Returns:
+            Pixel: The coordinates of a pixel.
+        """
+        rows_checked = 0
+        starting_coords = starting_pixel.coords
+        pixel = self.walk(starting_pixel, direction)
+
+        while pixel.out_of_bounds():
+            # Reset the pixel.
+            pixel = Pixel(self.image, starting_coords)
+            pixel.side_step(direction, rows_checked)
+            pixel = self.walk(pixel, direction)
+            rows_checked += 1
+
+        return pixel

@@ -2,15 +2,16 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from obj.simple_ring import Simple
 from obj.hough_transform_ring import HoughTransform
 from obj.dashed_ring import Dashed
+from obj.logs import logger
+
+LOGGER = logger('object')
 
 
 class DetectionStrategy(Enum):
-    SIMPLE = Simple
     HOUGH_TRANSFORM = HoughTransform
-    DASHED_RING = Dashed
+    DASHED = Dashed
 
 
 class Detect:
@@ -18,8 +19,10 @@ class Detect:
     Detect a ring from a given image.
     """
 
-    def __init__(self, image_path,
-                 strategy=DetectionStrategy.SIMPLE, debug=True):
+    def __init__(self,
+                 image_path,
+                 strategy=DetectionStrategy.DASHED,
+                 debug=True):
         self.image_path = image_path
         self.strategy = strategy.value
         self.debug = debug
@@ -39,15 +42,11 @@ class Detect:
         half_the_height = image.size[1] / 2
 
         # TODO: Will need to adjust these values to match the actual overlay.
-        cropped_image = image.crop(
-            (
-                half_the_width - (half_the_width * 0.25),
-                half_the_height - (half_the_height * 0.35),
-                half_the_width + (half_the_width * 0.25),
-                half_the_height + (half_the_height * 0.35)
-            )
-        )
-        
+        cropped_image = image.crop((half_the_width - (half_the_width * 0.5),
+                                    half_the_height - (half_the_height * 0.5),
+                                    half_the_width + (half_the_width * 0.5),
+                                    half_the_height + (half_the_height * 0.5)))
+
         return cropped_image
 
     def compress(self, image):
@@ -71,18 +70,12 @@ class Detect:
 
         Args:
             image (Image): The original image.
-            coords (tuple of int): The coordinates of a pixel.
+            ring (Ring): The ring.
         """
         pixel_matrix = image.load()
-        black_pixel = (0,0,0)
 
-        for coord in ring.inner_edges:
-            pixel_matrix[ring.inner_edges[coord]] = black_pixel
-
-        for coord in ring.outer_edges:
-            pixel_matrix[ring.outer_edges[coord]] = black_pixel
-
-        pixel_matrix[ring.center_coords] = black_pixel
+        for point in ring.color_sequence.points:
+            pixel_matrix[point] = (0, 0, 0)
 
         image.save("/Users/axelthor/Projects/object/images/test_draw.png")
 
@@ -92,15 +85,17 @@ class Detect:
         The image needs to be saved and reopened so that it can be manipulated
         as an array, where as the processing happens on the image object.
 
+        TODO: Preprocessing the image is super slow for some reason.
+
         Returns:
             Image: The preprocessed image.
         """
         image = Image.open(self.image_path)
-        filtered_image = image.filter(ImageFilter.MedianFilter())
+        # filtered_image = image.filter(ImageFilter.MedianFilter())
 
-        preprocessed_image = self.compress(self.crop(filtered_image))
+        # preprocessed_image = self.compress(self.crop(filtered_image))
 
-        return preprocessed_image
+        return image
 
     def log_debug_info(self, preprocessed_image, ring):
         """Log debugging information.
@@ -113,15 +108,13 @@ class Detect:
         """
         self.draw_ring(preprocessed_image, ring)
 
-        print(ring.overlay)
-
         if ring.is_valid:
-            print("Valid ring found at: {}".format(ring))
+            LOGGER.info("Valid ring found at: {}".format(ring))
         else:
             raise DetectionException("No valid ring found: {}".format(ring))
 
     @timecall
-    def detect_ring(self):
+    def detect_ring(self, grain=360):
         """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of
@@ -135,14 +128,18 @@ class Detect:
 
         # find the ring in the image
         starting_coords = (int(image.size[0] / 2), int(image.size[1] / 2))
-        ring = self.strategy(image, starting_coords, debug=self.debug)
-        ring.create()
 
-        # draw the ring onto a photo for visual validation
+        ring = self.strategy(image, starting_coords, debug=self.debug)
+
+        ring.approximate(grain)
+
+        if not ring.is_valid():
+            ring.calculate(grain)
+
         if self.debug:
             self.log_debug_info(image, ring)
 
-        return (ring.center_color, ring.ring_color)
+        return ring
 
 
 class DetectionException(Exception):
