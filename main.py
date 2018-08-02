@@ -41,8 +41,8 @@ def images(id):
     db.download_image()
 
     # colors = Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
-    colors = Detect(file_path).detect_circle()
-    color = str(colors[0]) + "-" + str(colors[1])
+    ring = Detect(file_path).detect_ring()
+    color = str(ring.colors[0]) + "-" + str(ring.colors[1])
     if PRODUCT_MAP.get(color):
         product = PRODUCT_MAP[color]
     else:
