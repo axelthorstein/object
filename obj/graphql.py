@@ -2,11 +2,14 @@ import requests
 
 
 class GraphQL:
+    """An interface for GraphQL endpoints."""
 
+    BASE_URL = 'https://axelteststore.myshopify.com'
+    
     @staticmethod
     def request(query):
         return requests.post(
-            'https://axelteststore.myshopify.com/api/graphql',
+            BASE_URL + '/api/graphql',
             data=query,
             headers={
                 'Content-Type':
@@ -19,9 +22,9 @@ class GraphQL:
     def get_products():
         products = {}
         all_products = requests.get(
-            "https://axelteststore.myshopify.com/admin/products.json",
-            auth=("e7759a3699a682d55e2c25991596e3cc",
-                  "c586e1e6cf85d7a25e0df45ee8f66204")).json()
+            BASE_URL + '/admin/products.json',
+            auth=('e7759a3699a682d55e2c25991596e3cc',
+                  'c586e1e6cf85d7a25e0df45ee8f66204')).json()
         for product in all_products["products"]:
             products[product['handle']] = GraphQL.get_product(product['handle'])
 
