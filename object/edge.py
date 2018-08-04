@@ -7,12 +7,10 @@ class Edge:
     An interface for incrementing coordinates in a pixel matrix.
     """
 
-    def __init__(self, image, starting_pixel, direction, depth):
+    def __init__(self, image, direction, depth):
         self.image = image
-        self.starting_pixel = starting_pixel
         self.direction = direction
         self.depth = depth
-        self.pixel = self.scan()
 
     def scan_adjacent_pixel(self, coords, direction, steps, starting_colors):
         """Probe the two adjacent pixels if the first pixel returns a new color.
@@ -78,7 +76,7 @@ class Edge:
 
         return pixel
 
-    def scan(self):
+    def scan(self, starting_pixel):
         """Probe the direction until part of the ring is found.
 
         In some cases we may not have a fully formed ring, so in order to
@@ -89,14 +87,14 @@ class Edge:
         TODO: We may need to have a limit to the number of rows checked.
 
         Args:
-            depth (str): The inner or outer ring indicator.
+            starting_pixel (Pixel): The pixel to start from.
 
         Returns:
             Pixel: The coordinates of a pixel.
         """
         rows_checked = 0
-        starting_coords = self.starting_pixel.coords
-        pixel = self.walk(self.starting_pixel, self.direction)
+        starting_coords = starting_pixel.coords
+        pixel = self.walk(starting_pixel, self.direction)
 
         while pixel.out_of_bounds():
             # Reset the pixel.

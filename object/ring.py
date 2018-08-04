@@ -65,8 +65,8 @@ class Ring:
         # TODO: Add real validity check.
         return self.color_sequence.is_valid
 
-    def get_radius(self):
-        """Return the average radius from the center to the middle of the ring.
+    def get_edges(self):
+        """Return the edges around the center point.
 
         To find the outer edge we begin moving from the inner edge until
         we reach the original color. We need to increment the inner edge
@@ -74,25 +74,59 @@ class Ring:
         would immeadiately exit otherwise.
 
         Returns:
-            int: The average radius from the center to the middle of the ring.
+            Dict[str, Dict[str, Pixel]]: The map of edges around the ring.
         """
         edges = {}
+        directions = Direction.get_directions()
+
+        for depth in ['inner', 'outer']:
+            edges[depth] = {}
+
+            for direction in directions:
+                edge = Edge(self.image, directions[direction], depth)
+
+                if depth == 'inner':
+                    pixel = edge.scan(self.center_point)
+                else:
+                    pixel = edge.scan(edges['inner'][direction])
+
+                edges[depth][direction] = pixel
+
+        self.update_center_coords(edges['inner'])
+
+        return edges
+
+    @staticmethod
+    def calculate_distance(inner_point, outer_point):
+        """Calculate the distance between two points.
+
+        Args:
+            inner_point (Pixel): The inner point.
+            outer_point (Pixel): The outer point.
+
+        Returns:
+            int: The distance between the points.
+        """
+        return hypot(inner_point.x - outer_point.x,
+                     inner_point.y - outer_point.y)
+
+    def get_radius(self):
+        """Return the average radius from the center to the middle of the ring.
+
+        Returns:
+            int: The average radius from the center to the middle of the ring.
+        """
         radii = []
+        edges = self.get_edges()
         directions = Direction.get_directions()
 
         for direction in directions:
-            inner_pixel = Edge(self.image, self.center_point,
-                               directions[direction], 'inner').pixel
-            outer_pixel = Edge(self.image, inner_pixel, directions[direction],
-                               'outer').pixel
-            inner_radius = hypot(self.center_point.x - inner_pixel.x,
-                                 self.center_point.y - inner_pixel.y)
-            outer_radius = hypot(inner_pixel.x - outer_pixel.x,
-                                 inner_pixel.y - outer_pixel.y)
-            radii.append(int(inner_radius + (outer_radius / 2)))
-            edges[direction] = inner_pixel
+            inner_radius = Ring.calculate_distance(self.center_point,
+                                                   edges['inner'][direction])
+            outer_radius = Ring.calculate_distance(edges['inner'][direction],
+                                                   edges['outer'][direction])
 
-        self.update_center_coords(edges)
+            radii.append(int(inner_radius + (outer_radius / 2)))
 
         return sum(radii) / len(radii)
 
