@@ -2,6 +2,8 @@
 import colorsys
 import webcolors
 
+from configs.config import COLOR_RANGE_MAP
+
 
 class ColorException(Exception):
     pass
@@ -20,22 +22,6 @@ COLOR_CODE_MAP = {
     'purple': '09',
     'magenta': '10',
     'pink': '11'
-}
-
-COLOR_RANGE_MAP = {
-    range(0, 15): 'red',
-    range(15, 45): 'orange',
-    range(45, 70): 'yellow',
-    range(70, 90): 'lime',
-    range(90, 150): 'green',
-    range(150, 160): 'turquoise',
-    range(160, 185): 'cyan',
-    range(185, 210): 'lightblue',
-    range(210, 260): 'blue',
-    range(260, 275): 'purple',
-    range(275, 300): 'magenta',
-    range(300, 330): 'pink',
-    range(330, 360): 'red'
 }
 
 
@@ -74,11 +60,10 @@ def get_hue_name(hue):
     Raises:
         ColorException: If the hue isn't in any color range.
     """
-    for color_range in COLOR_RANGE_MAP:
-        if hue in color_range:
-            return COLOR_RANGE_MAP[color_range]
-
-    raise ColorException(f"Hue {hue} not found.")
+    try:
+        return COLOR_RANGE_MAP[hue]
+    except ValueError:
+        raise ColorException(f"Hue {hue} not found.")
 
 
 def get_color(rgb):

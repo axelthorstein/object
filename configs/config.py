@@ -16,6 +16,39 @@ class Environments:
     production = 'production'
 
 
+def generate_color_range_map():
+    """Return a hash map of hue value to color name for fast access.
+
+    Create this map a single time at the beginning of execution to reduce
+    runtime.
+
+    Returns:
+        Dict[int, str]: The hue to color name hash map.
+    """
+    color_range_map = {}
+    color_ranges_map = {
+        range(0, 15): 'red',
+        range(15, 45): 'orange',
+        range(45, 70): 'yellow',
+        range(70, 90): 'lime',
+        range(90, 150): 'green',
+        range(150, 160): 'turquoise',
+        range(160, 185): 'cyan',
+        range(185, 210): 'lightblue',
+        range(210, 260): 'blue',
+        range(260, 275): 'purple',
+        range(275, 300): 'magenta',
+        range(300, 330): 'pink',
+        range(330, 360): 'red'
+    }
+
+    for color_range in color_ranges_map:
+        for value in color_range:
+            color_range_map[value] = color_ranges_map[color_range]
+
+    return color_range_map
+
+
 def current_environment():
     """Return the name of the current executing environment.
 
@@ -87,3 +120,5 @@ def load_config(file_name):
 
 
 SEQUENCES = load_config('product_map.json')
+
+COLOR_RANGE_MAP = generate_color_range_map()
