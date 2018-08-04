@@ -5,6 +5,7 @@ images/*_cropped*
 images/*_draw*
 images/*debug.png*
 *.pytest_cache/*
+configs/*.ejson
 
 
 # Byte-compiled / optimized / DLL files

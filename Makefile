@@ -23,3 +23,9 @@ install:
 
 shell:
 	pipenv shell
+
+server:
+	python main.py
+
+docker:
+	docker build . -t object_test && docker run -it -p 8080:8080 object_test

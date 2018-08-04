@@ -8,8 +8,7 @@ from firebase_admin import storage
 
 global admin
 admin = firebase_admin.initialize_app(
-    credentials.Certificate(
-        '/Users/axelthor/credentials/firebase_credentials.json'),
+    credentials.Certificate('configs/firebase_credentials.ejson'),
     name='object-is',
     options={"databaseURL": "https://object-is.firebaseio.com/"})
 
