@@ -110,7 +110,8 @@ class ColorSequence:
 
         if len(set(colors)) > 1:
             colors = colors[next(
-                colors.index(x) for x in colors
+                colors.index(x)
+                for x in colors
                 if x != self.center_point.colors[0]):]
 
             for i, color in enumerate(colors):

@@ -114,8 +114,8 @@ class Pixel:
         """
         width, height = self.image.size
 
-        return ((width - steps <= self.x) or (self.x <= steps)
-                or (height - steps <= self.y) or (self.y <= steps))
+        return ((width - steps <= self.x) or (self.x <= steps) or
+                (height - steps <= self.y) or (self.y <= steps))
 
     def __repr__(self):
         """Return a short, in line, description of the Pixel.
