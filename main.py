@@ -5,7 +5,7 @@ from flask import render_template
 from flask import redirect
 
 from obj.graphql import GraphQL
-from obj.detect import Detector
+from obj.detector import Detector
 from obj.firebase import Firebase
 from configs.config import SEQUENCES
 

@@ -1,14 +1,14 @@
-from obj.detect import Detect
+from obj.detector import Detector
 
 
 def get_ring(image_name):
     """Return a dashed ring from the image name shorthand.
     """
-    detect = Detect(
+    detector = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/{image_name}",
         debug=False)
 
-    return detect.detect()
+    return detector.detect()
 
 
 def test_detect_circle_med_36_square():
