@@ -57,29 +57,29 @@ def get_hue_name(hue):
     """
     if 0 <= hue <= 15:
         return 'red'
-    elif 15 < hue <= 45:
+    if 15 < hue <= 45:
         return 'orange'
-    elif 45 < hue <= 70:
+    if 45 < hue <= 70:
         return 'yellow'
-    elif 70 < hue <= 90:
+    if 70 < hue <= 90:
         return 'lime'
-    elif 90 < hue <= 145:
+    if 90 < hue <= 145:
         return 'green'
-    elif 145 < hue <= 160:
+    if 145 < hue <= 160:
         return 'turquoise'
-    elif 160 < hue <= 185:
+    if 160 < hue <= 185:
         return 'cyan'
-    elif 185 < hue <= 210:
+    if 185 < hue <= 210:
         return 'lightblue'
-    elif 210 < hue <= 260:
+    if 210 < hue <= 260:
         return 'blue'
-    elif 260 < hue <= 275:
+    if 260 < hue <= 275:
         return 'purple'
-    elif 275 < hue <= 300:
+    if 275 < hue <= 300:
         return 'magenta'
-    elif 300 < hue <= 330:
+    if 300 < hue <= 330:
         return 'pink'
-    elif 330 < hue <= 360:
+    if 330 < hue <= 360:
         return 'red'
 
 
