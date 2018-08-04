@@ -5,7 +5,7 @@ from flask import render_template
 from flask import redirect
 
 from obj.graphql import GraphQL
-from obj.detect import Detect
+from obj.detect import Detector
 from obj.firebase import Firebase
 from configs.config import SEQUENCES
 
@@ -32,7 +32,9 @@ def images(image_id):
     db = Firebase(file_path)
     db.download_image()
 
-    ring = Detect(file_path).detect_ring()
+    detector = Detector(file_path)
+
+    ring = detector.detect()
 
     if ring.is_valid:
         product = SEQUENCES[ring.color_sequence.sequence]

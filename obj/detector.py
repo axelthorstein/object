@@ -14,13 +14,12 @@ class DetectionStrategy(Enum):
     RING = Ring
 
 
-class Detect:
+class Detector:
     """
     Detect a ring from a given image.
     """
 
-    def __init__(self, image_path, strategy=DetectionStrategy.RING,
-                 debug=True):
+    def __init__(self, image_path, strategy=DetectionStrategy.RING, debug=True):
         self.image = Image(image_path)
         self.strategy = strategy.value
         self.debug = debug
@@ -41,7 +40,7 @@ class Detect:
             raise DetectionException("No valid ring found: {}".format(ring))
 
     @timecall
-    def detect_ring(self, grain=360):
+    def detect(self, grain=360):
         """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of
