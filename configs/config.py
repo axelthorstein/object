@@ -31,7 +31,7 @@ def relative_config_file_path(file_name):
     """Return the config file path based on the environment.
 
     Args:
-        environment (str): The current environment.
+        file_name (str): The file name to be loaded.
 
     Returns:
         str: The config file path.
@@ -59,6 +59,9 @@ def get_config(config_file):
 
     Returns:
         dict: The config file contents.
+
+    Raises:
+        ConfigException: If there is an issue loading the config file.
     """
     with open(config_file) as f:
         try:
@@ -83,4 +86,4 @@ def load_config(file_name):
     return config
 
 
-SEQUENCES = load_config('color_sequences.json')
+SEQUENCES = load_config('product_map.json')
