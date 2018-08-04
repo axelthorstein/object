@@ -2,8 +2,8 @@ from math import atan2, cos, degrees, sin
 from operator import sub
 from collections import Counter
 
-from obj.pixel import Pixel
-from obj.logs import logger
+from object.pixel import Pixel
+from object.logs import logger
 from utils.color_utils import sequence_to_code
 from configs.config import SEQUENCES
 

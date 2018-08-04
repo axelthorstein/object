@@ -1,5 +1,5 @@
-from obj.pixel import Pixel
-from obj.direction import Direction
+from object.pixel import Pixel
+from object.direction import Direction
 
 
 class Coordinate:

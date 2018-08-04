@@ -9,7 +9,7 @@ autoformat:
 	yapf --in-place --recursive --style google .
 
 lint:
-	@pylint -j 4 --rcfile=pylintrc obj/*.py tests/*.py configs/*.py utils/*.py *.py 
+	@pylint -j 4 --rcfile=pylintrc object/*.py tests/*.py configs/*.py utils/*.py *.py 
 
 autolint: autoformat lint
 

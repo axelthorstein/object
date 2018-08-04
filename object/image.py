@@ -2,7 +2,7 @@ from os.path import dirname, abspath
 from PIL import Image as pil_image
 from PIL import ImageFilter
 
-from obj.pixel import Pixel
+from object.pixel import Pixel
 
 
 class Image:
@@ -46,7 +46,7 @@ class Image:
             ring (Ring): The ring.
         """
         pixel_matrix = self.image.load()
-        debug_path = dirname(abspath(__file__)) + '/images/debug.png'
+        debug_path = dirname(dirname(abspath(__file__))) + '/images/debug.png'
 
         for point in ring.color_sequence.points:
             pixel_matrix[point] = (0, 0, 0)

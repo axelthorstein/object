@@ -1,10 +1,10 @@
 from unittest.mock import Mock
 from pytest import fixture
 
-from obj.ring import Ring
-from obj.coordinate import Coordinate
-from obj.overlay import Overlay
-from obj.pixel import Pixel
+from object.ring import Ring
+from object.coordinate import Coordinate
+from object.overlay import Overlay
+from object.pixel import Pixel
 
 
 @fixture()

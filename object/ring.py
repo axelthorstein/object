@@ -1,10 +1,10 @@
 from math import hypot
 
-from obj.coordinate import Coordinate
-from obj.direction import Direction
-from obj.overlay import Overlay
-from obj.color_sequence import ColorSequence
-from obj.logs import logger
+from object.coordinate import Coordinate
+from object.direction import Direction
+from object.overlay import Overlay
+from object.color_sequence import ColorSequence
+from object.logs import logger
 
 LOGGER = logger('object')
 

@@ -1,6 +1,6 @@
 import pytest
 
-from obj.direction import Direction, DirectionException
+from object.direction import Direction, DirectionException
 
 
 def test_direction_left(starting_coordinates):

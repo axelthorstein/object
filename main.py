@@ -4,9 +4,9 @@ from flask import Flask
 from flask import render_template
 from flask import redirect
 
-from obj.graphql import GraphQL
-from obj.detector import Detector
-from obj.firebase import Firebase
+from object.graphql import GraphQL
+from object.detector import Detector
+from object.firebase import Firebase
 from configs.config import SEQUENCES
 
 app = Flask(__name__)

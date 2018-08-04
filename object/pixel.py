@@ -1,4 +1,4 @@
-from obj.direction import Direction
+from object.direction import Direction
 from utils.color_utils import get_color, get_most_likely_colors
 
 

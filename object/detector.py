@@ -3,9 +3,9 @@
 from enum import Enum
 from profilehooks import timecall
 
-from obj.ring import Ring
-from obj.logs import logger
-from obj.image import Image
+from object.ring import Ring
+from object.logs import logger
+from object.image import Image
 
 LOGGER = logger('object')
 
@@ -62,7 +62,7 @@ class Detector:
             ring.calculate(grain)
 
         if self.debug:
-            self.log_debug_info(image, ring)
+            self.log_debug_info(ring)
 
         return ring
 
