@@ -4,7 +4,7 @@ from object.direction import Direction
 
 class Edge:
     """
-    An interface for incrementing coordinates in a pixel matrix.
+    An interface for finding the next edge from a starting pixel.
     """
 
     def __init__(self, image, direction, depth):
