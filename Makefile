@@ -1,9 +1,4 @@
-# Copyright (c) 2017 "Shopify inc." All rights reserved.
-# Use of this source code is governed by a MIT-style license that can be found in the LICENSE file.
-python_files := find . -path '*/.*' -prune -o -name '*.py' -print0
-python_version_full := $(wordlist 2,4,$(subst ., ,$(shell python --version 2>&1)))
-
-all: test
+all: clean install test
 
 clean:
 	find . \( -name '*.pyc' -o -name '*.pyo' -o -name '*~' \) -print -delete >/dev/null

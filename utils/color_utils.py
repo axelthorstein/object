@@ -7,7 +7,7 @@ class ColorException(Exception):
     pass
 
 
-COLOR_MAP = {
+COLOR_CODE_MAP = {
     'red': '00',
     'orange': '01',
     'yellow': '02',
@@ -20,6 +20,22 @@ COLOR_MAP = {
     'purple': '09',
     'magenta': '10',
     'pink': '11'
+}
+
+COLOR_RANGE_MAP = {
+    range(0, 15): 'red',
+    range(15, 45): 'orange',
+    range(45, 70): 'yellow',
+    range(70, 90): 'lime',
+    range(90, 150): 'green',
+    range(150, 160): 'turquoise',
+    range(160, 185): 'cyan',
+    range(185, 210): 'lightblue',
+    range(210, 260): 'blue',
+    range(260, 275): 'purple',
+    range(275, 300): 'magenta',
+    range(300, 330): 'pink',
+    range(330, 360): 'red'
 }
 
 
@@ -39,7 +55,7 @@ def sequence_to_code(sequence):
 
     try:
         for color in sequence:
-            code += COLOR_MAP[color]
+            code += COLOR_CODE_MAP[color]
     except ValueError:
         raise ColorException(f"Color {color} not found.")
 
@@ -54,33 +70,15 @@ def get_hue_name(hue):
 
     Returns:
         str: The color name from the hue value.
+
+    Raises:
+        ColorException: If the hue isn't in any color range.
     """
-    if 0 <= hue <= 15:
-        return 'red'
-    if 15 < hue <= 45:
-        return 'orange'
-    if 45 < hue <= 70:
-        return 'yellow'
-    if 70 < hue <= 90:
-        return 'lime'
-    if 90 < hue <= 145:
-        return 'green'
-    if 145 < hue <= 160:
-        return 'turquoise'
-    if 160 < hue <= 185:
-        return 'cyan'
-    if 185 < hue <= 210:
-        return 'lightblue'
-    if 210 < hue <= 260:
-        return 'blue'
-    if 260 < hue <= 275:
-        return 'purple'
-    if 275 < hue <= 300:
-        return 'magenta'
-    if 300 < hue <= 330:
-        return 'pink'
-    if 330 < hue <= 360:
-        return 'red'
+    for color_range in COLOR_RANGE_MAP:
+        if hue in color_range:
+            return COLOR_RANGE_MAP[color_range]
+
+    raise ColorException(f"Hue {hue} not found.")
 
 
 def get_color(rgb):

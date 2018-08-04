@@ -5,7 +5,8 @@ def get_ring(image_name):
     """Return a dashed ring from the image name shorthand.
     """
     detect = Detect(
-        f"/Users/axelthor/Projects/object/images/{image_name}", debug=False)
+        f"/Users/axelthor/Projects/object/tests/test_images/{image_name}",
+        debug=False)
 
     return detect.detect_ring()
 
@@ -53,7 +54,7 @@ def test_detect_circle_thin_18_round():
 
 def test_detect_circle_thin_50_square():
     detect = Detect(
-        f"/Users/axelthor/Projects/object/images/circle_thin_50_square.png",
+        f"/Users/axelthor/Projects/object/tests/test_images/circle_thin_50_square.png",
         debug=False)
     ring = detect.detect_ring(grain=3600)
     assert ring.is_valid()
