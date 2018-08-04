@@ -53,7 +53,7 @@ def test_detect_circle_thin_18_round():
 
 
 def test_detect_circle_thin_50_square():
-    detect = Detecto(
+    detect = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/circle_thin_50_square.png",
         debug=False)
     ring = detect.detect(grain=3600)
