@@ -3,7 +3,9 @@ images/*_preprocessed*
 images/*_thumbnail*
 images/*_cropped*
 images/*_draw*
+images/*debug.png*
 *.pytest_cache/*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

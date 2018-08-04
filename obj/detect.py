@@ -75,7 +75,7 @@ class Detect:
         for point in ring.color_sequence.points:
             pixel_matrix[point] = (0, 0, 0)
 
-        image.save("/Users/axelthor/Projects/object/images/test_draw.png")
+        image.save("/Users/axelthor/Projects/object/images/debug.png")
 
     def preprocess_image(self):
         """Crop, compress, and filter to image.
