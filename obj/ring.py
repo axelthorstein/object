@@ -3,7 +3,6 @@ from math import hypot
 from obj.coordinate import Coordinate
 from obj.direction import Direction
 from obj.overlay import Overlay
-from obj.pixel import Pixel
 from obj.color_sequence import ColorSequence
 from obj.logs import logger
 
@@ -16,10 +15,10 @@ class Ring:
     surrounded inside and outside by the same color.
     """
 
-    def __init__(self, image, starting_coords, debug=True):
+    def __init__(self, image, center_point, debug=True):
         self.image = image
         self.debug = debug
-        self.center_point = Pixel(image, starting_coords)
+        self.center_point = center_point
         self.radius = 0
         self.color_sequence = None
 
