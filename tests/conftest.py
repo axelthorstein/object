@@ -2,7 +2,6 @@ from unittest.mock import Mock
 from pytest import fixture
 
 from object.ring import Ring
-from object.coordinate import Coordinate
 from object.overlay import Overlay
 from object.pixel import Pixel
 
@@ -50,23 +49,3 @@ def ring(image, starting_coordinates):
 	"""
     ring = Ring(image, starting_coordinates)
     return ring
-
-
-@fixture()
-def inner_coordinate(image, depths):
-    """
-	An inner coordinate.
-	"""
-    coordinate = Coordinate(image, depths[0])
-
-    return coordinate
-
-
-@fixture()
-def outer_coordinate(image, depths):
-    """
-	An outer coordinate.
-	"""
-    coordinate = Coordinate(image, depths[1])
-
-    return coordinate

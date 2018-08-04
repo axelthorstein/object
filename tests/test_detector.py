@@ -6,7 +6,7 @@ def get_ring(image_name):
     """
     detector = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/{image_name}",
-        debug=False)
+        debug=True)
 
     return detector.detect()
 

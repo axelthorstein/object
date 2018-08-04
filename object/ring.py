@@ -1,6 +1,6 @@
 from math import hypot
 
-from object.coordinate import Coordinate
+from object.edge import Edge
 from object.direction import Direction
 from object.overlay import Overlay
 from object.color_sequence import ColorSequence
@@ -81,18 +81,14 @@ class Ring:
         directions = Direction.get_directions()
 
         for direction in directions:
-            inner_pixel = Coordinate(
-                self.image, depth='inner').scan(self.center_point,
-                                                directions[direction])
+            inner_pixel = Edge(self.image, self.center_point,
+                               directions[direction], 'inner').pixel
+            outer_pixel = Edge(self.image, inner_pixel, directions[direction],
+                               'outer').pixel
             inner_radius = hypot(self.center_point.x - inner_pixel.x,
                                  self.center_point.y - inner_pixel.y)
-
-            outer_pixel = Coordinate(
-                self.image, depth='outer').scan(inner_pixel,
-                                                directions[direction])
             outer_radius = hypot(inner_pixel.x - outer_pixel.x,
                                  inner_pixel.y - outer_pixel.y)
-
             radii.append(int(inner_radius + (outer_radius / 2)))
             edges[direction] = inner_pixel
 
@@ -113,7 +109,6 @@ class Ring:
         y_offset = int((inner_edges['down'].y - inner_edges['up'].y) / 2)
         x = inner_edges['left'].x + x_offset
         y = inner_edges['up'].y + y_offset
-
         self.center_point.update_coords(x, y)
 
     def __str__(self):
