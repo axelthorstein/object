@@ -109,6 +109,7 @@ class ColorSequence:
         j = 0
 
         if len(set(colors)) > 1:
+            # Remove preceeding center color occurences.
             colors = colors[next(
                 colors.index(x)
                 for x in colors

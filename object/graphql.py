@@ -8,6 +8,14 @@ class GraphQL:
 
     @staticmethod
     def request(query):
+        """Make a GraphQL request to the Shopify API.
+
+        Args:
+            query (str): The GraphQL request data.
+
+        Returns:
+            Response: The GraphQL response.
+        """
         return requests.post(
             BASE_URL + '/api/graphql',
             data=query,
@@ -20,6 +28,11 @@ class GraphQL:
 
     @staticmethod
     def get_products():
+        """Get all the products.
+
+        Returns:
+            Response: The GraphQL response.
+        """
         products = {}
         all_products = requests.get(
             BASE_URL + '/admin/products.json',
@@ -32,12 +45,28 @@ class GraphQL:
 
     @staticmethod
     def get_product(product_name):
+        """Get a single product given a name.
+
+        Args:
+            product_name: (str): The name of the product.
+
+        Returns:
+            Response: The GraphQL response.
+        """
         query = '{shop {productByHandle(handle: "' + product_name + '") {id}}}'
 
         return GraphQL.request(query)
 
     @staticmethod
     def get_product_variants(product_name):
+        """Get the variants for a given product.
+
+        Args:
+            product_name: (str): The name of the product.
+
+        Returns:
+            Response: The GraphQL response.
+        """
         query = '{ shop { productByHandle(handle: "' + product_name + '")\
                  { variants(first:3) { edges { node { id }}}}}}'
 
@@ -45,6 +74,14 @@ class GraphQL:
 
     @staticmethod
     def build_line_items(variants):
+        """Build the line items object for the product variants.
+
+        Args:
+            variants: (str): The variants of the product.
+
+        Returns:
+            str: The line items GraphQL string.
+        """
         variants = variants['data']['shop']['productByHandle']['variants'][
             'edges']
         line_items = "["
@@ -55,6 +92,14 @@ class GraphQL:
 
     @staticmethod
     def create_checkout(product_name):
+        """Crearte a checkout URL with the product added to the cart.
+
+        Args:
+            product_name: (str): The name of the product.
+
+        Returns:
+            str: The checkout URL.
+        """
         variants = GraphQL.get_product_variants(product_name)
         line_items = GraphQL.build_line_items(variants)
         query = (

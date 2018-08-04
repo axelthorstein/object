@@ -27,5 +27,5 @@ shell:
 server:
 	python main.py
 
-docker:
+docker: clean
 	docker build . -t object_test && docker run -it -p 8080:8080 object_test

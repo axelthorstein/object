@@ -50,7 +50,7 @@ class Ring:
         Args:
             grain (int): The number of pixels to sample.
         """
-        LOGGER.info('Approximation failed.')
+        LOGGER.debug('Approximation failed.')
         radius = self.get_radius()
 
         self.color_sequence = ColorSequence(

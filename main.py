@@ -24,8 +24,8 @@ def get_graphql_products():
     return str(GraphQL.get_products())
 
 
-@app.route('/images/<image_id>', methods=["GET"])
-def images(image_id):
+@app.route('/items/<image_id>', methods=["GET"])
+def items(image_id):
 
     file_path = "images/" + image_id + ".png"
 
@@ -49,4 +49,4 @@ def images(image_id):
 if __name__ == '__main__':
     # This is used when running locally. Gunicorn is used to run the
     # application on Google App Engine. See entrypoint in app.yaml.
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=8080)

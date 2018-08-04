@@ -126,7 +126,7 @@
   function takepicture() {
     var storageRef = firebase.storage().ref();
     var id = (Math.floor(Math.random() * (1000000 - 1)) + 1).toString();
-    var ref = storageRef.child("/images/" + id + ".png");
+    var ref = storageRef.child("/items/" + id + ".png");
     var context = canvas.getContext('2d');
     if (width && height) {
       canvas.width = width;
@@ -138,7 +138,7 @@
           console.log('Uploaded a data_url string!');
           var xhr = new XMLHttpRequest();
           var baseUrl = window.location.href.split('/capture')[0];
-          xhr.open('GET', baseUrl + "/images/" + id, true);
+          xhr.open('GET', baseUrl + "/items/" + id, true);
           xhr.send();
           xhr.onreadystatechange = processRequest;
           function processRequest(e) {

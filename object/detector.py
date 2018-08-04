@@ -35,7 +35,7 @@ class Detector:
         self.image.draw_ring(ring)
 
         if ring.is_valid:
-            LOGGER.info("Valid ring found at: {}".format(ring))
+            LOGGER.debug("Valid ring found at: {}".format(ring))
         else:
             raise DetectionException("No valid ring found: {}".format(ring))
 
