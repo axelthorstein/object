@@ -5,7 +5,7 @@ from collections import Counter
 from object.pixel import Pixel
 from object.logs import logger
 from utils.color_utils import sequence_to_code
-from configs.config import SEQUENCES
+from configs.config import PRODUCT_MAP
 
 LOGGER = logger('object')
 
@@ -33,7 +33,7 @@ class ColorSequence:
         Returns:
             bool: The validity of the color sequence.
         """
-        return self.sequence in SEQUENCES
+        return self.sequence in PRODUCT_MAP
 
     def sort_coordinates(self, coordinates):
         """Sort the coordinates counter clockwise around the center.

@@ -40,7 +40,7 @@ class Detector:
             raise DetectionException("No valid ring found: {}".format(ring))
 
     @timecall
-    def detect(self, grain=360):
+    def find_ring(self, grain=360):
         """Detect a ring in an image.
 
         Detect whether a ring exists in the photo within the center ~20% of

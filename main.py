@@ -5,15 +5,19 @@ from flask import render_template
 from flask import redirect
 
 from object.graphql import GraphQL
-from object.detector import Detector
+from object.product import Product
 from object.firebase import Firebase
-from configs.config import SEQUENCES
 
 app = Flask(__name__)
 
 
 @app.route('/capture')
 def capture():
+    """Return the view for the image capture page.
+
+    Returns:
+        FlaskTemplate: The image capture view.
+    """
     os.environ[
         "GOOGLE_APPLICATION_CREDENTIALS"] = "config/cloud_credentials.json"
     return render_template('capture.html')
@@ -21,26 +25,40 @@ def capture():
 
 @app.route('/products')
 def get_graphql_products():
+    """A GraphQL endpoint to return a list of products.
+
+    Returns:
+        str: The list of products.
+    """
     return str(GraphQL.get_products())
 
 
-@app.route('/items/<image_id>', methods=["GET"])
-def items(image_id):
+def download_image(image_path):
+    """Download the image from Firebase
 
-    file_path = "images/" + image_id + ".png"
+    Args:
+        image_path (str): The remote path to the image.
 
-    db = Firebase(file_path)
-    db.download_image()
+    Returns:
+        Firebase: The Firebase database reference.
+    """
+    database = Firebase(image_path)
+    database.download_image()
 
-    detector = Detector(file_path)
+    return database
 
-    ring = detector.detect()
 
-    if ring.is_valid:
-        product = SEQUENCES[ring.color_sequence.sequence]
-    else:
-        raise Exception("Product not found.")
+@app.route('/products/<product_id>', methods=["GET"])
+def get_product(product_id):
+    """A GraphQL endpoint to return a Shopify checkout URL for a given product.
 
-    db.clean_up()
+    Returns:
+        str: The product checkout URL.
+    """
+    image_path = "images/" + product_id + ".png"
 
-    return redirect(GraphQL.create_checkout(product))
+    database = download_image(image_path)
+    product = Product(image_path)
+    database.clean_up()
+
+    return redirect(product.checkout_url)

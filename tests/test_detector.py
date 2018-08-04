@@ -8,7 +8,7 @@ def get_ring(image_name):
         f"/Users/axelthor/Projects/object/tests/test_images/{image_name}",
         debug=True)
 
-    return detector.detect()
+    return detector.find_ring()
 
 
 def test_detect_circle_med_36_square():
@@ -56,5 +56,5 @@ def test_detect_circle_thin_50_square():
     detect = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/circle_thin_50_square.png",
         debug=True)
-    ring = detect.detect(grain=3600)
+    ring = detect.find_ring(grain=3600)
     assert ring.is_valid()

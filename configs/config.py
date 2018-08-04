@@ -119,6 +119,6 @@ def load_config(file_name):
     return config
 
 
-SEQUENCES = load_config('product_map.json')
+PRODUCT_MAP = load_config('product_map.json')
 
 COLOR_RANGE_MAP = generate_color_range_map()
