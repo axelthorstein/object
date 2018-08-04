@@ -1,13 +1,13 @@
-import pytest
 from unittest.mock import Mock
-from collections import Counter
+from pytest import fixture
 
-from obj.dashed_ring import Dashed
+from obj.ring import Ring
 from obj.coordinate import Coordinate
 from obj.overlay import Overlay
+from obj.pixel import Pixel
 
 
-@pytest.fixture()
+@fixture()
 def starting_coordinates():
     """
 	Starting coordinates on a pixel matrix.
@@ -15,7 +15,7 @@ def starting_coordinates():
     return (10, 10)
 
 
-@pytest.fixture()
+@fixture()
 def depths():
     """
 	The inner and outer depths.
@@ -23,15 +23,16 @@ def depths():
     return ["inner", "outer"]
 
 
-@pytest.fixture()
+@fixture()
 def overlay(image):
     """
 	An overlay instantiated with the center coordinates at (100, 100).
 	"""
-    return Overlay(image, (100, 100))
+    center_pixel = Pixel(image, (100, 100))
+    return Overlay(center_pixel)
 
 
-@pytest.fixture()
+@fixture()
 def image():
     """
 	A mock for the image.
@@ -42,16 +43,16 @@ def image():
     return image
 
 
-@pytest.fixture()
+@fixture()
 def ring(image, starting_coordinates):
     """
 	A Ring.
 	"""
-    ring = Dashed(image, starting_coordinates)
+    ring = Ring(image, starting_coordinates)
     return ring
 
 
-@pytest.fixture()
+@fixture()
 def inner_coordinate(image, depths):
     """
 	An inner coordinate.
@@ -61,7 +62,7 @@ def inner_coordinate(image, depths):
     return coordinate
 
 
-@pytest.fixture()
+@fixture()
 def outer_coordinate(image, depths):
     """
 	An outer coordinate.

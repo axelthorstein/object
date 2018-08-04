@@ -5,28 +5,28 @@ from utils.color_utils import get_color, get_most_likely_colors
 class Pixel:
     """A pixel in an image."""
 
-    def __init__(self, image, coords, color_range='css2', variance=2):
+    def __init__(self, image, coords, variance=2):
         self.image = image
         self.coords = coords
-        self.color_range = color_range
         self.colors = self.get_color(coords)
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.variance = variance
         self.distance_moved = 0
 
-    def get_color(self, coords):
+    def get_color(self, coords, color_range='css2'):
         """Get the pixel at the given coordinate.
 
         The color range determines the range of colors to search through.
 
         Args:
             coords (Tuple[int]): The coordinates of the pixel.
+            color_range (str): The range of web colors to use.
 
         Returns:
             Tuple[int]: The coordinates of a pixel.
         """
-        if self.color_range == 'css2':
+        if color_range == 'css2':
             return get_color(self.image.getpixel(coords))
 
         return get_most_likely_colors(self.image.getpixel(coords))
@@ -114,8 +114,8 @@ class Pixel:
         """
         width, height = self.image.size
 
-        return ((width - steps <= self.x) or (self.x <= steps) or
-                (height - steps <= self.y) or (self.y <= steps))
+        return ((width - steps <= self.x) or (self.x <= steps)
+                or (height - steps <= self.y) or (self.y <= steps))
 
     def __repr__(self):
         """Return a short, in line, description of the Pixel.

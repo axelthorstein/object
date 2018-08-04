@@ -1,11 +1,11 @@
 import requests
 
+BASE_URL = 'https://axelteststore.myshopify.com'
+
 
 class GraphQL:
     """An interface for GraphQL endpoints."""
 
-    BASE_URL = 'https://axelteststore.myshopify.com'
-    
     @staticmethod
     def request(query):
         return requests.post(
@@ -26,7 +26,8 @@ class GraphQL:
             auth=('e7759a3699a682d55e2c25991596e3cc',
                   'c586e1e6cf85d7a25e0df45ee8f66204')).json()
         for product in all_products["products"]:
-            products[product['handle']] = GraphQL.get_product(product['handle'])
+            products[product['handle']] = GraphQL.get_product(
+                product['handle'])
 
         return products
 
@@ -61,5 +62,7 @@ class GraphQL:
             'mutation {checkoutCreate(input: {lineItems: ' + line_items +
             '}){checkout {id webUrl lineItems(first: 5) {edges {node {title quantity}}}}}}'
         )
+        request = GraphQL.request(query)
+        checkout = request['data']['checkoutCreate']['checkout']['webUrl']
 
-        return GraphQL.request(query)
+        return checkout

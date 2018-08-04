@@ -1,15 +1,17 @@
+#pylint: skip-file
+
 from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from obj.dashed_ring import Dashed
+from obj.ring import Ring
 from obj.logs import logger
 
 LOGGER = logger('object')
 
 
 class DetectionStrategy(Enum):
-    DASHED = Dashed
+    RING = Ring
 
 
 class Detect:
@@ -17,9 +19,7 @@ class Detect:
     Detect a ring from a given image.
     """
 
-    def __init__(self,
-                 image_path,
-                 strategy=DetectionStrategy.DASHED,
+    def __init__(self, image_path, strategy=DetectionStrategy.RING,
                  debug=True):
         self.image_path = image_path
         self.strategy = strategy.value
@@ -40,10 +40,10 @@ class Detect:
         half_the_height = image.size[1] / 2
 
         # TODO: Will need to adjust these values to match the actual overlay.
-        cropped_image = image.crop((half_the_width - (half_the_width * 0.5),
-                                    half_the_height - (half_the_height * 0.5),
-                                    half_the_width + (half_the_width * 0.5),
-                                    half_the_height + (half_the_height * 0.5)))
+        cropped_image = image.crop((half_the_width - (half_the_width * 0.6),
+                                    half_the_height - (half_the_height * 0.3),
+                                    half_the_width + (half_the_width * 0.6),
+                                    half_the_height + (half_the_height * 0.3)))
 
         return cropped_image
 
@@ -92,6 +92,7 @@ class Detect:
         # filtered_image = image.filter(ImageFilter.MedianFilter())
 
         # preprocessed_image = self.compress(self.crop(filtered_image))
+        # preprocessed_image = self.crop(image)
 
         return image
 

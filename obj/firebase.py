@@ -1,3 +1,5 @@
+#pylint: disable=global-at-module-level
+
 import os
 
 import firebase_admin
@@ -13,7 +15,6 @@ admin = firebase_admin.initialize_app(
 
 
 class Firebase:
-
     def __init__(self, file_path):
         self.file_path = file_path
 

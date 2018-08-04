@@ -11,7 +11,7 @@ LOGGER = logger('object')
 
 
 class ColorSequence:
-    """The sequence of colors in a dashed ring from an image."""
+    """The sequence of colors in a ring from an image."""
 
     def __init__(self, image, center_point, radius, grain):
         self.image = image
@@ -105,25 +105,20 @@ class ColorSequence:
         Returns:
             List[str]: The collapsed sequence of colors.
         """
-        # Remove any initial occurances of the center color.
-
         sequence = []
         j = 0
 
-        try:
-            if len(set(colors)) > 1:
-                colors = colors[next(
-                    colors.index(x)
-                    for x in colors
-                    if x != self.center_point.colors[0]):]
+        if len(set(colors)) > 1:
+            colors = colors[next(
+                colors.index(x) for x in colors
+                if x != self.center_point.colors[0]):]
 
-                for i, color in enumerate(colors):
-                    if color == self.center_point.colors[0] or i == len(colors) - 1:
-                        if colors[j + 1:i]:
-                            sequence.append(Counter(colors[j:i]).most_common(1)[0][0])
-                        j = i
-        except:
-            LOGGER.info("Collapse failed.")
+            for i, color in enumerate(colors):
+                if color == self.center_point.colors[0] or i == len(colors) - 1:
+                    if colors[j + 1:i]:
+                        sequence.append(
+                            Counter(colors[j:i]).most_common(1)[0][0])
+                    j = i
 
         return sequence
 

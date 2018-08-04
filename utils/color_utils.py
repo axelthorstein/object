@@ -1,46 +1,47 @@
+#pylint: disable=too-many-return-statements,too-many-branches
 import colorsys
 import webcolors
-from operator import itemgetter
 
 
 class ColorException(Exception):
     pass
 
 
-def color_to_code(color):
-    if color == 'red':
-        return '00'
-    elif color == 'orange':
-        return '01'
-    elif color == 'yellow':
-        return '02'
-    elif color == 'lime':
-        return '03'
-    elif color == 'green':
-        return '04'
-    elif color == 'turquoise':
-        return '05'
-    elif color == 'cyan':
-        return '06'
-    elif color == 'lightblue':
-        return '07'
-    elif color == 'blue':
-        return '08'
-    elif color == 'purple':
-        return '09'
-    elif color == 'magenta':
-        return '10'
-    elif color == 'pink':
-        return '11'
-    else:
-        raise ColorException(f"Color {color} not found.")
+COLOR_MAP = {
+    'red': '00',
+    'orange': '01',
+    'yellow': '02',
+    'lime': '03',
+    'green': '04',
+    'turquoise': '05',
+    'cyan': '06',
+    'lightblue': '07',
+    'blue': '08',
+    'purple': '09',
+    'magenta': '10',
+    'pink': '11'
+}
 
 
 def sequence_to_code(sequence):
+    """Create a deterministic code of fixed length from the color sequence.
+
+    Args:
+        sequence (List[str]): The sequence of color names.
+
+    Returns:
+        str: The color code sequence string.
+
+    Raises:
+        ColorException: If the color name doesn't have a corresponding code.
+    """
     code = ''
 
-    for color in sequence:
-        code += color_to_code(color)
+    try:
+        for color in sequence:
+            code += COLOR_MAP[color]
+    except ValueError:
+        raise ColorException(f"Color {color} not found.")
 
     return code
 
@@ -92,10 +93,10 @@ def get_color(rgb):
     TODO: Add back grey checking.
 
     Args:
-        rgb (list of int): The Red, Green, Blue triplet.
+        rgb (List[int]): The Red, Green, Blue triplet.
 
     Returns:
-        set of str: The color name from the RGB value.
+        List[str]: The color name from the RGB value.
     """
     hsv = colorsys.rgb_to_hsv(rgb[0], rgb[1], rgb[2])
     hue = int(hsv[0] * 360)
@@ -125,10 +126,10 @@ def get_most_likely_colors(rgb):
     Resolve the three closest human readable names for a RBG value.
 
     Args:
-        rgb (list of int): The Red, Green, Blue triplet.
+        rgb (List[int]): The Red, Green, Blue triplet.
 
     Returns:
-        set of str: The closest color names from the RGB value.
+        List[str]: The closest color names from the RGB value.
     """
     min_colors = {}
 

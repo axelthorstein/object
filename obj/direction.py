@@ -36,7 +36,7 @@ class Direction:
         Raises:
             DirectionException: If the direction can't be found.
         """
-        if direction in (Direction.left, Direction.right):  # pylint: disable=comparison-with-callable
+        if direction in (Direction.left, Direction.right):
             return (Direction.up, Direction.down)
         if direction in (Direction.up, Direction.down):
             return (Direction.left, Direction.right)

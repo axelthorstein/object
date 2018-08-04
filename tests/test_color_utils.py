@@ -1,5 +1,3 @@
-import pytest
-
 from utils.color_utils import get_color, get_most_likely_colors
 
 

@@ -2,16 +2,14 @@ import os
 
 from flask import Flask
 from flask import render_template
+from flask import redirect
 
 from obj.graphql import GraphQL
 from obj.detect import Detect
 from obj.firebase import Firebase
+from configs.config import SEQUENCES
 
 app = Flask(__name__)
-
-PRODUCT_MAP = {
-    "crimson-gold": "object-001",
-}
 
 
 @app.route('/capture')
@@ -26,33 +24,24 @@ def get_graphql_products():
     return str(GraphQL.get_products())
 
 
-@app.route('/checkout/<path:target>')
-def create_checkout(target):
-    return str(GraphQL.create_checkout(target))
+@app.route('/images/<image_id>', methods=["GET"])
+def images(image_id):
 
-
-@app.route('/images/<id>', methods=["GET"])
-def images(id):
-    print("here")
-
-    file_path = "images/" + id + ".png"
+    file_path = "images/" + image_id + ".png"
 
     db = Firebase(file_path)
     db.download_image()
 
-    # colors = Detect('/Users/axelthor/Projects/object/images/ring.png').detect_circle()
     ring = Detect(file_path).detect_ring()
-    color = str(ring.colors[0]) + "-" + str(ring.colors[1])
-    if PRODUCT_MAP.get(color):
-        product = PRODUCT_MAP[color]
+
+    if ring.is_valid:
+        product = SEQUENCES[ring.color_sequence.sequence]
     else:
-        product = "object-001"
-    print(product)
+        raise Exception("Product not found.")
 
     db.clean_up()
 
-    return GraphQL.create_checkout(product)['data']['checkoutCreate'][
-        'checkout']['webUrl']
+    return redirect(GraphQL.create_checkout(product))
 
 
 if __name__ == '__main__':

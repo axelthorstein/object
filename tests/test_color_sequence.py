@@ -1,2 +1,2 @@
-from obj.color_sequence import ColorSequence
-
+def test_color_sequence():
+    pass

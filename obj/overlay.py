@@ -1,58 +1,22 @@
-from obj.ring import Ring
-
-
-class Overlay(Ring):
+class Overlay:
     """
     An object to represent the overlay over the camera.
     """
 
     def __init__(self, center_point):
         self.center_point = center_point
-        self.inner_radius = self.get_inner_radius()
-        self.outer_radius = self.get_outer_radius()
-        self.radius = self.get_mid_ring_radius()
-        self.inner_edges = self.get_edges(self.inner_radius)
-        self.outer_edges = self.get_edges(self.outer_radius)
+        self.radius = self.get_radius()
 
-    def get_inner_radius(self):
-        """Return the inner radius of the overlay.
-
-        Returns:
-            int: Half the height of the image.
-        """
-        return int(self.center_point.y * 0.45)
-
-    def get_outer_radius(self):
-        """Return the outer radius of the overlay.
-
-        Returns:
-            int: The outer radius.
-        """
-        return int(self.center_point.y * 0.22)
-
-    def get_mid_ring_radius(self):
+    def get_radius(self):
         """Find the radius of the middle of the outer circle.
 
         Returns:
             int: The average radius.
         """
-        return int(self.inner_radius + (self.outer_radius / 2))
+        inner_radius = int(self.center_point.y * 0.45)
+        outer_radius = int(self.center_point.y * 0.22)
 
-    def get_edges(self, radius):
-        """Return the edges of the overlay.
-
-        Returns:
-            int: The edges.
-        """
-        center = self.center_point
-        edges = {
-            "left": (center.x - radius, center.y),
-            "up": (center.x, center.y + radius),
-            "right": (center.x + radius, center.y),
-            "down": (center.x, center.y - radius)
-        }
-
-        return edges
+        return int(inner_radius + (outer_radius / 2))
 
     def __str__(self):
         """Return a description of the overlay.
