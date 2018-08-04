@@ -2,7 +2,6 @@ from enum import Enum
 from PIL import Image, ImageFilter
 from profilehooks import timecall
 
-from obj.hough_transform_ring import HoughTransform
 from obj.dashed_ring import Dashed
 from obj.logs import logger
 
@@ -10,7 +9,6 @@ LOGGER = logger('object')
 
 
 class DetectionStrategy(Enum):
-    HOUGH_TRANSFORM = HoughTransform
     DASHED = Dashed
 
 
