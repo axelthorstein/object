@@ -58,7 +58,7 @@ def download_image(image_path):
     return database
 
 
-@app.route('/products/<product_id>', methods=["GET"])
+@app.route('/images/<product_id>', methods=["GET"])
 def get_product(product_id):
     """A GraphQL endpoint to return a Shopify checkout URL for a given product.
 
