@@ -11,6 +11,16 @@ from object.firebase import Firebase
 app = Flask(__name__)
 
 
+@app.route('/')
+def index():
+    """Return the OK status code.
+
+    Returns:
+        str: The OK status code.
+    """
+    return "200"
+
+
 @app.route('/capture')
 def capture():
     """Return the view for the image capture page.
@@ -19,7 +29,7 @@ def capture():
         FlaskTemplate: The image capture view.
     """
     os.environ[
-        "GOOGLE_APPLICATION_CREDENTIALS"] = "config/cloud_credentials.json"
+        "GOOGLE_APPLICATION_CREDENTIALS"] = "configs/cloud_credentials.json"
     return render_template('capture.html')
 
 

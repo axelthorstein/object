@@ -2,7 +2,7 @@ from math import atan2, cos, degrees, sin
 from operator import sub
 
 from object.pixel import Pixel
-from object.logs import logger
+from utils.logging_utils import logger
 from utils.color_utils import sequence_to_code
 from utils.list_utils import collapse
 from configs.config import PRODUCT_MAP

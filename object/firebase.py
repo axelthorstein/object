@@ -1,14 +1,15 @@
 #pylint: disable=global-at-module-level
 
 import os
-
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import storage
+from configs.config import CREDENTIALS_FILE
 
 global admin
+
 admin = firebase_admin.initialize_app(
-    credentials.Certificate('configs/firebase_credentials.ejson'),
+    credentials.Certificate(CREDENTIALS_FILE),
     name='object-is',
     options={"databaseURL": "https://object-is.firebaseio.com/"})
 

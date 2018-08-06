@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 from multiprocessing import Lock
 
 OBJECT_DIR = os.getcwd()
@@ -16,11 +17,31 @@ class Environments:
     production = 'production'
 
 
+def save_credentials_file(file_path):
+    """Save the application default credentials service account to a file.
+
+    Args:
+        file_path: The path to the credentials file.
+
+    Returns:
+        str: Path to the saved credentials file.
+    """
+    if not Path(file_path).exists():
+        with open(file_path, 'w') as f:
+            json.dump(
+                json.loads(os.environ['APPLICATION_DEFAULT_CREDENTIALS']), f)
+
+    return file_path
+
+
 def generate_color_range_map():
     """Return a hash map of hue value to color name for fast access.
 
     Create this map a single time at the beginning of execution to reduce
     runtime.
+
+    Todo:
+        Make sure this only gets called on app startup.
 
     Returns:
         Dict[int, str]: The hue to color name hash map.
@@ -124,3 +145,5 @@ PRODUCT_MAP = load_config('product_map.json')
 COLOR_CODE_MAP = load_config('color_code_map.json')
 
 COLOR_RANGE_MAP = generate_color_range_map()
+
+CREDENTIALS_FILE = save_credentials_file('configs/cloud_credentials.ejson')

@@ -4,7 +4,7 @@ from object.edge import Edge
 from object.direction import Direction
 from object.overlay import Overlay
 from object.color_sequence import ColorSequence
-from object.logs import logger
+from utils.logging_utils import logger
 
 LOGGER = logger('object')
 

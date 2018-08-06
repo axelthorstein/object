@@ -4,7 +4,7 @@ from enum import Enum
 from profilehooks import timecall
 
 from object.ring import Ring
-from object.logs import logger
+from utils.logging_utils import logger
 from object.image import Image
 
 LOGGER = logger('object')
