@@ -18,7 +18,7 @@ def index():
     Returns:
         str: The OK status code.
     """
-    return "200"
+    return render_template('index.htm')
 
 
 @app.route('/capture')
