@@ -5,18 +5,18 @@ clean:
 	find . -name '__pycache__' -exec rm -rvf '{}' + >/dev/null
 	pipenv clean
 
-autoformat:
+format:
 	yapf --in-place --recursive --style google .
 
 lint:
 	@pylint -j 4 --rcfile=pylintrc object/*.py tests/*.py configs/*.py utils/*.py *.py 
 
-autolint: autoformat lint
+autolint: format lint
 
 run_test: clean
 	pytest .
 
-test: autolint run_test lint
+test: autolint lint run_test
 
 install:
 	pipenv install

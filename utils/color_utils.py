@@ -3,26 +3,11 @@ import colorsys
 import webcolors
 
 from configs.config import COLOR_RANGE_MAP
+from configs.config import COLOR_CODE_MAP
 
 
 class ColorException(Exception):
     pass
-
-
-COLOR_CODE_MAP = {
-    'red': '00',
-    'orange': '01',
-    'yellow': '02',
-    'lime': '03',
-    'green': '04',
-    'turquoise': '05',
-    'cyan': '06',
-    'lightblue': '07',
-    'blue': '08',
-    'purple': '09',
-    'magenta': '10',
-    'pink': '11'
-}
 
 
 def sequence_to_code(sequence):
@@ -42,7 +27,7 @@ def sequence_to_code(sequence):
     try:
         for color in sequence:
             code += COLOR_CODE_MAP[color]
-    except ValueError:
+    except KeyError:
         raise ColorException(f"Color {color} not found.")
 
     return code
@@ -62,7 +47,7 @@ def get_hue_name(hue):
     """
     try:
         return COLOR_RANGE_MAP[hue]
-    except ValueError:
+    except KeyError:
         raise ColorException(f"Hue {hue} not found.")
 
 
@@ -73,32 +58,26 @@ def get_color(rgb):
     speed increase over the `get_most_likely_colors` method, however it assumes
     that the hue is the exact color name and is limited to 16 colors (for now).
 
-    TODO: Add back grey checking.
-
     Args:
         rgb (List[int]): The Red, Green, Blue triplet.
 
     Returns:
         List[str]: The color name from the RGB value.
     """
-    hsv = colorsys.rgb_to_hsv(rgb[0], rgb[1], rgb[2])
+    hsv = colorsys.rgb_to_hsv(*rgb[0:3])
     hue = int(hsv[0] * 360)
     saturation = hsv[1]
     brightness = hsv[2] / 255
-    color_name = get_hue_name(hue)
 
-    if brightness < 0.3:
+    if brightness < 0.20:
         color = 'black'
-    elif saturation < 0.05 and brightness > 0.95:
+    elif saturation < 0.09 and brightness > 0.91:
         color = 'white'
-    # elif (saturation < 0.05 and brightness > 0.30) or (saturation < 0.1 and brightness < 0.50):
-    #     color = 'grey'
-    # elif brightness < 0.75:
-    #     color = 'dark-' + color_name
-    # elif saturation < 0.75 and brightness > 0.95:
-    #     color = 'light-' + color_name
+    elif (saturation < 0.25 and brightness < 0.40) or (saturation < 0.15 and
+                                                       brightness < 0.80):
+        color = 'grey'
     else:
-        color = color_name
+        color = get_hue_name(hue)
 
     return [color]
 

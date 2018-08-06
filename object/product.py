@@ -27,5 +27,5 @@ class Product:
 
         try:
             return PRODUCT_MAP[ring.color_sequence.sequence]
-        except ValueError:
+        except KeyError:
             raise ProductException("Product not found.")

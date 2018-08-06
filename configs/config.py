@@ -121,4 +121,6 @@ def load_config(file_name):
 
 PRODUCT_MAP = load_config('product_map.json')
 
+COLOR_CODE_MAP = load_config('color_code_map.json')
+
 COLOR_RANGE_MAP = generate_color_range_map()
