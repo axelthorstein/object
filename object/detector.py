@@ -56,6 +56,7 @@ class Detector:
         ring = self.strategy(
             self.image.image, self.image.center_point, debug=self.debug)
 
+        # Try using crop hints to guess radius.
         ring.approximate(grain)
 
         if not ring.is_valid():
