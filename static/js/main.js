@@ -207,7 +207,7 @@ function takeSnapshot() {
 
     var storageRef = firebase.storage().ref();
     var id = (Math.floor(Math.random() * (1000000 - 1)) + 1).toString();
-    var ref = storageRef.child("/images/" + id + ".png");
+    var ref = storageRef.child("images/" + id + ".png");
     context = canvas.getContext('2d');
     context.drawImage(video, 0, 0, width, height);
 
@@ -215,8 +215,9 @@ function takeSnapshot() {
     ref.putString(data, 'data_url').then(function(snapshot) {
       console.log('Uploaded a data_url string!');
       var xhr = new XMLHttpRequest();
-      var baseUrl = window.location.href.split('/capture')[0];
-      xhr.open('GET', baseUrl + "/images/" + id, true);
+      var baseUrl = window.location.href.split('/')[0];
+      console.log(baseUrl)
+      xhr.open('GET', baseUrl + "images/" + id, true);
       xhr.send();
       xhr.onreadystatechange = processRequest;
       function processRequest(e) {

@@ -52,6 +52,12 @@ def test_detect_circle_thin_18_round():
     assert ring.is_valid()
 
 
+def test_detect_circle_real():
+    ring = get_ring("test.png")
+
+    assert ring.is_valid()
+
+
 def test_detect_circle_thin_50_square():
     detect = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/circle_thin_50_square.png",

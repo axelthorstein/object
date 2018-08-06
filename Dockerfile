@@ -1,6 +1,7 @@
-FROM gcr.io/google-appengine/python
-LABEL python_version=python3.6
-RUN virtualenv --no-download /env -p python3.6
+FROM python:3.6.6-jessie
+
+# LABEL python_version=python3.6
+# RUN virtualenv --no-download /env -p python3.6
 
 # -- Install Pipenv:
 RUN apt update && apt install python3-pip git -y && pip3 install pipenv
@@ -18,7 +19,7 @@ COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
 
 # -- Install dependencies:
-RUN set -ex && pipenv install
+RUN set -ex && pipenv --python 3.6.6 && pipenv install
 
 # -- Copy project:
 COPY . /app

@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask
 from flask import render_template
 from flask import redirect
@@ -7,18 +5,21 @@ from flask import redirect
 from object.graphql import GraphQL
 from object.product import Product
 from object.firebase import Firebase
+from utils.logging_utils import logger
 
 app = Flask(__name__)
+
+LOGGER = logger('object')
 
 
 @app.route('/')
 def index():
-    """Return the OK status code.
+    """Return the view for the image capture page.
 
     Returns:
-        str: The OK status code.
+        FlaskTemplate: The image capture view.
     """
-    return render_template('index.htm')
+    return render_template('index.html')
 
 
 @app.route('/capture')
@@ -28,8 +29,6 @@ def capture():
     Returns:
         FlaskTemplate: The image capture view.
     """
-    os.environ[
-        "GOOGLE_APPLICATION_CREDENTIALS"] = "configs/cloud_credentials.json"
     return render_template('capture.html')
 
 
