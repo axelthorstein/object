@@ -14,6 +14,15 @@ class Pixel:
         self.variance = variance
         self.distance_moved = 0
 
+    @property
+    def color(self):
+        """Return the last seen color.
+
+        Returns:
+            str: The color.
+        """
+        return self.colors[0]
+
     def get_color(self, coords, color_range='css2'):
         """Get the pixel at the given coordinate.
 

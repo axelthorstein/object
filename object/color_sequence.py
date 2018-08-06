@@ -100,17 +100,9 @@ class ColorSequence:
             str: The integer representation of a color sequence.
         """
         # Get the colors for each pixel on the rings circumference.
-        # TODO: Make colors not a list.
-        ring_colors = [
-            Pixel(self.image, (point)).colors[0] for point in self.points
-        ]
+        ring_colors = [Pixel(self.image, point).color for point in self.points]
 
         # Collapse duplicates.
-        ring_colors = collapse(ring_colors, self.center_point.colors[0])
-
-        # Filter out center color.
-        color_sequence = list(
-            filter(lambda color: color != self.center_point.colors[0],
-                   ring_colors))
+        color_sequence = collapse(ring_colors, self.center_point.color)
 
         return sequence_to_code(color_sequence)

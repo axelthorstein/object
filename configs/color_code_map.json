@@ -10,5 +10,7 @@
     "blue": "08",
     "purple": "09",
     "magenta": "10",
-    "pink": "11"
+    "pink": "11",
+    "black": "12",
+    "white": "13"
 }
