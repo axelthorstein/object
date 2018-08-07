@@ -19,4 +19,4 @@ RUN set -ex && pipenv --python 3.6.6 && pipenv install
 # -- Copy project into working directory.
 COPY . /app
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["pipenv", "run", "gunicorn", "--config", "/app/gunicorn.conf.py", "--log-level", "info", "-b", ":8080", "main:app"]
