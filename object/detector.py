@@ -46,17 +46,15 @@ class Detector:
         Detect whether a ring exists in the photo within the center ~20% of
         the image, detected using a specified strategy.
 
+        Todo:
+            Try using crop hints to guess radius.
+        
         Returns:
             tuple of int: The colors of the ring.
         """
-        # crop, compress, and blur image
-
-        # find the ring in the image
-
         ring = self.strategy(
             self.image.image, self.image.center_point, debug=self.debug)
 
-        # Try using crop hints to guess radius.
         ring.approximate(grain)
 
         if not ring.is_valid():

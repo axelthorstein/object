@@ -59,10 +59,12 @@ class Ring:
     def is_valid(self):
         """Determine if the ring is valid.
 
+        Todo:
+            Add real validity check.
+
         Returns:
             bool: Whether the ring is valid.
         """
-        # TODO: Add real validity check.
         return self.color_sequence.is_valid
 
     def get_edges(self):

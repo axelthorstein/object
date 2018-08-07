@@ -42,6 +42,14 @@ OBJECT_LOGGER.parent.addHandler(_CONSOLE_HANDLER)
 
 
 def logger(name):
+    """Return the logger for the given name.
+
+    Args:
+        name (str): Name of the logger.
+
+    Returns:
+        Logger: The logger for the given name.
+    """
     return logging.getLogger(name)
 
 

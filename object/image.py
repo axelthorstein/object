@@ -66,8 +66,10 @@ class Image:
 
     def crop(self):
         """Crop the photo by creating to slightly larger than the ring overlay.
+
+        Todo:
+            Will need to adjust these values to match the actual overlay.
         """
-        # TODO: Will need to adjust these values to match the actual overlay.
         self.image = self.image.crop(
             (self.center_point.x - (self.center_point.x * 0.6),
              self.center_point.y - (self.center_point.y * 0.3),

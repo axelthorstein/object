@@ -22,16 +22,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/capture')
-def capture():
-    """Return the view for the image capture page.
-
-    Returns:
-        FlaskTemplate: The image capture view.
-    """
-    return render_template('capture.html')
-
-
 @app.route('/products')
 def get_graphql_products():
     """A GraphQL endpoint to return a list of products.
