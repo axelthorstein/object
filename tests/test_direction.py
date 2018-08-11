@@ -1,4 +1,4 @@
-import pytest
+from pytest import raises
 
 from object.direction import Direction, DirectionException
 
@@ -61,14 +61,16 @@ def test_direction_left_raises_error_on_negative_coord(starting_coordinates):
     """Test that the coordinate will raise an exception
 	it tries to direction to a negative coordinate.
 	"""
-
-    with pytest.raises(DirectionException):
+    message = f'A coordinate cannot be less than zero. -1'
+    with raises(DirectionException, match=message):
         Direction.left(starting_coordinates, steps=11)
 
 
-def test_direction_down_raises_error_on_negative_coord(starting_coordinates):
-    """Test that the coordinate will raise an exception
-	it tries to direction to a negative coordinate.
-	"""
-    with pytest.raises(DirectionException):
-        Direction.left(starting_coordinates, steps=11)
+def test_direction_get_adjacent_direction():
+    """Test that the adjacent direction is returned.
+    """
+    expected = (Direction.up, Direction.down)
+    actual_left = Direction.get_adjacent_direction(Direction.left)
+    actual_right = Direction.get_adjacent_direction(Direction.right)
+
+    assert actual_left == expected == actual_right

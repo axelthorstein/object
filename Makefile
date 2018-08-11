@@ -18,7 +18,7 @@ autolint: format lint
 
 run_test: clean
 	@echo 'Running test cases.'
-	@pytest .
+	@pytest --durations=10 $(ARGS)
 
 test: autolint lint run_test
 

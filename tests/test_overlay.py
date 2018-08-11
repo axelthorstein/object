@@ -1,6 +1,6 @@
 def test_overlay_get_radius(overlay):
     """
-	Test that the size of theradius.
+	Test the size of the radius.
 	"""
     expected = overlay.radius
     actual = 56

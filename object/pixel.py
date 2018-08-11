@@ -21,7 +21,7 @@ class Pixel:
         Returns:
             str: The color.
         """
-        return self.colors[0]
+        return self.colors[-1]
 
     def get_color(self, coords, color_range='css2'):
         """Get the pixel at the given coordinate.
@@ -46,7 +46,8 @@ class Pixel:
         Alternate the direction to move to based on the number of rows that
         have been checked so far.
 
-        TODO: Change the function name to something more explicit.
+        Todo:
+            Change the function name to something more explicit.
 
         Args:
             steps (int): The number of rows checked.
@@ -93,10 +94,17 @@ class Pixel:
         Args:
             x (int): The x coordinate.
             y (int): The y coordinate.
+
+        Raises:
+            PixelException: If the new pixels are invalid.
         """
         self.coords = (x, y)
         self.x = x
         self.y = y
+
+        if self.out_of_bounds():
+            raise PixelException(
+                f"The new coordinates ({x}, {y}) are out of bounds.")
 
     def colors_intersect(self, other_color):
         """Determine if last colors the pixel has seen.
@@ -147,3 +155,7 @@ class Pixel:
             desc += f'    {key}: {self.__dict__[attribute]},\n'
 
         return desc
+
+
+class PixelException(Exception):
+    pass

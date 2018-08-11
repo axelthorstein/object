@@ -16,6 +16,7 @@ pytest = "==3.7.1"
 colorlog = "==2.10.0"
 yapf = "==0.22.0"
 git-pylint-commit-hook = "*"
+coverage = "*"
 
 [dev-packages]
 
