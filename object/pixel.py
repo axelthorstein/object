@@ -68,6 +68,9 @@ class Pixel:
     def move(self, direction, steps):
         """Increment the pixels location and update relevant attributes.
 
+        Todo:
+            Try to use this instead of actually calculating the radius.
+
         Args:
             direction (Direction): The direction to increment/decrement.
             steps (int): The amount of pixel spaces to move.
@@ -76,7 +79,6 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.update_colors()
-        # TODO: Try to use this instead of actually calculating the radius.
         self.distance_moved += 1
 
     def update_colors(self):
@@ -134,13 +136,38 @@ class Pixel:
         return ((width - steps <= self.x) or (self.x <= steps) or
                 (height - steps <= self.y) or (self.y <= steps))
 
+    def scan_adjacent_pixels(self, direction, starting_colors):
+        """Scan the two adjacent pixels if the first pixel returns a new color.
+
+        Check the two pixels beside the pixel that was just checked to see
+        if the edge is increasing or decreasing on an angle that is less than
+        45 degrees.
+
+        Todo:
+            The `starting_colors == prospective_colors` call should probably
+            be a not equals. The issue is that the case where we are searching
+            from the middle pixel compared to starting from inside the edges
+            means that the `==` -> `!=`. Right now it works with just the
+            equality, but I think we may need to fix this in the future.
+
+        Args:
+            direction (Direction): The direction to move.
+            starting_colors (List[str]): The original colors to check against.
+        """
+        for adjacent_direction in Direction.get_adjacent_directions(direction):
+            prospective_colors = self.get_color(adjacent_direction(self.coords))
+
+            if starting_colors == prospective_colors:
+                self.move(adjacent_direction, steps=1)
+                break
+
     def __repr__(self):
         """Return a short, in line, description of the Pixel.
 
         Returns:
             str: The string representation of the Pixel.
         """
-        return f'Pixel {self.coords} with {self.colors} colors.'
+        return f'{self.__class__.__name__} at {self.coords} with {self.colors} colors.'
 
     def __str__(self):
         """Return a full description of the Pixel.

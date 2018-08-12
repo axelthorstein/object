@@ -110,7 +110,7 @@ def large_image():
     """
     image = Mock()
     side_effect = [(100, 100, 100), (100, 100, 100), (100, 100, 100), (0, 0, 0),
-                   (255, 255, 255)]
+                   (0, 0, 0), (255, 255, 255)]
     image.getpixel = MagicMock(side_effect=side_effect)
     image.size = (100, 100)
 
@@ -130,4 +130,4 @@ def edge(large_image):
     """
 	An edge.
 	"""
-    return Edge(large_image, Direction.left, 'inner')
+    return Edge(large_image, Direction.left)

@@ -85,7 +85,7 @@ class Ring:
             edges[depth] = {}
 
             for direction in directions:
-                edge = Edge(self.image, directions[direction], depth)
+                edge = Edge(self.image, directions[direction])
 
                 if depth == 'inner':
                     pixel = edge.scan(self.center_point)
