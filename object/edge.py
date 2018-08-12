@@ -1,5 +1,4 @@
 from object.pixel import Pixel
-from object.direction import Direction
 
 
 class Edge:
@@ -7,40 +6,11 @@ class Edge:
     An interface for finding the next edge from a starting pixel.
     """
 
-    def __init__(self, image, direction, depth):
+    def __init__(self, image, direction):
         self.image = image
         self.direction = direction
-        self.depth = depth
 
-    def scan_adjacent_pixel(self, pixel, starting_colors):
-        """Probe the two adjacent pixels if the first pixel returns a new color.
-
-        Check the two pixels beside the pixel that was just checked to see
-        if the edge is increasing or decreasing on an angle that is less than
-        45 degrees.
-
-        Args:
-            pixel (Pixel): The original pixel.
-            starting_colors (List[str]): The original colors to check against.
-
-        Returns:
-            Pixel: The pixel to move to.
-        """
-        starting_coords = pixel.coords
-        adjacent_directions = Direction.get_adjacent_direction(self.direction)
-
-        for adjacent_direction in adjacent_directions:
-            pixel.move(adjacent_direction, steps=1)
-
-            if pixel.colors_intersect(starting_colors):
-                return pixel
-
-            # Reset the pixel to the original.
-            pixel.update_coords(*starting_coords)
-
-        return pixel
-
-    def walk(self, starting_coords, steps=1):
+    def walk(self, starting_pixel, steps=1):
         """Walk a stright line of pixels until a new color is reached.
 
         Begining at the starting coordinates continue incrementally
@@ -51,14 +21,18 @@ class Edge:
         no common elements for two iterations we consider an edge to be found
         and exit. This provides us with minimal error recovery.
 
+        Todo:
+            Doing the adjacent pixel scanning on non outer edges may be making
+            the detection slower.
+
         Args:
-            starting_coords (Pixel): Coordinates of the starting pixel.
+            starting_pixel (Pixel): Coordinates of the starting pixel.
             steps (int): The amount of pixels to skew on each interation.
 
         Returns:
             Pixel: The coordinates of a pixel.
         """
-        starting_coords = starting_coords.coords
+        starting_coords = starting_pixel.coords
         pixel = Pixel(self.image, starting_coords)
         starting_colors = pixel.colors
 
@@ -66,9 +40,8 @@ class Edge:
                 starting_colors) and not pixel.out_of_bounds():
             pixel.move(self.direction, steps)
 
-            if self.depth == 'outer':
-                if not pixel.colors_intersect(starting_colors):
-                    pixel = self.scan_adjacent_pixel(pixel, starting_colors)
+            if not pixel.colors_intersect(starting_colors):
+                pixel.scan_adjacent_pixels(self.direction, starting_colors)
 
         return pixel
 
@@ -80,7 +53,8 @@ class Edge:
         and if not part of the ring is found, we skew slightly and try again.
         Continue checking until an edge is found.
 
-        TODO: We may need to have a limit to the number of rows checked.
+        Todo:
+            We may need to have a limit to the number of rows checked.
 
         Args:
             starting_pixel (Pixel): The pixel to start from.

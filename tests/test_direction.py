@@ -70,7 +70,7 @@ def test_direction_get_adjacent_direction():
     """Test that the adjacent direction is returned.
     """
     expected = (Direction.up, Direction.down)
-    actual_left = Direction.get_adjacent_direction(Direction.left)
-    actual_right = Direction.get_adjacent_direction(Direction.right)
+    actual_left = Direction.get_adjacent_directions(Direction.left)
+    actual_right = Direction.get_adjacent_directions(Direction.right)
 
     assert actual_left == expected == actual_right

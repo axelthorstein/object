@@ -24,7 +24,7 @@ class Direction:
         return directions
 
     @staticmethod
-    def get_adjacent_direction(direction):
+    def get_adjacent_directions(direction):
         """Return the directions that are adjacent to the original direction.
 
         Args:

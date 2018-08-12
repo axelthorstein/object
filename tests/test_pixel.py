@@ -90,3 +90,43 @@ def test_pixel_color_is_out_of_bounds(pixel):
     """
     with raises(PixelException):
         pixel.update_coords(1, -1)
+
+
+def test_pixel_scan_adjacent_pixels(pixel):
+    """
+    Test that the pixel that is returned is the same color as the center pixel
+    so that is increments on tne first direction it searches.
+    """
+    expected_color = 'grey'
+    expected_coords = (30, 29)
+
+    pixel.scan_adjacent_pixels(Direction.left, ['grey'])
+
+    assert (expected_color == pixel.color and expected_coords == pixel.coords)
+
+
+def test_pixel_scan_adjacent_pixels_other_direction(pixel):
+    """
+    Test that the pixel that is returned is the same color as the center pixel
+    so that is increments on tne second direction it searches.
+    """
+    pixel.get_color(pixel.coords)
+    expected_color = 'black'
+    expected_coords = (30, 31)
+
+    pixel.scan_adjacent_pixels(Direction.left, ['black'])
+
+    assert (expected_color == pixel.color and expected_coords == pixel.coords)
+
+
+def test_pixel_scan_adjacent_pixels_original_direction(pixel):
+    """
+    Test that if the expected color isn't seen then the original pixel will get
+    returned.
+    """
+    expected_color = 'grey'
+    expected_coords = (30, 30)
+
+    pixel.scan_adjacent_pixels(Direction.left, ['blue'])
+
+    assert (expected_color == pixel.color and expected_coords == pixel.coords)
