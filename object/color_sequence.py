@@ -105,4 +105,5 @@ class ColorSequence:
         # Collapse duplicates.
         color_sequence = collapse(ring_colors, self.center_point.color)
 
+        # print(color_sequence)
         return sequence_to_code(color_sequence)

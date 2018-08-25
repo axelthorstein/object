@@ -4,7 +4,7 @@ clean:
 	@echo 'Removing extra Python files and unused dependencies.'
 	@find . \( -name '*.pyc' -o -name '*.pyo' -o -name '*~' \) -print -delete >/dev/null
 	@find . -name '__pycache__' -exec rm -rvf '{}' + >/dev/null
-	@pipenv clean
+	# @pipenv clean
 
 format:
 	@echo 'Formatting code in place according to Yapf.'

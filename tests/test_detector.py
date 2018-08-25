@@ -58,3 +58,13 @@ def test_detect_circle_thin_50_square():
         debug=True)
     ring = detect.find_ring(grain=3600)
     assert ring.is_valid()
+
+
+def test_detect_real_test_circle():
+    # ring = get_ring("real_test_circle.png")
+    print("here")
+    
+    detect = Detector(
+        f"/Users/axelthor/Projects/object/images/debug.png", debug=True)
+    ring = detect.find_ring(grain=360)
+    # assert ring.is_valid()

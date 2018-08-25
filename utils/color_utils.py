@@ -71,11 +71,11 @@ def get_color(rgb):
 
     if brightness < 0.20:
         color = 'black'
-    elif saturation < 0.09 and brightness > 0.91:
+    elif saturation < 0.09 and brightness > 0.85:
         color = 'white'
-    elif ((saturation < 0.25 and brightness < 0.40) or
-          (saturation < 0.15 and brightness < 0.80)):
-        color = 'grey'
+    # elif ((saturation < 0.25 and brightness < 0.40) or
+    #       (saturation < 0.15 and brightness < 0.80)):
+    #     color = 'grey'
     else:
         color = get_hue_name(hue)
 

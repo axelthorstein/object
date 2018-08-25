@@ -17,6 +17,10 @@ colorlog = "==2.10.0"
 yapf = "==0.22.0"
 git-pylint-commit-hook = "*"
 coverage = "*"
+numpy = "*"
+ipdb = "*"
+scikit-image = "*"
+opencv-python = "*"
 
 [dev-packages]
 
