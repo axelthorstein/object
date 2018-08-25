@@ -52,7 +52,7 @@ class Detector:
         Returns:
             tuple of int: The colors of the ring.
         """
-        
+
         ring = self.strategy(
             self.image.image, self.image.center_point, debug=self.debug)
 

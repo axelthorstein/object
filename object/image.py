@@ -32,9 +32,9 @@ class Image:
         center_point = (int(image.size[0] / 2), int(image.size[1] / 2))
 
         image = image.crop((center_point[0] - (center_point[0] * 0.8),
-                    center_point[1] - (center_point[1] * 0.6),
-                    center_point[0] + (center_point[0] * 0.8),
-                    center_point[1] + (center_point[1] * 0.6)))
+                            center_point[1] - (center_point[1] * 0.6),
+                            center_point[0] + (center_point[0] * 0.8),
+                            center_point[1] + (center_point[1] * 0.6)))
         # self.filter()
         # self.compress()
         # self.crop()
@@ -69,13 +69,13 @@ class Image:
         """
         self.image = self.image.filter(ImageFilter.MedianFilter())
 
-    def crop(self, image):
+    def crop(self):
         """Crop the photo by creating to slightly larger than the ring overlay.
 
         Todo:
             Will need to adjust these values to match the actual overlay.
         """
-        return image.crop((self.center_point.x - (self.center_point.x * 0.6),
-                           self.center_point.y - (self.center_point.y * 0.3),
-                           self.center_point.x + (self.center_point.x * 0.6),
-                           self.center_point.y + (self.center_point.y * 0.3)))
+        self.image.crop((center_point[0] - (center_point[0] * 0.8),
+                         center_point[1] - (center_point[1] * 0.6),
+                         center_point[0] + (center_point[0] * 0.8),
+                         center_point[1] + (center_point[1] * 0.6)))

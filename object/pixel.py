@@ -85,12 +85,9 @@ class Pixel:
         self.distance_moved += 1
         # print("old_coords", old_coords)
 
-
         # pixel_matrix = self.image.load()
         # pixel_matrix[old_coords] = (0, 0, 0)
         # self.image.save('images/debug2.png')
-
-
 
     def update_colors(self):
         """Update the most recent colors the pixel has seen.
