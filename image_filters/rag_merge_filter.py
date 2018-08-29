@@ -1,9 +1,10 @@
+# pylint: disable=no-member,unused-argument
+
+import cv2
 from skimage import io
 from skimage import segmentation
 from skimage import color
 from skimage.future import graph
-from cv2 import medianBlur
-from cv2 import imwrite
 from numpy.linalg import norm
 from profilehooks import timecall
 
@@ -49,8 +50,9 @@ def merge_mean_color(graph, src, dst):
 def rag_merge_filter(image_path, out_path):
     """Use the RAG merge filter algorithm to consolidate local pixel colors.
 
-    Note:
+    Notes:
         The imput image must be RGB or this won't work.
+        Increasing the threshhold will increase the level of merging.
 
     Args:
         image_path (str): Path to the image.
@@ -63,16 +65,16 @@ def rag_merge_filter(image_path, out_path):
     labels2 = graph.merge_hierarchical(
         labels,
         g,
-        thresh=35,
+        thresh=150,
         rag_copy=False,
         in_place_merge=True,
         merge_func=merge_mean_color,
         weight_func=_weight_mean_color)
 
     out = color.label2rgb(labels2, image, kind='avg')
-    image = out[:, :, ::-1] # Need to reverse the RGB to BGR for OpenCV. 
-    image = medianBlur(image, 25)
-    imwrite(out_path, image)
+    image = out[:, :, ::-1]  # Need to reverse the RGB to BGR for OpenCV.
+    image = cv2.medianBlur(image, 25)
+    cv2.imwrite(out_path, image)
 
 
 if __name__ == '__main__':

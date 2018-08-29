@@ -1,6 +1,7 @@
 from object.detector import Detector
 from image_filters.rag_merge_filter import rag_merge_filter
 
+
 def get_ring(image_name):
     """Return a dashed ring from the image name shorthand.
     """
@@ -61,7 +62,7 @@ def test_detect_circle_thin_50_square():
 
 
 def test_detect_debug_image():
-    image_path = 'tests/test_images/real_test_circle_rgb.png'
+    image_path = 'tests/test_images/real_test_circle.png'
     out_path = 'images/debug.png'
     rag_merge_filter(image_path, out_path)
 
