@@ -19,8 +19,13 @@ class Detector:
     Detect a ring from a given image.
     """
 
-    def __init__(self, image_path, strategy=DetectionStrategy.RING, debug=True):
-        self.image = Image(image_path)
+    def __init__(self,
+                 image_path,
+                 strategy=DetectionStrategy.RING,
+                 debug=True,
+                 crop=True,
+                 merge_filter=False):
+        self.image = Image(image_path, crop=crop, merge_filter=merge_filter)
         self.strategy = strategy.value
         self.debug = debug
 

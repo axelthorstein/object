@@ -20,20 +20,62 @@ class ColorSequence:
         self.grain = grain
         self.points = self.get_points_on_circumference()
         self.sequence = self.calculate_sequence()
-        self.is_valid = self.is_valid()
+
+    @staticmethod
+    def are_rotations(string1, string2):
+        """Check if strings are rotations of each other.
+
+        You can tell if a string is a rotated version of another string if it's
+        inside a duplicated version of the first string.
+
+        Examples:
+            >>> s1 = "abcd"
+            >>> s2 = "cdab"
+            >>> "cdab" in "abcdabcd"
+            True
+
+        Args:
+            string1 (str): String to check against.
+            string2 (str): String to check against.
+
+        Returns:
+            str: The product code string if they are rotations of each other.
+        """
+        if len(string1) == len(string2) and string2 in string1 + string1:
+            return string2
+
+        return ""
 
     def is_valid(self):
         """Determine whether the color sequence is valid.
 
         Check the color sequence generated from the image against all known
         sequences. If the sequence is not known return that is is not valid.
+        The first check will be O(1), but if the sequence is known, but we've
+        only seen a rotated version then we need to check for the rotated
+        version in each key of the product map which is O(n). Another solution
+        would be to put every variation of a roation for a color sequence in the
+        color map so that it would always be O(1), but that means the product
+        map could become enormous.
 
         TODO: Add back `and len(self.sequence) % 18 == 0` check.
 
         Returns:
             bool: The validity of the color sequence.
         """
-        return self.sequence in PRODUCT_MAP
+        if self.sequence['code'] in PRODUCT_MAP:
+            return True
+
+        for product_sequence in PRODUCT_MAP:
+            if ColorSequence.are_rotations(self.sequence['code'],
+                                           product_sequence):
+                # If we have found a rotated version of our sequence in the
+                # product map, we'll need to update to that order so we can pull
+                # the product later.
+                self.sequence['code'] = product_sequence
+                return True
+
+        return False
 
     def sort_coordinates(self, coordinates):
         """Sort the coordinates counter clockwise around the center.
@@ -105,5 +147,7 @@ class ColorSequence:
         # Collapse duplicates.
         color_sequence = collapse(ring_colors, self.center_point.color)
 
-        # print(color_sequence)
-        return sequence_to_code(color_sequence)
+        return {
+            "code": sequence_to_code(color_sequence),
+            "colors": color_sequence
+        }

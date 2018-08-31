@@ -35,11 +35,11 @@ def test_pixel_color_update_coords(pixel):
     when there are multiple colors in the colors attribute.
     """
     old_coords = pixel.coords
-    pixel.update_coords(20, 10)
+    pixel.update_coords(15, 16)
 
-    expected_x = 20
-    expected_y = 10
-    expected_coords = (20, 10)
+    expected_x = 15
+    expected_y = 16
+    expected_coords = (15, 16)
 
     actual_x = pixel.x
     actual_y = pixel.y
@@ -78,7 +78,7 @@ def test_pixel_color_is_not_out_of_bounds(pixel):
     Test that valid coordinates return that it's in bounds.
     """
     expected = False
-    pixel.update_coords(20, 10)
+    pixel.update_coords(15, 15)
     actual = pixel.out_of_bounds()
 
     assert expected == actual

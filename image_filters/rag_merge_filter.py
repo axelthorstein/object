@@ -1,5 +1,6 @@
 # pylint: disable=no-member,unused-argument
 
+import warnings
 import cv2
 from skimage import io
 from skimage import segmentation
@@ -80,4 +81,7 @@ def rag_merge_filter(image_path, out_path):
 if __name__ == '__main__':
     image_path = 'tests/test_images/real_test_circle.png'
     out_path = 'images/debug.png'
-    rag_merge_filter(image_path, out_path)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        rag_merge_filter(image_path, out_path)

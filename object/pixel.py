@@ -75,19 +75,11 @@ class Pixel:
             direction (Direction): The direction to increment/decrement.
             steps (int): The amount of pixel spaces to move.
         """
-
-        # old_coords = self.coords
-        # print("old_coords", old_coords)
-        self.coords = direction(self.coords, steps=1)
+        self.coords = direction(self.coords, steps)
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.update_colors()
         self.distance_moved += 1
-        # print("old_coords", old_coords)
-
-        # pixel_matrix = self.image.load()
-        # pixel_matrix[old_coords] = (0, 0, 0)
-        # self.image.save('images/debug2.png')
 
     def update_colors(self):
         """Update the most recent colors the pixel has seen.
@@ -130,7 +122,7 @@ class Pixel:
         """
         return other_color[0] in self.colors[-self.variance:]
 
-    def out_of_bounds(self, steps=2):
+    def out_of_bounds(self, steps=10):
         """Check if the pixel is at the edge of the image.
 
         Args:

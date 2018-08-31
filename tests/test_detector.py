@@ -1,5 +1,4 @@
 from object.detector import Detector
-from image_filters.rag_merge_filter import rag_merge_filter
 
 
 def get_ring(image_name):
@@ -56,17 +55,17 @@ def test_detect_circle_thin_18_round():
 def test_detect_circle_thin_50_square():
     detect = Detector(
         f"/Users/axelthor/Projects/object/tests/test_images/circle_thin_50_square.png",
-        debug=True)
+        debug=True,
+        crop=False)
     ring = detect.find_ring(grain=3600)
     assert ring.is_valid()
 
 
 def test_detect_debug_image():
-    image_path = 'tests/test_images/real_test_circle.png'
-    out_path = 'images/debug.png'
-    rag_merge_filter(image_path, out_path)
-
     detect = Detector(
-        f"/Users/axelthor/Projects/object/images/debug.png", debug=True)
+        f"/Users/axelthor/Projects/object/tests/test_images/real_test_circle.png",
+        debug=True,
+        merge_filter=True)
     ring = detect.find_ring(grain=360)
+
     assert ring.is_valid()

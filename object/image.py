@@ -1,14 +1,17 @@
+import warnings
 from os.path import dirname, abspath
 from PIL import Image as pil_image
-from PIL import ImageFilter
 
 from object.pixel import Pixel
+from image_filters.rag_merge_filter import rag_merge_filter
 
 
 class Image:
     """An interface for an image."""
 
-    def __init__(self, image_path):
+    def __init__(self, image_path, crop=True, merge_filter=False):
+        self.crop = crop
+        self.merge_filter = merge_filter
         self.image = self.preprocess_image(image_path)
         self.center_point = Pixel(
             self.image,
@@ -28,16 +31,15 @@ class Image:
         Returns:
             Image: The processed image.
         """
-        image = pil_image.open(image_path)
-        center_point = (int(image.size[0] / 2), int(image.size[1] / 2))
+        if self.merge_filter:
+            image_path = Image.filter(image_path)
 
-        image = image.crop((center_point[0] - (center_point[0] * 0.8),
-                            center_point[1] - (center_point[1] * 0.6),
-                            center_point[0] + (center_point[0] * 0.8),
-                            center_point[1] + (center_point[1] * 0.6)))
-        # self.filter()
+        image = pil_image.open(image_path)
+
+        if self.crop:
+            image = Image.crop(image)
+
         # self.compress()
-        # self.crop()
 
         return image
 
@@ -51,7 +53,8 @@ class Image:
             ring (Ring): The ring.
         """
         pixel_matrix = self.image.load()
-        debug_path = dirname(dirname(abspath(__file__))) + '/images/debug2.png'
+        debug_path = dirname(dirname(
+            abspath(__file__))) + '/images/debug_ring.png'
 
         for point in ring.color_sequence.points:
             pixel_matrix[point] = (0, 0, 0)
@@ -64,18 +67,40 @@ class Image:
         self.image = self.image.thumbnail(
             (self.image.size[0], self.image.size[0]), pil_image.ANTIALIAS)
 
-    def filter(self):
-        """Filter a photo.
-        """
-        self.image = self.image.filter(ImageFilter.MedianFilter())
+    @staticmethod
+    def filter(image_path):
+        """Filter the image so that it consolidates colors.
 
-    def crop(self):
+        Args:
+            image_path (str): The path to the image.
+
+        Returns:
+            image_path (str): The path to the filtered image.
+        """
+        out_path = 'images/debug.png'
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            rag_merge_filter(image_path, out_path)
+
+        return out_path
+
+    @staticmethod
+    def crop(image):
         """Crop the photo by creating to slightly larger than the ring overlay.
 
         Todo:
             Will need to adjust these values to match the actual overlay.
+
+        Args:
+            image (Image): The image to crop.
+
+        Returns:
+            Image: A cropped image.
         """
-        self.image.crop((center_point[0] - (center_point[0] * 0.8),
-                         center_point[1] - (center_point[1] * 0.6),
-                         center_point[0] + (center_point[0] * 0.8),
-                         center_point[1] + (center_point[1] * 0.6)))
+        center_point = (int(image.size[0] / 2), int(image.size[1] / 2))
+
+        return image.crop((center_point[0] - (center_point[0] * 0.8),
+                           center_point[1] - (center_point[1] * 0.6),
+                           center_point[0] + (center_point[0] * 0.8),
+                           center_point[1] + (center_point[1] * 0.6)))

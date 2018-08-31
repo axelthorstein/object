@@ -65,7 +65,7 @@ class Ring:
         Returns:
             bool: Whether the ring is valid.
         """
-        return self.color_sequence.is_valid
+        return self.color_sequence.is_valid()
 
     def get_edges(self):
         """Return the edges around the center point.
@@ -180,4 +180,4 @@ class Ring:
         Returns:
             str: The string representation of the ring.
         """
-        return self.__str__()
+        return f'color_sequence: {self.color_sequence.sequence}'
