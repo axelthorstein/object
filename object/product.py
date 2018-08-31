@@ -22,8 +22,9 @@ class Product:
         Returns:
             str: The product ID.
         """
-        detector = Detector(self.image_path)
-        ring = detector.find_ring()
+        detector = Detector(
+            self.image_path, crop=True, merge_filter=True)
+        ring = detector.find_ring(grain=720)
 
         try:
             return PRODUCT_MAP[ring.color_sequence.sequence]
