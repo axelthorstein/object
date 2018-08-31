@@ -66,7 +66,7 @@ class Edge:
         starting_coords = starting_pixel.coords
         pixel = self.walk(starting_pixel)
 
-        while pixel.out_of_bounds():
+        while pixel.out_of_bounds() and rows_checked < 100:
             # Reset the pixel.
             pixel = Pixel(self.image, starting_coords)
             pixel.side_step(self.direction, rows_checked)

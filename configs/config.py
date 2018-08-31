@@ -48,19 +48,13 @@ def generate_color_range_map():
     """
     color_range_map = {}
     color_ranges_map = {
-        range(0, 15): 'red',
-        range(15, 45): 'orange',
-        range(45, 70): 'yellow',
-        range(70, 90): 'lime',
-        range(90, 150): 'green',
-        range(150, 160): 'turquoise',
-        range(160, 185): 'cyan',
-        range(185, 210): 'lightblue',
-        range(210, 260): 'blue',
-        range(260, 275): 'purple',
-        range(275, 300): 'magenta',
-        range(300, 330): 'pink',
-        range(330, 360): 'red'
+        range(0, 7): 'red',
+        range(7, 45): 'orange',
+        range(45, 80): 'yellow',
+        range(80, 180): 'green',
+        range(180, 260): 'blue',
+        range(260, 300): 'purple',
+        range(300, 360): 'red'
     }
 
     for color_range in color_ranges_map:
