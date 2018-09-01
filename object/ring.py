@@ -118,22 +118,9 @@ class Ring:
         Returns:
             int: The average radius from the center to the middle of the ring.
         """
-        # pixel_matrix = self.image.load()
-
-        # pixel_matrix[self.center_point.coords] = (0, 255, 255)
         radii = []
         edges = self.get_edges()
         directions = Direction.get_directions()
-        # import pprint
-        # pprint.pprint(edges)
-        # debug_path = 'images/debug2.png'
-
-        # for point in edges['inner']:
-        #     pixel_matrix[edges['inner'][point].coords] = (0, 255, 255)
-
-        # pixel_matrix[self.center_point.coords] = (0, 255, 255)
-
-        # self.image.save(debug_path)
 
         for direction in directions:
             inner_radius = Ring.calculate_distance(self.center_point,
