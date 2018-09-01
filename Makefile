@@ -12,7 +12,7 @@ format:
 
 lint:
 	@echo 'Linting code.'
-	@pylint -j 4 --rcfile=pylintrc object/*.py tests/*.py configs/*.py utils/*.py *.py 
+	@pylint -j 4 --rcfile=pylintrc object/*.py tests/*.py configs/*.py utils/*.py image_filters/*.py *.py 
 
 autolint: format lint
 

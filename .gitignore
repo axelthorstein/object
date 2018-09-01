@@ -3,7 +3,7 @@ images/*_preprocessed*
 images/*_thumbnail*
 images/*_cropped*
 images/*_draw*
-images/*debug.png*
+images/*debug*.png*
 *.pytest_cache/*
 configs/*.ejson
 

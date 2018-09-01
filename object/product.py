@@ -22,7 +22,7 @@ class Product:
         Returns:
             str: The product ID.
         """
-        detector = Detector(self.image_path, crop=True, merge_filter=True)
+        detector = Detector(self.image_path)
         ring = detector.find_ring(grain=720)
 
         try:

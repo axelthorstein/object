@@ -12,7 +12,6 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.variance = variance
-        self.distance_moved = 0
 
     @property
     def color(self):
@@ -79,7 +78,6 @@ class Pixel:
         self.x = self.coords[0]
         self.y = self.coords[1]
         self.update_colors()
-        self.distance_moved += 1
 
     def update_colors(self):
         """Update the most recent colors the pixel has seen.

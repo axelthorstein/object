@@ -24,8 +24,15 @@ class Detector:
                  strategy=DetectionStrategy.RING,
                  debug=True,
                  crop=True,
-                 merge_filter=False):
-        self.image = Image(image_path, crop=crop, merge_filter=merge_filter)
+                 apply_filters=True,
+                 merge_filter=False,
+                 compress=True):
+        self.image = Image(
+            image_path,
+            crop=crop,
+            apply_filters=apply_filters,
+            merge_filter=merge_filter,
+            compress=compress)
         self.strategy = strategy.value
         self.debug = debug
 
