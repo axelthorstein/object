@@ -1,17 +1,25 @@
 import warnings
-from os.path import dirname, abspath
 from PIL import Image as pil_image
 
 from object.pixel import Pixel
-from image_filters.rag_merge_filter import rag_merge_filter
+from image_filters.filters import rag_merge_filter
+from image_filters.filters import median_filter
+from image_filters.filters import sharpen
 
 
 class Image:
     """An interface for an image."""
 
-    def __init__(self, image_path, crop=True, merge_filter=False):
+    def __init__(self,
+                 image_path,
+                 crop=True,
+                 apply_filters=True,
+                 merge_filter=False,
+                 compress=True):
         self.crop = crop
+        self.apply_filters = apply_filters
         self.merge_filter = merge_filter
+        self.compress = compress
         self.image = self.preprocess_image(image_path)
         self.center_point = Pixel(
             self.image,
@@ -23,7 +31,8 @@ class Image:
         The image needs to be saved and reopened so that it can be manipulated
         as an array, where as the processing happens on the image object.
 
-        TODO: Preprocessing the image is super slow for some reason.
+        Todo:
+            Find a way to being the image size as low as possible
 
         Args:
             image_path (str): The path to the image.
@@ -31,15 +40,16 @@ class Image:
         Returns:
             Image: The processed image.
         """
-        if self.merge_filter:
-            image_path = Image.filter(image_path)
-
         image = pil_image.open(image_path)
+
+        if self.apply_filters:
+            image = Image.filter(image, self.merge_filter)
 
         if self.crop:
             image = Image.crop(image)
 
-        # self.compress()
+        if self.compress:
+            image.thumbnail((256, 256), pil_image.ANTIALIAS)
 
         return image
 
@@ -52,38 +62,54 @@ class Image:
         Args:
             ring (Ring): The ring.
         """
+        self.image.save('images/debug.png')
         pixel_matrix = self.image.load()
-        debug_path = dirname(dirname(
-            abspath(__file__))) + '/images/debug_ring.png'
+        debug_path = 'images/debug_ring.png'
 
         for point in ring.color_sequence.points:
             pixel_matrix[point] = (0, 0, 0)
 
+        pixel_matrix[ring.center_point.coords] = (0, 0, 0)
+
         self.image.save(debug_path)
 
-    def compress(self):
-        """Compress a photo.
-        """
-        self.image = self.image.thumbnail(
-            (self.image.size[0], self.image.size[0]), pil_image.ANTIALIAS)
-
     @staticmethod
-    def filter(image_path):
-        """Filter the image so that it consolidates colors.
+    def compress(image):
+        """Compress the image so that it is a constant size.
 
         Args:
-            image_path (str): The path to the image.
+            image (Image): The image to compress.
 
         Returns:
-            image_path (str): The path to the filtered image.
+            Image: A compressed image.
         """
-        out_path = 'images/debug.png'
+        return image.thumbnail((256, 256), pil_image.ANTIALIAS)
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            rag_merge_filter(image_path, out_path)
+    @staticmethod
+    def filter(image, merge_filter):
+        """Filter the image so that it consolidates colors.
 
-        return out_path
+        Notes:
+            The merge filter is separate because it is considerably more
+            computaionally intensive than the other filters, on the order of
+            multiple seconds.
+
+        Args:
+            image (Image): The image.
+            merge_filter (bool): Whether to apply the RAG merge filter.
+
+        Returns:
+            image (Image): The filtered image.
+        """
+        if merge_filter:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                image = rag_merge_filter(image)
+
+        image = median_filter(image, blur_level=25)
+        image = sharpen(image)
+
+        return image
 
     @staticmethod
     def crop(image):
@@ -101,6 +127,6 @@ class Image:
         center_point = (int(image.size[0] / 2), int(image.size[1] / 2))
 
         return image.crop((center_point[0] - (center_point[0] * 0.8),
-                           center_point[1] - (center_point[1] * 0.6),
+                           center_point[1] - (center_point[1] * 0.8),
                            center_point[0] + (center_point[0] * 0.8),
-                           center_point[1] + (center_point[1] * 0.6)))
+                           center_point[1] + (center_point[1] * 0.8)))
