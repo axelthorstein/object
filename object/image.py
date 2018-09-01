@@ -113,7 +113,7 @@ class Image:
         """
         center_point = (int(image.size[0] / 2), int(image.size[1] / 2))
 
-        return image.crop((center_point[0] - (center_point[0] * 0.8),
-                           center_point[1] - (center_point[1] * 0.8),
-                           center_point[0] + (center_point[0] * 0.8),
-                           center_point[1] + (center_point[1] * 0.8)))
+        return image.crop((center_point[0] - (center_point[0] * 0.75),
+                           center_point[1] - (center_point[1] * 0.75),
+                           center_point[0] + (center_point[0] * 0.75),
+                           center_point[1] + (center_point[1] * 0.75)))
