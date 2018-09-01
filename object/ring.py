@@ -93,8 +93,7 @@ class Ring:
                     pixel = edge.scan(edges['inner'][direction])
 
                 edges[depth][direction] = pixel
-        import pprint
-        pprint.pprint(edges)
+
         self.update_center_coords(edges['inner'])
 
         return edges

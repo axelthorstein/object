@@ -49,7 +49,7 @@ class Image:
             image = Image.crop(image)
 
         if self.compress:
-            image.thumbnail((256, 256), pil_image.ANTIALIAS)
+            image.thumbnail((512, 512), pil_image.ANTIALIAS)
 
         return image
 
@@ -64,26 +64,13 @@ class Image:
         """
         self.image.save('images/debug.png')
         pixel_matrix = self.image.load()
-        debug_path = 'images/debug_ring.png'
 
         for point in ring.color_sequence.points:
             pixel_matrix[point] = (0, 0, 0)
 
         pixel_matrix[ring.center_point.coords] = (0, 0, 0)
 
-        self.image.save(debug_path)
-
-    @staticmethod
-    def compress(image):
-        """Compress the image so that it is a constant size.
-
-        Args:
-            image (Image): The image to compress.
-
-        Returns:
-            Image: A compressed image.
-        """
-        return image.thumbnail((256, 256), pil_image.ANTIALIAS)
+        self.image.save('images/debug_ring.png')
 
     @staticmethod
     def filter(image, merge_filter):
@@ -105,9 +92,9 @@ class Image:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 image = rag_merge_filter(image)
-
-        image = median_filter(image, blur_level=25)
-        image = sharpen(image)
+        else:
+            image = median_filter(image)
+            image = sharpen(image)
 
         return image
 
