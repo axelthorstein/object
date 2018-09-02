@@ -1,5 +1,8 @@
-FROM python:3.6.6-jessie
+FROM python:3.6.6-alpine
 
+RUN pip install --upgrade pip
+
+RUN pip3 install opencv-python==3.4.2.17
 
 # -- Install Pipenv.
 RUN pip install pipenv
@@ -7,15 +10,16 @@ RUN pip install pipenv
 # -- Set the working directory.
 WORKDIR /app
 
+# -- Fix opencv-python issue.
+RUN apk add gcc g++ libpng freetype-dev
+# libsm6 libxext6 
+
 # -- Adding Pipfiles.
 COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
 
 # -- Install dependencies.
 RUN set -ex && pipenv install --system
-
-# -- Fix opencv-python issue.
-RUN apt-get install -y libsm6 libxext6
 
 # -- Copy project into working directory.
 COPY ./Dockerfile /app/Dockerfile
