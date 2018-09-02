@@ -1,6 +1,5 @@
 FROM python:3.6.6-jessie
 
-
 # -- Install Pipenv.
 RUN pip install pipenv
 
