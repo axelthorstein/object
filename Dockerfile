@@ -1,7 +1,5 @@
 FROM python:3.6.6-jessie
 
-# LABEL python_version=python3.6
-# RUN virtualenv --no-download /env -p python3.6
 
 # -- Install Pipenv.
 RUN pip install pipenv
@@ -14,9 +12,12 @@ COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
 
 # -- Install dependencies.
-RUN set -ex && pipenv --python 3.6.6 && pipenv install
+RUN set -ex && pipenv install --system
+
+# -- Fix opencv-python issue.
+RUN apt-get update && apt-get install -y libsm6 libxext6
 
 # -- Copy project into working directory.
 COPY . /app
 
-CMD ["pipenv", "run", "gunicorn", "--config", "/app/gunicorn.conf.py", "--log-level", "info", "-b", ":8080", "main:app"]
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "--log-level", "info", "main:app"]
