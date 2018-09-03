@@ -42,34 +42,36 @@ def test_detect_circle_thick_18_round():
 
 
 def test_detect_circle_thin_18_square():
-    # Can't apply the filters because the dashes are too thin.
-    image_path = f"{BASE_TEST_IMAGE_PATH}/circle_thin_18_square.png"
-    detect = Detector(image_path, apply_filters=False)
-    ring = detect.find_ring()
-
+    ring = get_ring("circle_thin_18_square.png")
     assert ring.is_valid()
 
 
 def test_detect_circle_thin_18_round():
-    # Can't apply the filters because the dashes are too thin.
-    image_path = f"{BASE_TEST_IMAGE_PATH}/circle_thin_18_round.png"
-    detect = Detector(image_path, apply_filters=False)
-    ring = detect.find_ring()
-
+    ring = get_ring("circle_thin_18_round.png")
     assert ring.is_valid()
 
 
 def test_detect_circle_thin_50_square():
     # Can't apply the filters because the dashes are too thin.
     image_path = f"{BASE_TEST_IMAGE_PATH}/circle_thin_50_square.png"
-    detect = Detector(image_path, crop=False, apply_filters=False)
-    ring = detect.find_ring(grain=3600)
+    detect = Detector(image_path, apply_filters=False)
+    ring = detect.find_ring()
 
     assert ring.is_valid()
 
 
-def test_detect_real_test_circle():
-    image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle.png"
+def test_detect_real_test_circle_1():
+    ring = get_ring("real_test_circle_1.png")
+    assert ring.is_valid()
+
+
+def test_detect_real_test_circle_2():
+    ring = get_ring("real_test_circle_2.png")
+    assert ring.is_valid()
+
+
+def test_detect_real_test_circle_3():
+    image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png"
     detect = Detector(image_path, merge_filter=True)
     ring = detect.find_ring()
 
