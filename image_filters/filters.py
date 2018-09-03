@@ -121,6 +121,7 @@ def sharpen(image, sharpness=1):
     return image
 
 
+@timecall
 def rgba_to_rgb(image, color=(255, 255, 255)):
     """Alpha composite an RGBA Image with a specified color.
 

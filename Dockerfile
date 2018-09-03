@@ -11,7 +11,7 @@ COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
 
 # -- Install Python dependencies.
-RUN set -ex && pipenv install --system
+RUN set -ex && pipenv install --system --deploy
 
 # -- Install system dependencies.
 RUN apt-get update && apt-get install -y libsm6 libxext6 libgtk2.0 tk
