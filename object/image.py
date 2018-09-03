@@ -1,4 +1,5 @@
 import warnings
+from profilehooks import timecall
 from PIL import Image as pil_image
 
 from object.pixel import Pixel
@@ -49,10 +50,11 @@ class Image:
             image = Image.crop(image)
 
         if self.compress:
-            image.thumbnail((512, 512), pil_image.ANTIALIAS)
+            image.thumbnail((256, 256), pil_image.ANTIALIAS)
 
         return image
 
+    @timecall
     def draw_ring(self, ring):
         """Draw onto a new image the potentially found ring.
 
@@ -104,6 +106,8 @@ class Image:
 
         Todo:
             Will need to adjust these values to match the actual overlay.
+            Maybe we could check if all the edges of the image are the same as
+            the center color and keep cropping in until that's true.
 
         Args:
             image (Image): The image to crop.
