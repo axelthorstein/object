@@ -33,7 +33,7 @@ class Image:
         as an array, where as the processing happens on the image object.
 
         Todo:
-            Find a way to being the image size as low as possible
+            Find a way to being the image size as low as possible.
 
         Args:
             image_path (str): The path to the image.

@@ -48,7 +48,7 @@ def merge_mean_color(graph, src, dst):
 
 
 @timecall
-def rag_merge_filter(image, filter_level=145):
+def rag_merge_filter(image, filter_level=100):
     """Use the RAG merge filter algorithm to consolidate local pixel colors.
 
     Notes:
@@ -61,7 +61,9 @@ def rag_merge_filter(image, filter_level=145):
     Returns:
         numpy.ndarray: The filtered image.
     """
-    image = rgba_to_rgb(image)
+    if image.mode == 'RGBA':
+        image = rgba_to_rgb(image)
+
     image = np.asarray(image)
     labels = segmentation.slic(image, compactness=30, n_segments=640)
     g = graph.rag_mean_color(image, labels)
