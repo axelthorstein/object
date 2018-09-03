@@ -4,6 +4,7 @@ from flask import redirect
 
 from object.graphql import GraphQL
 from object.product import Product
+from object.product import ProductException
 from object.firebase import Firebase
 from utils.logging_utils import logger
 
@@ -55,9 +56,13 @@ def get_product(product_id):
         str: The product checkout URL.
     """
     image_path = "images/" + product_id + ".png"
-
     database = download_image(image_path)
-    product = Product(image_path)
+
+    try:
+        product = Product(image_path)
+    except ProductException as exception:
+        return exception
+
     database.clean_up()
 
     return redirect(product.checkout_url)
