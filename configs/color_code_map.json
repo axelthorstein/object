@@ -2,10 +2,10 @@
     "red": "00",
     "orange": "01",
     "yellow": "02",
-    "green": "04",
-    "blue": "08",
-    "purple": "09",
-    "black": "12",
-    "white": "13",
-    "grey": "14"
+    "green": "03",
+    "blue": "04",
+    "purple": "05",
+    "black": "06",
+    "white": "07",
+    "grey": "08"
 }
