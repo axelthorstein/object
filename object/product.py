@@ -1,6 +1,9 @@
 from configs.config import PRODUCT_MAP
 from object.detector import Detector
 from object.graphql import GraphQL
+from utils.logging_utils import logger
+
+LOGGER = logger('object')
 
 
 class ProductException(Exception):
@@ -23,8 +26,9 @@ class Product:
             str: The product ID.
         """
         detector = Detector(self.image_path)
-        ring = detector.find_ring(grain=720)
-
+        ring = detector.find_ring()
+        sequence = 'sequence {}'.format(ring.color_sequence.sequence)
+        LOGGER.info(sequence)
         try:
             return PRODUCT_MAP[ring.color_sequence.sequence]
         except KeyError:
