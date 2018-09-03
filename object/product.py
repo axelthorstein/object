@@ -32,6 +32,6 @@ class Product:
         LOGGER.info(sequence)
 
         try:
-            return PRODUCT_MAP[ring.color_sequence.sequence[0]]
+            return PRODUCT_MAP[ring.color_sequence.sequence['code']]
         except KeyError:
             raise ProductException("Product not found.")
