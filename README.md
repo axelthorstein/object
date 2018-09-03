@@ -13,4 +13,5 @@ In the ideal situation the user will already have been a Shopify user and have t
 # Authors
 
 *Axel Steingrimsson*
+
 *Hanna Steingrimsdottir*
