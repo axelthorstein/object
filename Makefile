@@ -32,4 +32,4 @@ server:
 	@python main.py
 
 docker: clean
-	@docker build . -t object_test && docker run -it -p 8080:8080 object_test
+	@docker build . -t object_test && docker run -it -p 8000:8000 object_test
