@@ -97,6 +97,9 @@ def median_filter(image, blur_level=15):
     Returns:
         Image: The filtered image.
     """
+    if image.mode == '1':
+        image = image.convert("RGBA")
+
     image = np.asarray(image)
     image = image[:, :, ::-1]  # Need to reverse the RGB to BGR for OpenCV.
     image = cv2.medianBlur(image, blur_level)  #pylint: disable=no-member

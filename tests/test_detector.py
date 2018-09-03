@@ -77,6 +77,12 @@ def test_detect_real_test_circle_3():
 
     assert ring.is_valid()
 
+
 def test_detect_circle_black_and_white():
     ring = get_ring("circle_black_and_white.png")
+    assert ring.is_valid()
+
+
+def test_detect_circle_white_and_black():
+    ring = get_ring("circle_white_and_black.png")
     assert ring.is_valid()
