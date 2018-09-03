@@ -1,4 +1,5 @@
 import warnings
+from os.path import dirname, abspath
 from profilehooks import timecall
 from PIL import Image as pil_image
 
@@ -64,7 +65,8 @@ class Image:
         Args:
             ring (Ring): The ring.
         """
-        self.image.save('images/debug.png')
+        self.image.save(
+            dirname(dirname(abspath(__file__))) + '/images/debug.png')
         pixel_matrix = self.image.load()
 
         for point in ring.color_sequence.points:
@@ -72,7 +74,8 @@ class Image:
 
         pixel_matrix[ring.center_point.coords] = (0, 0, 0)
 
-        self.image.save('images/debug_ring.png')
+        self.image.save(
+            dirname(dirname(abspath(__file__))) + '/images/debug_ring.png')
 
     @staticmethod
     def filter(image, merge_filter):
