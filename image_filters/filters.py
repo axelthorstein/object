@@ -48,7 +48,7 @@ def merge_mean_color(graph, src, dst):
 
 
 @timecall
-def rag_merge_filter(image, filter_level=150):
+def rag_merge_filter(image, filter_level=100):
     """Use the RAG merge filter algorithm to consolidate local pixel colors.
 
     Notes:
@@ -61,6 +61,9 @@ def rag_merge_filter(image, filter_level=150):
     Returns:
         numpy.ndarray: The filtered image.
     """
+    if image.mode == 'RGBA':
+        image = rgba_to_rgb(image)
+
     image = np.asarray(image)
     labels = segmentation.slic(image, compactness=30, n_segments=640)
     g = graph.rag_mean_color(image, labels)
@@ -80,7 +83,7 @@ def rag_merge_filter(image, filter_level=150):
 
 
 @timecall
-def median_filter(image, blur_level=25):
+def median_filter(image, blur_level=15):
     """Apply the median filter to an image to remove noise.
 
     Todo:
@@ -102,7 +105,7 @@ def median_filter(image, blur_level=25):
 
 
 @timecall
-def sharpen(image, sharpness=2):
+def sharpen(image, sharpness=1):
     """Sharpen the edges in an image.
 
     Args:
@@ -116,6 +119,27 @@ def sharpen(image, sharpness=2):
         image = image.filter(SHARPEN)
 
     return image
+
+
+def rgba_to_rgb(image, color=(255, 255, 255)):
+    """Alpha composite an RGBA Image with a specified color.
+
+    Simpler, faster version than the solutions above.
+
+    Source: http://stackoverflow.com/a/9459208/284318
+
+    Args:
+        image (Image): PIL RGBA Image object
+        color (Tuple): r, g, b (default 255, 255, 255)
+
+    Returns:
+        Image: The RGB image.
+    """
+    image.load()  # needed for split()
+    background = Image.new('RGB', image.size, color)
+    background.paste(image, mask=image.split()[3])  # 3 is the alpha channel
+
+    return background
 
 
 if __name__ == '__main__':
