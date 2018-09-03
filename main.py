@@ -61,7 +61,7 @@ def get_product(product_id):
     try:
         product = Product(image_path)
     except ProductException as exception:
-        return exception
+        return exception.args[0]
 
     database.clean_up()
 
