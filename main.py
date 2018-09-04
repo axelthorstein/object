@@ -65,4 +65,6 @@ def get_product(product_id):
 
     database.clean_up()
 
+    LOGGER.info(product.checkout_url)
+
     return redirect(product.checkout_url)

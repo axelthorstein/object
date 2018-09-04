@@ -221,10 +221,14 @@ function takeSnapshot() {
       xhr.send();
       xhr.onreadystatechange = processRequest;
       function processRequest(e) {
-          if (xhr.readyState == 4 && xhr.status == 200) {
-              console.log(xhr.responseText);
-              window.location.replace(xhr.responseText);
-          }
+          console.log(xhr);
+          console.log(xhr.readyState);
+          console.log(xhr.status);
+          console.log(xhr.responseText);
+          // if (xhr.readyState == 4 && xhr.status == 200) {
+              // console.log(xhr.responseText);
+          window.location.replace(xhr.responseText);
+          // }
       }
     });
 }

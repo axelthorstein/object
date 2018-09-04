@@ -163,7 +163,6 @@ def collapse(colors, center_color):
     Returns:
         List[str]: The collapsed sequence of colors.
     """
-
     sequence = []
 
     if len(set(colors)) >= 1:
