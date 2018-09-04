@@ -31,6 +31,13 @@ class Product:
 
         LOGGER.info(sequence)
 
+        if ring.color_sequence.sequence['code'] not in PRODUCT_MAP:
+            detector = Detector(self.image_path, merge_filter=True)
+            ring = detector.find_ring()
+
+        sequence = 'ColorSequence: {}'.format(ring.color_sequence.sequence)
+        LOGGER.info(sequence)
+
         try:
             return PRODUCT_MAP[ring.color_sequence.sequence['code']]
         except KeyError:

@@ -78,6 +78,19 @@ def test_detect_real_test_circle_3():
     assert ring.is_valid()
 
 
+def test_detect_real_test_circle_4():
+    image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png"
+    detect = Detector(image_path, merge_filter=True)
+    ring = detect.find_ring()
+
+    assert ring.is_valid()
+
+
+def test_detect_real_test_circle_5():
+    ring = get_ring("real_test_circle_5.png")
+    assert ring.is_valid()
+
+
 def test_detect_circle_black_and_white():
     ring = get_ring("circle_black_and_white.png")
     assert ring.is_valid()

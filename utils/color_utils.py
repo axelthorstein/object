@@ -71,7 +71,7 @@ def get_color(rgb):
 
     if brightness < 0.20:
         color = 'black'
-    elif saturation < 0.09 and brightness > 0.80:
+    elif saturation < 0.09 and brightness > 0.8:
         color = 'white'
     elif ((saturation < 0.25 and brightness < 0.40) or
           (saturation < 0.15 and brightness < 0.80)):
