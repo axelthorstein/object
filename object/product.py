@@ -1,3 +1,4 @@
+from profilehooks import timecall
 from configs.config import PRODUCT_MAP
 from object.detector import Detector
 from object.graphql import GraphQL
@@ -18,6 +19,7 @@ class Product:
         self.product = self.get_product()
         self.checkout_url = GraphQL.create_checkout(self.product)
 
+    @timecall
     def get_product(self):
         """Return the product based on the ring in the image.
 

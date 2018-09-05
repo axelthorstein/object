@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from profilehooks import timecall
 
 from object.graphql import GraphQL
 from object.product import Product
@@ -32,6 +33,7 @@ def get_graphql_products():
     return str(GraphQL.get_products())
 
 
+@timecall
 def download_image(image_path):
     """Download the image from Firebase
 

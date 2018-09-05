@@ -22,7 +22,7 @@ class Detector:
     def __init__(self,
                  image_path,
                  strategy=DetectionStrategy.RING,
-                 debug=True,
+                 debug=False,
                  crop=True,
                  apply_filters=True,
                  merge_filter=False,
