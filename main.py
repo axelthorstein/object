@@ -1,6 +1,5 @@
 from flask import Flask
 from flask import render_template
-from flask import redirect
 
 from object.graphql import GraphQL
 from object.product import Product
@@ -67,4 +66,4 @@ def get_product(product_id):
 
     LOGGER.info(product.checkout_url)
 
-    return redirect(product.checkout_url)
+    return product.checkout_url
