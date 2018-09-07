@@ -48,8 +48,8 @@ def generate_color_range_map():
     """
     color_range_map = {}
     color_ranges_map = {
-        range(0, 7): 'red',
-        range(7, 45): 'orange',
+        range(0, 4): 'red',
+        range(4, 45): 'orange',
         range(45, 80): 'yellow',
         range(80, 180): 'green',
         range(180, 250): 'blue',
