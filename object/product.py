@@ -28,14 +28,14 @@ class Product:
         """
         ring = Detector(self.image_path).find_ring()
 
-        LOGGER.info(ring.color_sequence.sequence)
+        LOGGER.info(ring.sequence.sequence)
 
         # if not ring.is_valid():
         #     ring = Detector(self.image_path, merge_filter=True).find_ring()
 
-        # LOGGER.info(ring.color_sequence.sequence)
+        # LOGGER.info(ring.sequence.sequence)
 
         if ring.is_valid():
-            return PRODUCT_MAP[ring.color_sequence.sequence['code']]
+            return PRODUCT_MAP[ring.sequence.sequence['code']]
 
         return "Product not found."

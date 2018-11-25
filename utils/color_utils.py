@@ -82,6 +82,21 @@ def get_color(rgb):
     return [color]
 
 
+def get_brightness(rgb):
+    """Get the brightness percentage of a pixel.
+
+    Args:
+        rgb (List[int]): The Red, Green, Blue triplet.
+
+    Returns:
+        List[str]: The brightness percentage of a pixel.
+    """
+    hsv = colorsys.rgb_to_hsv(*rgb[0:3])
+    brightness = hsv[2] / 255
+
+    return [brightness]
+
+
 def get_most_likely_colors(rgb):
     """Get the name of a color for a RGB value.
 

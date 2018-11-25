@@ -69,7 +69,7 @@ class Image:
             dirname(dirname(abspath(__file__))) + '/images/debug.png')
         pixel_matrix = self.image.load()
 
-        for point in ring.color_sequence.points:
+        for point in ring.sequence.coordinates:
             pixel_matrix[point] = (0, 0, 0)
 
         pixel_matrix[ring.center_point.coords] = (0, 0, 0)

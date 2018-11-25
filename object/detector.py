@@ -3,15 +3,16 @@
 from enum import Enum
 from profilehooks import timecall
 
-from object.ring import Ring
+from object.object import Object
 from utils.logging_utils import logger
 from object.image import Image
+from object.overlay import Overlay
 
 LOGGER = logger('object')
 
 
 class DetectionStrategy(Enum):
-    RING = Ring
+    RING = Object
 
 
 class Detector:
@@ -36,20 +37,20 @@ class Detector:
         self.strategy = strategy.value
         self.debug = debug
 
-    def log_debug_info(self, ring):
+    def log_debug_info(self, object):
         """Log debugging information.
 
-        Log the overlay and ring dimensions and draw them onto the image.
+        Log the overlay and object dimensions and draw them onto the image.
 
         Args:
-            ring (Ring): The detected ring.
+            object (Object): The detected object.
         """
-        self.image.draw_ring(ring)
+        self.image.draw_ring(object)
 
-        if ring.is_valid:
-            LOGGER.debug("Valid ring found at: {}".format(ring))
+        if object.is_valid:
+            LOGGER.debug("Valid object found at: {}".format(object))
         else:
-            raise DetectionException("No valid ring found: {}".format(ring))
+            raise DetectionException("No valid object found: {}".format(object))
 
     @timecall
     def find_ring(self, grain=360):
@@ -64,14 +65,12 @@ class Detector:
         Returns:
             tuple of int: The colors of the ring.
         """
+        overlay = Overlay(self.image.center_point)
 
-        ring = self.strategy(
-            self.image.image, self.image.center_point, debug=self.debug)
+        ring = self.strategy(self.image.image, overlay.center_point,
+                             overlay.radius * 1.35)
 
         ring.approximate(grain)
-
-        if not ring.is_valid():
-            ring.calculate(grain)
 
         if self.debug:
             self.log_debug_info(ring)

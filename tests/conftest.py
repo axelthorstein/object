@@ -2,12 +2,10 @@ from unittest.mock import Mock
 from unittest.mock import MagicMock
 from pytest import fixture
 
-from object.ring import Ring
+from object.coordinate_maps.dashed_ring_map import DashedRingMap
+from object.object import Object
 from object.overlay import Overlay
 from object.pixel import Pixel
-from object.color_sequence import ColorSequence
-from object.direction import Direction
-from object.edge import Edge
 
 
 @fixture()
@@ -31,6 +29,7 @@ def overlay(image):
     """
 	An overlay instantiated with the center coordinates at (100, 100).
 	"""
+    image.size = (150, 150)
     center_point = Pixel(image, (100, 100))
     return Overlay(center_point)
 
@@ -51,32 +50,32 @@ def ring(image, starting_coordinates):
     """
     A Ring.
     """
-    ring = Ring(image, starting_coordinates)
+    ring = Object(image, starting_coordinates, 10)
     return ring
 
 
 @fixture()
-def color_sequence(image, center_pixel):
+def coordinate_map(center_pixel):
     """
-    A color sequence.
+    A coordinate map.
     """
-    return ColorSequence(image, center_pixel, 3, 16)
+    return DashedRingMap(center_pixel, 3, 16)
 
 
 @fixture()
-def color_sequence_high_grain(image, center_pixel):
+def coordinate_map_high_grain(center_pixel):
     """
-    A color sequence with a high grain.
+    A coordinate map with a high grain.
     """
-    return ColorSequence(image, center_pixel, 3, 360)
+    return DashedRingMap(center_pixel, 3, 360)
 
 
 @fixture()
-def color_sequence_super_high_grain(image, center_pixel):
+def coordinate_map_super_high_grain(center_pixel):
     """
-    A color sequence with a super high grain.
+    A coordinate map with a super high grain.
     """
-    return ColorSequence(image, center_pixel, 3, 3600)
+    return DashedRingMap(center_pixel, 3, 3600)
 
 
 @fixture()
@@ -84,6 +83,7 @@ def center_pixel(image):
     """
     Center pixel.
     """
+    image.size = (150, 150)
     return Pixel(image, (3, 3))
 
 
@@ -93,14 +93,6 @@ def center_element():
     The center color.
     """
     return '1'
-
-
-@fixture()
-def directions():
-    """
-    A mapping of direction names to direction methods.
-    """
-    return Direction.get_directions()
 
 
 @fixture()
@@ -123,11 +115,3 @@ def pixel(large_image):
     A pixel.
     """
     return Pixel(large_image, (30, 30))
-
-
-@fixture()
-def edge(large_image):
-    """
-	An edge.
-	"""
-    return Edge(large_image, Direction.left)
