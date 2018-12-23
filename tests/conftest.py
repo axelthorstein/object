@@ -3,8 +3,6 @@ from unittest.mock import MagicMock
 from pytest import fixture
 
 from object.coordinate_maps.dashed_ring_map import DashedRingMap
-from object.object import Object
-from object.overlay import Overlay
 from object.pixel import Pixel
 
 
@@ -25,16 +23,6 @@ def depths():
 
 
 @fixture()
-def overlay(image):
-    """
-	An overlay instantiated with the center coordinates at (100, 100).
-	"""
-    image.size = (150, 150)
-    center_point = Pixel(image, (100, 100))
-    return Overlay(center_point)
-
-
-@fixture()
 def image():
     """
 	A mock for the image.
@@ -46,36 +34,11 @@ def image():
 
 
 @fixture()
-def ring(image, starting_coordinates):
-    """
-    A Ring.
-    """
-    ring = Object(image, starting_coordinates, 10)
-    return ring
-
-
-@fixture()
 def coordinate_map(center_pixel):
     """
     A coordinate map.
     """
-    return DashedRingMap(center_pixel, 3, 16)
-
-
-@fixture()
-def coordinate_map_high_grain(center_pixel):
-    """
-    A coordinate map with a high grain.
-    """
-    return DashedRingMap(center_pixel, 3, 360)
-
-
-@fixture()
-def coordinate_map_super_high_grain(center_pixel):
-    """
-    A coordinate map with a super high grain.
-    """
-    return DashedRingMap(center_pixel, 3, 3600)
+    return DashedRingMap(center_pixel)
 
 
 @fixture()

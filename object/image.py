@@ -23,11 +23,19 @@ class Image:
         self.merge_filter = merge_filter
         self.compress = compress
         self.image = self.preprocess_image(image_path)
-        self.center_point = Pixel(
-            self.image,
-            (int(self.image.size[0] / 2), int(self.image.size[1] / 2)))
+        self.center_point = self.set_center_point()
 
-    def preprocess_image(self, image_path):  #pylint: disable=no-self-use
+    def set_center_point(self):
+        """Set the center point of the image.
+
+        Returns:
+            Pixel: The center pixel of the image.
+        """
+        coords = (int(self.image.size[0] / 2), int(self.image.size[1] / 2))
+
+        return Pixel(self.image, coords)
+
+    def preprocess_image(self, image_path):
         """Crop, compress, and filter to image.
 
         The image needs to be saved and reopened so that it can be manipulated
@@ -54,28 +62,6 @@ class Image:
             image.thumbnail((256, 256), pil_image.ANTIALIAS)
 
         return image
-
-    @timecall
-    def draw_ring(self, ring):
-        """Draw onto a new image the potentially found ring.
-
-        Convert each edge and center coordinate black for a visual
-        representation of the found ring.
-
-        Args:
-            ring (Ring): The ring.
-        """
-        self.image.save(
-            dirname(dirname(abspath(__file__))) + '/images/debug.png')
-        pixel_matrix = self.image.load()
-
-        for point in ring.sequence.coordinates:
-            pixel_matrix[point] = (0, 0, 0)
-
-        pixel_matrix[ring.center_point.coords] = (0, 0, 0)
-
-        self.image.save(
-            dirname(dirname(abspath(__file__))) + '/images/debug_ring.png')
 
     @staticmethod
     def filter(image, merge_filter):
@@ -124,3 +110,25 @@ class Image:
                            center_point[1] - (center_point[1] * 0.75),
                            center_point[0] + (center_point[0] * 0.75),
                            center_point[1] + (center_point[1] * 0.75)))
+
+    @timecall
+    def draw_ring(self, coordinates):
+        """Draw onto a new image the potentially found ring.
+
+        Convert each edge and center coordinate black for a visual
+        representation of the found ring.
+
+        Args:
+            coordinates (List[Tuple]): The sequence coordinates.
+        """
+        self.image.save(
+            dirname(dirname(abspath(__file__))) + '/images/debug.png')
+        pixel_matrix = self.image.load()
+
+        for point in coordinates:
+            pixel_matrix[point] = (0, 0, 0)
+
+        pixel_matrix[self.center_point.coords] = (0, 0, 0)
+
+        self.image.save(
+            dirname(dirname(abspath(__file__))) + '/images/debug_ring.png')

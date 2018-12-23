@@ -2,7 +2,7 @@ from pytest import raises
 
 from utils.color_utils import get_color
 from utils.color_utils import get_most_likely_colors
-from utils.color_utils import sequence_to_code
+from utils.color_utils import sequence_to_color_code
 from utils.color_utils import get_hue_name
 from utils.color_utils import ColorException
 
@@ -121,35 +121,35 @@ def test_get_color_name_all_colors_return_grey():
     assert expected == actual
 
 
-def test_sequence_to_code():
+def test_sequence_to_color_code():
     """
     Test that a sequence returns a valid code.
     """
     sequence = ['green', 'green', 'green', 'red', 'red', 'red', 'blue', 'blue']
     expected = '0303030000000404'
-    actual = sequence_to_code(sequence)
+    actual = sequence_to_color_code(sequence)
 
     assert expected == actual
 
 
-def test_sequence_to_code_raises_exception_on_invalid_color_name():
+def test_sequence_to_color_code_raises_exception_on_invalid_color_name():
     """
     Test that an exception is raised when passed an invalid color name.
     """
     sequence = ['maroon', 'green', 'green', 'red', 'red', 'red', 'blue', 'blue']
 
     with raises(ColorException, match="Color maroon not found."):
-        sequence_to_code(sequence)
+        sequence_to_color_code(sequence)
 
 
-def test_sequence_to_code_with_empty_sequence():
+def test_sequence_to_color_code_with_empty_sequence():
     """
     Test that a sequence returns an empty string when it intakes a empty
     sequence.
     """
     sequence = []
     expected = ''
-    actual = sequence_to_code(sequence)
+    actual = sequence_to_color_code(sequence)
 
     assert expected == actual
 

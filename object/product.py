@@ -1,6 +1,6 @@
 from profilehooks import timecall
+
 from configs.config import PRODUCT_MAP
-from object.detector import Detector
 from object.graphql import GraphQL
 from utils.logging_utils import logger
 
@@ -14,10 +14,57 @@ class ProductException(Exception):
 class Product:
     """A product."""
 
-    def __init__(self, image_path):
-        self.image_path = image_path
+    def __init__(self, product_code):
+        self.product_code = product_code
         self.product = self.get_product()
-        self.checkout_url = GraphQL.create_checkout(self.product)
+
+    def get_checkout_url(self):
+        """Get the Shopify URL for the given product.
+
+        Returns:
+            str: The checkout URL with the product added to the basket.
+        """
+        return GraphQL.create_checkout(self.product)
+
+    def is_valid(self):
+        """Determine whether the sequence is valid.
+
+        Check every rotation of the coded sequence to see if it exists in the
+        product map.
+
+        Returns:
+            str: The valid code or an empty string.
+        """
+        code = self.product_code
+
+        if code in PRODUCT_MAP:
+            return code
+
+        for _ in code:
+            code = code[1:] + code[0]
+
+            if code in PRODUCT_MAP:
+                return code
+
+        return ''
+
+    # def check_similar(code):
+    #     """
+    #     """
+    # from difflib import SequenceMatcher
+
+    #     most_likely = (0, None)
+
+    #     for _ in code:
+    #         code = code[1:] + code[0]
+
+    #         for product in PRODUCT_MAP:
+    #             if similarity >= most_likely[0]:
+    #                 most_likely = (similarity, product)
+    #             similarity = SequenceMatcher(None, code, product).ratio()
+
+    #     if most_likely[0] > 0.8:
+    #         return most_likely[1]
 
     @timecall
     def get_product(self):
@@ -26,16 +73,9 @@ class Product:
         Returns:
             str: The product ID.
         """
-        ring = Detector(self.image_path).find_ring()
+        valid_product_code = self.is_valid()
 
-        LOGGER.info(ring.sequence.sequence)
+        if valid_product_code:
+            return PRODUCT_MAP[valid_product_code]
 
-        # if not ring.is_valid():
-        #     ring = Detector(self.image_path, merge_filter=True).find_ring()
-
-        # LOGGER.info(ring.sequence.sequence)
-
-        if ring.is_valid():
-            return PRODUCT_MAP[ring.sequence.sequence['code']]
-
-        return "Product not found."
+        raise ProductException("Product not found.")

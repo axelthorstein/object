@@ -10,7 +10,7 @@ class ColorException(Exception):
     pass
 
 
-def sequence_to_code(sequence):
+def sequence_to_color_code(sequence):
     """Create a deterministic code of fixed length from the color sequence.
 
     Args:
