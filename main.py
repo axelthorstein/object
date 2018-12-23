@@ -62,7 +62,7 @@ def get_product(product_id):
 
     try:
         image = Image(image_path)
-        product = Detector(image).get_product()
+        product = Detector(image).detect_product()
     except ProductException as exception:
         return exception.args[0]
 

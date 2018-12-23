@@ -10,7 +10,7 @@ def get_product(image_name):
     image = Image(f"{BASE_TEST_IMAGE_PATH}/{image_name}")
     detector = Detector(image, debug=True)
 
-    return detector.get_product()
+    return detector.detect_product()
 
 
 def test_detect_circle_black_and_white():

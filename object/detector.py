@@ -20,29 +20,35 @@ class Detector:
         self.coordinate_map = coordinate_map
         self.debug = debug
 
-    @timecall
-    def get_product(self):
-        """Detect an object in an image.
+    def get_product(self, center_point):
+        """Detect an object in an image and return the corresponding product.
 
-        Todo:
-            Try using crop hints to guess radius.
+        Args:
+            center_point (Pixel): The center point.
 
         Returns:
-            OBject: The detected object.
+            Product: The product.
         """
-        product = Product('')
-        center_point = self.image.center_point
-
-        while not product.is_valid():
-            coordinates = self.coordinate_map(center_point).coordinates
-
-            # Apply coodinate map to image and get value sequence
-            sequence = Sequence(self.image, center_point, coordinates)
-
-            # Attempt to get the corresponding product
-            product = Product(sequence.color_code)
+        coordinates = self.coordinate_map(center_point).coordinates
+        sequence = Sequence(self.image, center_point, coordinates)
 
         if self.debug:
             self.image.draw_ring(coordinates)
+
+        return Product(sequence.color_code)
+
+    @timecall
+    def detect_product(self):
+        """Detect a product based on the image.
+
+        Returns:
+            str: The product name.
+        """
+        center_point = self.image.center_point
+        product = self.get_product(center_point)
+
+        while not product.is_valid():
+            center_point = self.image.center_point
+            product = self.get_product(center_point)
 
         return product.get_name()
