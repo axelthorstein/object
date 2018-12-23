@@ -1,7 +1,6 @@
 from profilehooks import timecall
 
 from configs.config import PRODUCT_MAP
-from object.graphql import GraphQL
 from utils.logging_utils import logger
 
 LOGGER = logger('object')
@@ -16,15 +15,7 @@ class Product:
 
     def __init__(self, product_code):
         self.product_code = product_code
-        self.product = self.get_product()
-
-    def get_checkout_url(self):
-        """Get the Shopify URL for the given product.
-
-        Returns:
-            str: The checkout URL with the product added to the basket.
-        """
-        return GraphQL.create_checkout(self.product)
+        self.product_name = self.get_name()
 
     def is_valid(self):
         """Determine whether the sequence is valid.
@@ -67,7 +58,7 @@ class Product:
     #         return most_likely[1]
 
     @timecall
-    def get_product(self):
+    def get_name(self):
         """Return the product based on the ring in the image.
 
         Returns:
@@ -78,4 +69,4 @@ class Product:
         if valid_product_code:
             return PRODUCT_MAP[valid_product_code]
 
-        raise ProductException("Product not found.")
+        return ProductException("Product not found.")

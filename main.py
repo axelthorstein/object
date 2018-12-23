@@ -3,7 +3,6 @@ from flask import render_template
 from profilehooks import timecall
 
 from object.graphql import GraphQL
-from object.product import Product
 from object.product import ProductException
 from object.detector import Detector
 from object.image import Image
@@ -63,14 +62,10 @@ def get_product(product_id):
 
     try:
         image = Image(image_path)
-        sequence = Detector(image).get_sequence()
-        product = Product(sequence.color_code)
+        product = Detector(image).get_product()
     except ProductException as exception:
         return exception.args[0]
 
     database.clean_up()
-    checkout_url = product.get_checkout_url()
 
-    LOGGER.info(checkout_url)
-
-    return checkout_url
+    return GraphQL.create_checkout(product)

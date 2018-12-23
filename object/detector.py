@@ -3,6 +3,7 @@
 from profilehooks import timecall
 
 from object.coordinate_maps.dashed_ring_map import DashedRingMap
+from object.product import Product
 from object.sequence import Sequence
 from utils.logging_utils import logger
 
@@ -20,7 +21,7 @@ class Detector:
         self.debug = debug
 
     @timecall
-    def get_sequence(self):
+    def get_product(self):
         """Detect an object in an image.
 
         Todo:
@@ -29,15 +30,19 @@ class Detector:
         Returns:
             OBject: The detected object.
         """
-        coordinates = self.coordinate_map(self.image.center_point).coordinates
+        product = Product('')
+        center_point = self.image.center_point
 
-        # Apply coodinate map to image and get value sequence
-        sequence = Sequence(self.image, self.image.center_point, coordinates)
+        while not product.is_valid():
+            coordinates = self.coordinate_map(center_point).coordinates
+
+            # Apply coodinate map to image and get value sequence
+            sequence = Sequence(self.image, center_point, coordinates)
+
+            # Attempt to get the corresponding product
+            product = Product(sequence.color_code)
 
         if self.debug:
             self.image.draw_ring(coordinates)
-        return sequence
 
-
-class DetectionException(Exception):
-    pass
+        return product.get_name()
