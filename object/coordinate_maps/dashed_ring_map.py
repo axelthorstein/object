@@ -10,7 +10,7 @@ class DashedRingMap(CoordinateMap):
     def __init__(self, center_point):
         super(DashedRingMap, self).__init__()
         self.center_point = center_point
-        self.radius = (center_point.y / 2) * 1.50
+        self.radius = (center_point.y / 2) * 1.5
         self.coordinates = self.get_coordinates()
 
     def sort_coordinates(self, coordinates):

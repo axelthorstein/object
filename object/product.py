@@ -69,4 +69,4 @@ class Product:
         if valid_product_code:
             return PRODUCT_MAP[valid_product_code]
 
-        raise ProductException("Product not found.")
+        return ''

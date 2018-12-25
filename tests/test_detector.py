@@ -8,7 +8,7 @@ def get_product(image_name):
     """Return a product from the image name shorthand.
     """
     image = Image(f"{BASE_TEST_IMAGE_PATH}/{image_name}")
-    detector = Detector(image, debug=True)
+    detector = Detector(image)
 
     return detector.detect_product()
 
@@ -48,29 +48,36 @@ def test_detect_circle_thin_18_square():
 
 # Off Center Rings:
 
-# def test_detect_circle_thick_18_round():
-#     product = get_product("circle_thick_18_round.png")
-#     assert product
 
-# def test_detect_circle_med_18_round():
-#     product = get_product("circle_med_18_round.png")
-#     assert product
+def test_detect_circle_thick_18_round():
+    product = get_product("circle_thick_18_round.png")
+    assert product
 
-# def test_detect_circle_thin_18_round():
-#     product = get_product("circle_thin_18_round.png")
-#     assert product
 
-# def test_detect_circle_med_36_round():
-#     product = get_product("circle_med_36_round.png")
-#     assert product
+def test_detect_circle_med_18_round():
+    product = get_product("circle_med_18_round.png")
+    assert product
 
-# def test_detect_circle_thin_50_square():
-#     # Can't apply the filters because the dashes are too thin.
-#     image_path = f"{BASE_TEST_IMAGE_PATH}/circle_thin_50_square.png"
-#     detect = Detector(image_path, apply_filters=False)
-#     ring = detect.detect()
 
-#     assert product
+def test_detect_circle_thin_18_round():
+    product = get_product("circle_thin_18_round.png")
+    assert product
+
+
+def test_detect_circle_med_36_round():
+    product = get_product("circle_med_36_round.png")
+    assert product
+
+
+def test_detect_circle_thin_50_square():
+    # Can't apply the filters because the dashes are too thin.
+    image = Image(
+        f"{BASE_TEST_IMAGE_PATH}/circle_thin_50_square.png",
+        apply_filters=False)
+    detector = Detector(image)
+
+    return detector.detect_product()
+
 
 # Real world tests:
 
@@ -83,11 +90,12 @@ def test_detect_circle_thin_18_square():
 #     assert product
 
 # def test_detect_real_test_circle_3():
-#     image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png"
-#     detect = Detector(image_path, merge_filter=True)
-#     ring = detect.detect()
+#     image = Image(
+#         f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png",
+#         merge_filter=True)
+#     detector = Detector(image)
 
-#     assert product
+#     return detector.detect_product()
 
 # def test_detect_real_test_circle_4():
 #     image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png"
