@@ -52,14 +52,14 @@ class Image:
         """
         image = pil_image.open(image_path)
 
-        if self.apply_filters:
-            image = Image.filter(image, self.merge_filter)
+        if self.compress:
+            image = image.resize((256, 256))
 
         if self.crop:
             image = Image.crop(image)
 
-        if self.compress:
-            image.thumbnail((256, 256), pil_image.ANTIALIAS)
+        if self.apply_filters:
+            image = Image.filter(image, self.merge_filter)
 
         return image
 
@@ -121,14 +121,14 @@ class Image:
         Args:
             coordinates (List[Tuple]): The sequence coordinates.
         """
-        self.image.save(
-            dirname(dirname(abspath(__file__))) + '/images/debug.png')
+        base_path  = dirname(dirname(abspath(__file__)))
+        self.image.save(f'{base_path}/images/debug.png')
         pixel_matrix = self.image.load()
+        pixel_matrix[self.center_point.coords] = (0, 0, 0)
 
         for point in coordinates:
             pixel_matrix[point] = (0, 0, 0)
-
-        pixel_matrix[self.center_point.coords] = (0, 0, 0)
-
-        self.image.save(
-            dirname(dirname(abspath(__file__))) + '/images/debug_ring.png')
+        self.image.save(f'{base_path}/images/debug_ring.png')
+        # from time import sleep
+        #     sleep(0.001)
+        # sleep(1)

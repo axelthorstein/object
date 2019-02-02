@@ -7,10 +7,10 @@ from object.coordinate_maps.coordinate_map import CoordinateMap
 class DashedRingMap(CoordinateMap):
     """A coordinate map for sampling the coordinates from a dashed ring."""
 
-    def __init__(self, center_point):
+    def __init__(self, center_point, radius):
         super(DashedRingMap, self).__init__()
         self.center_point = center_point
-        self.radius = (center_point.y / 2) * 1.5
+        self.radius = radius
         self.coordinates = self.get_coordinates()
 
     def sort_coordinates(self, coordinates):

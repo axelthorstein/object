@@ -17,7 +17,7 @@ class Detector:
     Detect an object from a given image.
     """
 
-    def __init__(self, image, coordinate_map=DashedRingMap, debug=False):
+    def __init__(self, image, coordinate_map=DashedRingMap, debug=True):
         self.image = image
         self.coordinate_map = coordinate_map
         self.debug = debug
@@ -36,10 +36,10 @@ class Detector:
 
         variations = [
             center_point,
-            Pixel(image, (int(center_point.x * 0.85), center_point.y)),
-            Pixel(image, (center_point.x, int(center_point.y * 0.85))),
-            Pixel(image, (int(center_point.x * 1.15), center_point.y)),
-            Pixel(image, (center_point.x, int(center_point.y * 1.15)))
+            Pixel(image, (int(center_point.x * 0.8), center_point.y)),
+            Pixel(image, (center_point.x, int(center_point.y * 0.8))),
+            Pixel(image, (int(center_point.x * 1.2), center_point.y)),
+            Pixel(image, (center_point.x, int(center_point.y * 1.2)))
         ]
 
         return variations
@@ -61,12 +61,15 @@ class Detector:
         Returns:
             Product: The product.
         """
-        coordinates = self.coordinate_map(center_point).coordinates
-
-        if self.debug:
-            self.image.draw_ring(coordinates)
-
+        # We want to use the same radius for all rings.
+        radius = (self.image.center_point.y + self.image.center_point.x) * .3725
+        coordinates = self.coordinate_map(center_point, radius).coordinates
         sequence = Sequence(self.image, center_point, coordinates)
+
+        # if self.debug:
+        #     # When this is enabled it will put black pixels on the debug image
+        #     # which will cause the tests to fail if it draws more than one ring.
+        #     self.image.draw_ring(coordinates)
 
         return Product(sequence.color_code).product_name
 

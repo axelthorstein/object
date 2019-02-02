@@ -53,7 +53,7 @@ class Pixel:
 
         raise PixelException(f"The new coordinates {coords} are out of bounds.")
 
-    def out_of_bounds(self, coords, steps=10):
+    def out_of_bounds(self, coords, steps=3):
         """Check if the new coordinates are at the edge of the image.
 
         Args:
