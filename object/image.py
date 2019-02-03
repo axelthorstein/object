@@ -129,6 +129,6 @@ class Image:
         for point in coordinates:
             pixel_matrix[point] = (0, 0, 0)
         self.image.save(f'{base_path}/images/debug_ring.png')
-        # from time import sleep
+        #     from time import sleep
         #     sleep(0.001)
         # sleep(1)

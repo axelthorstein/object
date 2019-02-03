@@ -20,18 +20,18 @@ def test_product_check_similar_almost_exact_values():
 
 
 def test_product_check_similar_90_percent_similar():
-    code = '020202030303040404050505000000019999'
+    code = '020202030303040404050505000000010999'
     product_map = {'020202030303040404050505000000010101': 'test-object'}
-    expected = ('020202030303040404050505000000010101', 0.89)
+    expected = ('020202030303040404050505000000010101', 0.92)
     actual = tuple(Product.check_similar(code, product_map))
 
     assert expected == actual
 
 
 def test_product_check_similar_80_percent_similar():
-    code = '020202030303040404050505000009999999'
+    code = '020202030303040404050505000000999999'
     product_map = {'020202030303040404050505000000010101': 'test-object'}
-    expected = ('020202030303040404050505000000010101', 0.81)
+    expected = (None, 0.83)
     actual = tuple(Product.check_similar(code, product_map))
 
     assert expected == actual
