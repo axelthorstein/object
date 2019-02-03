@@ -1,3 +1,4 @@
+from difflib import SequenceMatcher
 from profilehooks import timecall
 
 from configs.config import PRODUCT_MAP
@@ -31,31 +32,43 @@ class Product:
         if code in PRODUCT_MAP:
             return code
 
-        for _ in code:
-            code = code[1:] + code[0]
-
-            if code in PRODUCT_MAP:
-                return code
+        similar, _ = Product.check_similar(code, PRODUCT_MAP)
+        if similar:
+            return similar
 
         return ''
 
-    # def check_similar(code):
-    #     """
-    #     """
-    # from difflib import SequenceMatcher
+    @staticmethod
+    def check_similar(code, products):
+        """Return a product code if it is within a threshhold of similarity.
 
-    #     most_likely = (0, None)
+        Args:
+            code (str): The detected sequence from an image.
+            products (dict): The map of product sequences to names.
 
-    #     for _ in code:
-    #         code = code[1:] + code[0]
+        Returns:
+            str, float: The similar code and the similarity.
+        """
+        similar_code = None
+        max_similarity = 0
+        similarity_threshold = 0.8
 
-    #         for product in PRODUCT_MAP:
-    #             if similarity >= most_likely[0]:
-    #                 most_likely = (similarity, product)
-    #             similarity = SequenceMatcher(None, code, product).ratio()
+        for _ in code:
+            code = code[1:] + code[0]
 
-    #     if most_likely[0] > 0.8:
-    #         return most_likely[1]
+            for product in products:
+                similarity = SequenceMatcher(None, code, product).ratio()
+                if similarity == 1:
+                    return product, similarity
+
+                if similarity >= max_similarity:
+                    similar_code = product
+                    max_similarity = round(similarity, 2)
+
+        if max_similarity >= similarity_threshold:
+            return similar_code, max_similarity
+
+        return None, max_similarity
 
     @timecall
     def get_name(self):
@@ -70,4 +83,4 @@ class Product:
         if valid_product_code:
             return PRODUCT_MAP[valid_product_code]
 
-        return ''
+        return None
