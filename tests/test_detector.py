@@ -81,43 +81,43 @@ def test_detect_circle_thin_50_square():
 
 # Real world tests:
 
-# def test_detect_real_test_circle_1():
-#     product = get_product("real_test_circle_1.png")
-#     assert product
 
-# def test_detect_real_test_circle_2():
-#     product = get_product("real_test_circle_2.png")
-#     assert product
+def test_detect_real_test_circle_1():
+    product = get_product("real_test_circle_1.png")
+    assert product
 
-# def test_detect_real_test_circle_3():
-#     image = Image(
-#         f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png",
-#         merge_filter=True)
-#     detector = Detector(image)
 
-#     return detector.detect_product()
+def test_detect_real_test_circle_2():
+    product = get_product("real_test_circle_2.png")
+    assert product
 
-# def test_detect_real_test_circle_4():
-#     image_path = f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png"
-#     detect = Detector(image_path, merge_filter=True)
-#     ring = detect.detect()
 
-#     assert product
+def test_detect_real_test_circle_3():
+    image = Image(
+        f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png", merge_filter=True)
+    detector = Detector(image)
 
-# def test_detect_real_test_circle_5():
-#     product = get_product("real_test_circle_5.png")
-#     assert product
+    return detector.detect_product()
 
-# def test_detect_circle_thick_18_square_sim_colors():
-#     product = get_product("circle_thick_18_square_sim_colors.png")
-#     from pprint import pprint
-#     pprint(ring.sequence.sequence)
-#     exit()
-#     assert product
+
+def test_detect_real_test_circle_4():
+    image = Image(
+        f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png", merge_filter=True)
+    detector = Detector(image)
+
+    return detector.detect_product()
+
+
+def test_detect_real_test_circle_5():
+    product = get_product("real_test_circle_5.png")
+    assert product
+
+
+def test_detect_circle_thick_18_square_sim_colors():
+    product = get_product("circle_thick_18_square_sim_colors.png")
+    assert product
+
 
 # def test_detect_circle_peach_merged():
 #     product = get_product("peach_merged.png")
-#     from pprint import pprint
-#     pprint(ring.sequence.sequence)
-#     exit()
 #     assert product

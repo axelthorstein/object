@@ -19,8 +19,8 @@ def test_coordinate_map_get_coordinates(coordinate_map):
     the center point.
     """
     expected = [(0, 3), (0, 4), (1, 4), (1, 5), (2, 5), (3, 5), (4, 5), (4, 4),
-                (5, 4), (5, 3), (5, 2), (4, 1), (4, 0), (3, 0), (2, 0), (1, 0),
-                (1, 1), (0, 2)]
+                (5, 4), (5, 3), (5, 2), (5, 1), (4, 1), (4, 0), (3, 0), (2, 0),
+                (1, 0), (1, 1), (0, 1), (0, 2)]
     actual = coordinate_map.get_coordinates()
 
     assert expected == actual

@@ -13,11 +13,13 @@ class ProductException(Exception):
 class Product:
     """A product."""
 
-    def __init__(self, product_code):
-        self.product_code = product_code
+    def __init__(self, sequence):
+        self.color_code = sequence.color_code
+        self.brightness_values = sequence.brightness_values
         self.product_name = self.get_name()
 
-    def is_valid(self):
+    @staticmethod
+    def is_valid(code):
         """Determine whether the sequence is valid.
 
         Check every rotation of the coded sequence to see if it exists in the
@@ -26,8 +28,6 @@ class Product:
         Returns:
             str: The valid code or an empty string.
         """
-        code = self.product_code
-
         if code in PRODUCT_MAP:
             return code
 
@@ -64,7 +64,8 @@ class Product:
         Returns:
             str: The product ID.
         """
-        valid_product_code = self.is_valid()
+        valid_product_code = (Product.is_valid(self.color_code) or
+                              Product.is_valid(self.brightness_values))
 
         if valid_product_code:
             return PRODUCT_MAP[valid_product_code]

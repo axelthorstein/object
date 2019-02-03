@@ -121,7 +121,7 @@ class Image:
         Args:
             coordinates (List[Tuple]): The sequence coordinates.
         """
-        base_path  = dirname(dirname(abspath(__file__)))
+        base_path = dirname(dirname(abspath(__file__)))
         self.image.save(f'{base_path}/images/debug.png')
         pixel_matrix = self.image.load()
         pixel_matrix[self.center_point.coords] = (0, 0, 0)

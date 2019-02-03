@@ -38,7 +38,7 @@ def coordinate_map(center_pixel):
     """
     A coordinate map.
     """
-    return DashedRingMap(center_pixel)
+    return DashedRingMap(center_pixel, 2.5)
 
 
 @fixture()

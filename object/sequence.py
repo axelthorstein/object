@@ -42,7 +42,9 @@ class Sequence:
         ]
 
         # Collapse adjacent duplicates into a single element.
-        return collapse(brightness_values, self.center_coord.brightness)
+        values = collapse(brightness_values, self.center_coord.brightness)
+
+        return ''.join(map(str, values))
 
     def calculate_sequence(self):
         """Get the code corresponding to the colors in the sequence.

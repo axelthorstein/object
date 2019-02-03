@@ -28,7 +28,7 @@ class Pixel:
         Returns:
             str: The brightness.
         """
-        return self.brightness_values[-1]
+        return round(self.brightness_values[-1] * 100)
 
     def get_color(self, coords, color_range='css2'):
         """Get the pixel at the given coordinate.
