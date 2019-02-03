@@ -1,4 +1,5 @@
 # Object ignore
+configs/*.ejson
 images/*_preprocessed*
 images/*_thumbnail*
 images/*_cropped*

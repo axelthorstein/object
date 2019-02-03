@@ -3,8 +3,9 @@ from flask import render_template
 from profilehooks import timecall
 
 from object.graphql import GraphQL
-from object.product import Product
 from object.product import ProductException
+from object.detector import Detector
+from object.image import Image
 from object.firebase import Firebase
 from utils.logging_utils import logger
 
@@ -60,12 +61,11 @@ def get_product(product_id):
     database = download_image(image_path)
 
     try:
-        product = Product(image_path)
+        image = Image(image_path)
+        product = Detector(image).detect_product()
     except ProductException as exception:
         return exception.args[0]
 
     database.clean_up()
 
-    LOGGER.info(product.checkout_url)
-
-    return product.checkout_url
+    return GraphQL.create_checkout(product)

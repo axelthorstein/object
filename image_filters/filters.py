@@ -83,7 +83,7 @@ def rag_merge_filter(image, filter_level=100):
 
 
 @timecall
-def median_filter(image, blur_level=15):
+def median_filter(image, blur_level=3):
     """Apply the median filter to an image to remove noise.
 
     Todo:
