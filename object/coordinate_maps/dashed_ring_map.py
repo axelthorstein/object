@@ -62,6 +62,4 @@ class DashedRingMap(CoordinateMap):
 
         coordinates = CoordinateMap.deduplicate(coordinates)
 
-        sorted_coordinates = self.sort_coordinates(coordinates)
-
-        return sorted_coordinates
+        return self.sort_coordinates(coordinates)
