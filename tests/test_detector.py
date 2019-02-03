@@ -93,16 +93,14 @@ def test_detect_real_test_circle_2():
 
 
 def test_detect_real_test_circle_3():
-    image = Image(
-        f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png", merge_filter=True)
+    image = Image(f"{BASE_TEST_IMAGE_PATH}/real_test_circle_3.png")
     detector = Detector(image)
 
     return detector.detect_product()
 
 
 def test_detect_real_test_circle_4():
-    image = Image(
-        f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png", merge_filter=True)
+    image = Image(f"{BASE_TEST_IMAGE_PATH}/real_test_circle_4.png")
     detector = Detector(image)
 
     return detector.detect_product()

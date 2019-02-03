@@ -30,7 +30,7 @@ class Detector:
             - Make the variation equal to .75 of the width of the ring.
 
         Returns:
-            List[Tuples]: The list of varied center points.
+            Tuple[Pixel]: The list of varied center points.
         """
         image = self.image.image
 
@@ -44,25 +44,27 @@ class Detector:
 
         return variations
 
-    def get_radius_variations(self):
+    def get_radius_variations(self, center_point):
         """Get slight variations of the radius for sampling.
 
         Returns:
-            List[Tuples]: The list of varied radii.
+            Tuple[int]: The list of varied radii.
         """
-        pass
+        radius = (center_point.y + center_point.x) * .35
 
-    def get_product_name(self, center_point):
+        return (radius, radius * 1.1, radius * 0.8)
+
+    def get_product_name(self, center_point, radius):
         """Detect an object in an image and return the corresponding product.
 
         Args:
             center_point (Pixel): The center point.
+            radius (Pixel): The radius of the circle.
 
         Returns:
             Product: The product.
         """
         # We want to use the same radius for all rings.
-        radius = (self.image.center_point.y + self.image.center_point.x) * .3725
         coordinates = self.coordinate_map(center_point, radius).coordinates
         sequence = Sequence(self.image, center_point, coordinates)
 
@@ -81,11 +83,13 @@ class Detector:
             str: The product name.
         """
         center_points = self.get_center_variations(self.image.center_point)
+        radii = self.get_radius_variations(self.image.center_point)
 
         for center_point in center_points:
-            product_name = self.get_product_name(center_point)
+            for radius in radii:
+                product_name = self.get_product_name(center_point, radius)
 
-            if product_name:
-                return product_name
+                if product_name:
+                    return product_name
 
         raise ProductException("Product not found.")
