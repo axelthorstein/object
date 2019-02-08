@@ -1,72 +1,33 @@
-### Circle Detection
+## Circle Detection
 
-#### Simple
+The detection algorithm has evolved significantly since I first started developing it and I believe it now stands at a place that will be sufficient for a minimally viable product.
 
-I think we could effectively _cheat_ with our circle detection by leveraging our assumptions about the incoming photo. We can assume that the user will at least moderately align the circle on the item with the circle overlay on the web page. If this is the case and we have a perfect alignment then we could crop the image client side to be just larger than the circle, and estimate the colours from the from an arbitrary location in the overlay, and the center point from the overlay. This way we could potentially do all the calculations client side and avoid network overhead. If this is the case we would have an extremely small compute time. 
+#### Nomenclature:
 
-Realistically the user will not exactly align the overlay with the objects circle. In this case we can still use some assumptions to limit the computation time. Again we can assume the the overlay is relatively aligned with the object circle in which case we can crop the image to slightly larger than the overlay and minimize our matrix size. Once we have a relatively minimal image matrix server side we can assume that the center point of the overlay is inside the objects circle. This would assume the the overlay and the onject circle are at least 50% aligned, which if this assumption is false I think it's reasonable to request realignment from the user. If we are able to appropriately obtain a pixel within the objects circle then we can naively choose any direction to walk and for each pixel determine if there is a colour change. As soon as we change to a distinctly different colour we can assume that we are in the circles ring. At this point we continue walking until we reach the original colour affectively determining the dimensions of our circle. At this point we can use the objects center pixel and a pixel from the circles ring to determine the two colours and create the checkout URL.
-
-A simple error check for this could be taking the center of the ring and confirming that the colour matches the pixel when you transform the location clockwise around the circle.
-
-Example:
-
-```
-r, r, r, r, r, r, r, r, r, r
-r, r, r, b, b, b, r, r, r, r
-r, r, b, b, b, b, b, r, r, r
-r, b, b, r, r, r, b, b, r, r
-r, b, b, r, r, r ,b, b, r, r
-r, b, b, r, r, r, b, b, r, r
-r, r, b, b, b, b, b, r, r, r
-r, r, r, b, b, b, r, r, r, r
-r, r, r, r, r, r, r, r, r, r
-r, r, r, r, r, r, r, r, r, r
-
-r: red pixel
-b: blue pixel
-```
-
-Here we can assume that the image has been cropped by the overlay so that it is not exactly aligned with the object circle. If we use the proposed algorithm to obtain one of the circle pixels (because the matrix has even x, y lengths then there are four potential center pixels) at one of the following locations: (5, 5), (5, 6), (6, 5), (6, 6). Each of these pixels are indeed of the center colour and if we were to choose any of these and walk in any direction we would obtain our second (and ring) colour. Then we would continue until we reached the original colour red, which would be the case in any direction. As an example let us choose the pixel at the coordinates (6, 6) and we walk upwards. We would obtain the array [r, r, r, b, b, r]. With this we can determine that the ring diameter is 2, the colour of the ring is blue, and the center colour is red. With this information we can generate the checkout URL. 
-
-If we wished to error checkout our circle we could take the distance in the array from the center point we chose to find the coordinates for the ring: (6, 6 - 3) -> (6, 3). We should also determine the diameter of the circle so we walk down from the center point and find outside the circle to be 3 pixels down. This way we know 2 things: first that the diameter of the circle is 7, and second that we are in fact not at the center pixel of the circle because we had to walk three up and one down. We then move our center point to (6, 5). Knowing this we can also check our x center point. So we choose an arbitrary x direction and walk. If we choose left and realize we need to walk three to the left, knowing that our inner circle diameter is 3 then we know the center point is at (5, 5). With this we can go back to determining the circle by adding half our inner circle diameter plus half of our ring diamter minus the center point to find the top mid center of the the ring which is (5, round_down(1.5 + 1) - 5) -> (5, 3). We can then determine that the location of the sides and bottom of the ring will be the same fraction of reversed signs:
-
-```
-top: (5, round_down(1.5 + 1) - 5) -> (5, 3)
-left: (round_down(1.5 + 1) - 5, 5) -> (5, 3)
-right: (round_down(1.5 + 1) + 5, 5) -> (5, 3)
-bottom: (5, round_down(1.5 + 1) + 5) -> (5, 3)
-```
-
-So we are left with an array of [b, b, b, b]. If any of these values were not blue we would invalidate the circles and begin the process again with a new image, or escalate to a more intensive algorithm. 
+- **product code:** The character sequence that uniquely identify a product. These are stored in a mapping of product codes to product names.
+- **sequence:** The sequence of either brightness values or RGB codes of image pixels (we translate primary colors to simpler codes for fixed length sequences).
+- **coordinate map:** The function for generating a sequence of coordinate positions based on a center point and a radius.
 
 
-#### Sampling
+### Core Functionality
 
-Another very quick test that we could do, potentially before our simple analysis, is to sample to cropped image space for expected results. If know that our overlay will be a specific ratio inside our cropped space we could take pixels from the corners, sides, top, inside the overlay, and the center and determine if they match our assumptions. Using our previous example this would look like:
+Taking what I've learned from previous iterations I realized that the quickest approximation (so far) for detecting a sequence from an image is by taking a coordinate map and applying it to various likely locations on the image. If we use our assumptions about where the symbol is most likely to lie within an image we can limit the number of locations that we need to sample. At the present moment I have it set to sample from the center point of the image and 4 directions (left, right, up, down) that are 20% translations in any direction. At each of these translated center points I recalculate the coordinate map with a radius of 75% of the image, then 10% increased and decreased (85% and 65% respectively). This amounts to 15 (5 center points * 3 radii) coordinate maps applied to the image. Given that this step isn't very computationally expensive we can repeat it many times to give us a greater certainty that we've found the circle. And if the circle is found in the first iteration then the search stops and the sequence is returned. That way we can account for the worst case, but hope for the best. Ideally if we preprocess the image properly and enforce strict assumptions from the client side we should see a relatively high level of success.
 
-```
-# corners
-top_left_corner = [1, 1]
-bottom_left_corner = [1, 8]
-top_right_corner = [8, 1]
-bottom_right_corner = [8, 8]
+Additionally, I have added a "fuzzy matching" for the sequences so that if a coordinate map covers 90% of the elements then we can still potentially correctly identify the product code. This is intended to account for image noise, motion blur, brightness variance, etc. from real world examples. The _issue_ with fuzzy matching the product sequences is that the implementation that I have at the moment is slow. It has become the greatest bottleneck behind image filtering with the RAG Merge filter. I don't have insight into the actual implementation because I'm using a library, but I know it is at the least O(n<sup>2</sup>) and likely worse. I want to focus first on correctly identifying the sequences bands, and then I'll focus on speed.
 
-# top, bottom, and sides
-top = [1, 5]
-bottom = [5, 8]
-left = [5, 1]
-right = [8, 5]
+The beauty about separating out the logic for the coordinate maps is that we can completely isolate a symbol per coordinate map and then we can easily translate and transform it before applying it to an image to identify sequences. And because the sequences are based on either RGB color values or brightness values, then we have a lot of flexibility of what symbol we use.
 
-# center
-center_point = [5, 5]
-```
 
-From these points we expect that the corners will be red, the sides, top and bottom will be blue, and the center will be red. In reality we can see that all of our assumptions are correct except for the bottom and right are red aswell. This means that our circle is not exactly alighed with our overlay. From this we can escalate to our simple method of detection, but using the previous information we can begin walking to the right and down. If we identify that the ring is in both of these directions we can assume we have found the circle and return the colors.
+### Assumptions
 
-For the sampling we could also use a median group sample to account for pixel color variability.
+A lot of the algorithm relies on some assumptions about the image:
 
-# Overlay Assumption
+- The image must be a certain size with the symbol as close to the center as possible.
+- It must be taken from a straight angle so the symbol isn't skewed.
+- There shouldn't too much noise or varying brightnesses
+- It should be large enough that it takes up about 75% of the frame. If these conditions are approximately met then the algorithm should be able to identify the sequence on the first iteration and very quickly return the product code.
 
-We can increase our validations by making some assumptions about the overlay. If we know that the image will be cropped to a specific ratio and the overlay is in the exact same location on every crop, then as we use our simple detection method we can we can use this assumption to validate on the fly. So for the first walk to the right: We assume that the center point is the center of the crop and walk right from there, and we know exactly where the overlay inner edge starts, so if we reach the circles inner edge before the pixel when the overlay starts we know that either the circle is offset to the left or the circle is smaller than the overlay. We can decide which of these is true by knowing if the overlay width is larger than the circle width then the latter is true, if they are approximately equal then it's the former. 
 
-Let's say then that we know it's offset by 5 pixels, we could then decrement our center x coordinate when we walk left. Then if the circle matches with overlay we know our assumption was right. There could be the case that the right side appears smaller in the photo becasue the fabic is angled, but if that is the case checking the left side would correct for that. If this process is repeated for all directions, continually correcting for offsets, we can be fairly confident in our assumption.
+### Image Filtering
+
+In reality, we will have noise in images. The incoming images will be taken by users in a variety of locations and the symbol will be on fabric so the image could be skewed, too dark, too light, have undefined noise, too close, too far, etc. In order to counteract the presence of noise we can filter the images before we begin processing. We have simple merge and sharpening that we do to every image which help reduce a minimal amount of noise, however I have implemented RAG Merge filtering which can greatly reduce excess noise from an image and give us a really clean image to work with. The issue is that it's resource intensive. We could potentially run this on an external GPU, or test running it on client machines, but if we could preprocess every image with this quickly it would greatly increase our success rate.
