@@ -55,6 +55,12 @@ def test_detect_circle_thin_18_square():
     assert product == 'circle-18-multi-color'
 
 
+def test_detect_circle_thick_18_square_all_colors():
+    product = get_product("circle_thick_18_square_all_colors.png")
+
+    assert product == 'circle-18-all-colors'
+
+
 # Off center circles:
 
 
