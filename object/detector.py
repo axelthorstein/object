@@ -25,10 +25,6 @@ class Detector:
     def get_center_variations(self, center_point):
         """Get slight variations of the center point for sampling.
 
-        TODO:
-            - Make the transformation functions cleaner.
-            - Make the variation equal to .75 of the width of the ring.
-
         Returns:
             Tuple[Pixel]: The list of varied center points.
         """
@@ -36,10 +32,14 @@ class Detector:
 
         variations = [
             center_point,
-            Pixel(image, (int(center_point.x * 0.8), center_point.y)),
-            Pixel(image, (center_point.x, int(center_point.y * 0.8))),
-            Pixel(image, (int(center_point.x * 1.2), center_point.y)),
-            Pixel(image, (center_point.x, int(center_point.y * 1.2)))
+            Pixel(image, (int(center_point.x * 0.85), center_point.y)),
+            Pixel(image, (center_point.x, int(center_point.y * 0.85))),
+            Pixel(image, (int(center_point.x * 1.15), center_point.y)),
+            Pixel(image, (center_point.x, int(center_point.y * 1.15))),
+            Pixel(image, (int(center_point.x * 0.85), center_point.y * 0.85)),
+            Pixel(image, (center_point.x * 1.15, int(center_point.y * 0.85))),
+            Pixel(image, (int(center_point.x * 1.15), center_point.y * 1.15)),
+            Pixel(image, (center_point.x * 0.85, int(center_point.y * 1.15)))
         ]
 
         return variations
@@ -47,12 +47,15 @@ class Detector:
     def get_radius_variations(self, center_point):
         """Get slight variations of the radius for sampling.
 
+        Note: We want the radius to be 66% of the image, so that's a diameter
+        of .66 or a radius of .33.
+
         Returns:
             Tuple[int]: The list of varied radii.
         """
-        radius = (center_point.y + center_point.x) * .35
+        radius = (center_point.y + center_point.x) * .34
 
-        return (radius, radius * 1.1, radius * 0.8)
+        return (radius, radius * 1.2, radius * 0.8)
 
     def get_product_name(self, center_point, radius):
         """Detect an object in an image and return the corresponding product.
