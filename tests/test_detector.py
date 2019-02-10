@@ -16,6 +16,9 @@ def get_product(image_name):
     return detector.detect_product()
 
 
+# Known products:
+
+
 def test_detect_circle_black_and_white():
     product = get_product("circle_black_and_white.png")
 
@@ -52,14 +55,7 @@ def test_detect_circle_thin_18_square():
     assert product == 'circle-18-multi-color'
 
 
-def test_detect_circle_thick_18_square_random_colors():
-    with raises(ProductException) as exception:
-        get_product("circle_thick_18_square_random_colors.png")
-
-    assert str(exception.value) == 'Product not found.'
-
-
-# Off Center Rings:
+# Off center circles:
 
 
 def test_detect_circle_thick_18_round():
@@ -130,6 +126,46 @@ def test_detect_circle_thick_18_square_sim_colors():
     assert product == 'circle-18-square-sim-colors'
 
 
-# def test_detect_circle_peach_merged():
-#     product = get_product("peach_merged.png")
-#     assert product
+# Unknown product tests:
+
+
+def test_detect_circle_thick_18_square_random_colors():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_random_colors.png")
+
+    assert str(exception.value) == 'Product not found.'
+
+
+def test_detect_circle_thick_18_square_one_off():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_one_off.png")
+
+    assert str(exception.value) == 'Product not found.'
+
+
+def test_detect_circle_thick_18_square_pair_reversed():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_pair_reversed.png")
+
+    assert str(exception.value) == 'Product not found.'
+
+
+def test_detect_circle_thick_18_square_three_reversed():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_three_reversed.png")
+
+    assert str(exception.value) == 'Product not found.'
+
+
+def test_detect_circle_thick_18_square_one_removed():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_one_removed.png")
+
+    assert str(exception.value) == 'Product not found.'
+
+
+def test_detect_circle_thick_18_square_two_removed():
+    with raises(ProductException) as exception:
+        get_product("circle_thick_18_square_two_removed.png")
+
+    assert str(exception.value) == 'Product not found.'

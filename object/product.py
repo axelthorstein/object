@@ -45,14 +45,14 @@ class Product:
             for product in PRODUCT_MAP:
                 # If the products are 18 characters, then checking a substring
                 # of 16 characters will give a certainty of minimum 88%.
-                if (len(code) >= len(product) - 8 and
+                if (len(code) >= len(product) - 1 and
                         code[:(len(product) - 2)] in product):
                     return product
 
         # O(nm^2+), n = code length, m = number of pruducts
-        similar, _ = Product.check_similar(code, PRODUCT_MAP)
-        if similar:
-            return similar
+        # similar, _ = Product.check_similar(code, PRODUCT_MAP)
+        # if similar:
+        #     return similar
 
         return ''
 
