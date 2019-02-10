@@ -126,7 +126,7 @@ def test_sequence_to_color_code():
     Test that a sequence returns a valid code.
     """
     sequence = ['green', 'green', 'green', 'red', 'red', 'red', 'blue', 'blue']
-    expected = '0303030000000404'
+    expected = '33300044'
     actual = sequence_to_color_code(sequence)
 
     assert expected == actual

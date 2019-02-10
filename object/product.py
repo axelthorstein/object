@@ -33,16 +33,26 @@ class Product:
         if code in PRODUCT_MAP:
             return code
 
-        # O(n) time check.
+        # O(n), n = code length.
         for _ in code:
             code = code[1:] + code[0]
             if code in PRODUCT_MAP:
                 return code
 
-        # O(n^2+) time check.
-        similar, _ = Product.check_similar(code, PRODUCT_MAP)
-        if similar:
-            return similar
+        # O(n * m), n = code length, m = number of pruducts.
+        for _ in code:
+            code = code[1:] + code[0]
+            for product in PRODUCT_MAP:
+                # If the products are 18 characters, then checking a substring
+                # of 16 characters will give a certainty of minimum 88%.
+                if (len(code) >= len(product) - 1 and
+                        code[:(len(product) - 2)] in product):
+                    return product
+
+        # O(nm^2+), n = code length, m = number of pruducts
+        # similar, _ = Product.check_similar(code, PRODUCT_MAP)
+        # if similar:
+        #     return similar
 
         return ''
 
