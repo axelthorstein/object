@@ -33,16 +33,24 @@ class Product:
         if code in PRODUCT_MAP:
             return code
 
-        # O(n) time check.
+        # O(n), n = code length.
         for _ in code:
             code = code[1:] + code[0]
             if code in PRODUCT_MAP:
                 return code
 
-        # O(n^2+) time check.
-        similar, _ = Product.check_similar(code, PRODUCT_MAP)
-        if similar:
-            return similar
+        # O(n * m), n = code length, m = number of pruducts.
+        for _ in code:
+            code = code[1:] + code[0]
+            for product in PRODUCT_MAP:
+                if len(code) - 1 >= len(product):
+                    if code[:(len(product) - 2)] in product:
+                        return product
+
+        # O(nm^2+), n = code length, m = number of pruducts
+        # similar, _ = Product.check_similar(code, PRODUCT_MAP)
+        # if similar:
+        #     return similar
 
         return ''
 
