@@ -1,7 +1,7 @@
 class CoordinateMap:
     """An abstract class for sampling the coordinates from a map."""
 
-    def get_coordinates():
+    def get_coordinates():  # pylint: disable=no-method-argument
         """Abstract method for returning the coordinates of a map.
 
         Returns:

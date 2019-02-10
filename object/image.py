@@ -14,14 +14,14 @@ class Image:
 
     def __init__(self,
                  image_path,
-                 crop=True,
+                 crop=False,
+                 compress=False,
                  apply_filters=True,
-                 merge_filter=False,
-                 compress=True):
+                 merge_filter=False):
         self.crop = crop
+        self.compress = compress
         self.apply_filters = apply_filters
         self.merge_filter = merge_filter
-        self.compress = compress
         self.image = self.preprocess_image(image_path)
         self.center_point = self.set_center_point()
 
